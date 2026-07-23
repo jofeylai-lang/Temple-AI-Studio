@@ -37,8 +37,13 @@ D:\AI\Jofey AI Studio\apps\temple-product-video-generator\release\TempleProductV
 - `docs/V1_FINAL_QA_REPORT.md`
 - `docs/V1_IMPLEMENTATION_REPORT.md`
 - `docs/V1_KNOWN_LIMITATIONS.md`
+- `docs/V1_OPERATOR_HANDOFF.md`
+- `docs/V1_PRODUCTION_DEPLOYMENT_REPORT.md`
+- `docs/V1_PRODUCTION_PATHS.md`
 - `docs/V1_RELEASE_MANIFEST.md`
 - `docs/V1_RELEASE_NOTES.md`
+- `docs/V1_SUPPORT_AND_DIAGNOSTICS.md`
+- `docs/V1_UPGRADE_AND_ROLLBACK.md`
 - `docs/V1_USER_QUICKSTART_ZH_TW.md`
 - `docs/V1_VALIDATION_REPORT.md`
 
@@ -55,6 +60,8 @@ data/projects/
 data/exports/
 data/backups/
 data/evidence/
+data/logs/
+data/support/
 ```
 
 ## Backup
