@@ -103,6 +103,12 @@ Navigation:
 
 - `V1_DOCUMENT_INDEX.md`
 
+## Cleanup Status
+
+Old files, old product experiments, and prior trial works were removed from the active repository after baseline.
+
+The active V1 repository now keeps V1 definition, planning, validation, operations, and governance documents, while excluding obsolete experiment assets and generated media.
+
 ## V1 Product Scope
 
 Included:
@@ -202,4 +208,3 @@ Breakdown:
 Temple Product Video Generator is V1 Ready for CEO Review.
 
 Implementation should not begin until CEO review is complete and generation path is approved.
-

@@ -35,6 +35,21 @@ No destructive file operations were performed.
 - `REVIEW_REPORT.md`
 - `V1_READY_REPORT.md`
 
+## Cleanup Applied After Baseline
+
+Old files and experiment works removed from the active repository:
+
+- `docs/PROJECT_AUDIT.md`
+- `docs/README.md`
+- `docs/requirements/`
+- `image_factory/`
+- Prior `videos/factory/projects/2026/07/09/vf-*` experiment folders
+- Ignored media/export folders related to those experiments
+
+Reason:
+
+The CEO direction was to remove old files, old products, and trial works instead of carrying them forward into the active V1 project.
+
 ## Existing Documents Modified
 
 - `AUDIT_REPORT.md`
@@ -94,6 +109,16 @@ The product was close to expanding into universal AI infrastructure, multi-provi
 Fix:
 
 Reconfirmed these as out of scope in V1 planning, release checklist, technical plan, architecture plan, and risk log.
+
+### Historical Experiment References
+
+Problem:
+
+Some planning documents still referenced old experiment folders or `image_factory`.
+
+Fix:
+
+Updated active V1 planning documents to treat those as historical lessons only, not active assets or required folders.
 
 ### Documentation Encoding Risk
 
@@ -212,4 +237,3 @@ Acceptance Test Plan defines how to validate once implementation begins.
 ## Review Result
 
 V1 documentation package is internally consistent and ready for CEO review.
-

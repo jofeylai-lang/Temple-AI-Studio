@@ -143,7 +143,7 @@ The product depends on:
 
 ## External Tool Dependencies
 
-Current project context includes external tools from prior experiments:
+Current project context has historical knowledge from prior experiments, but the old experiment assets have been removed from the active repository:
 
 - Local ComfyUI environment
 - LivePortrait setup

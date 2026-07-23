@@ -61,7 +61,7 @@ videos/factory/projects/YYYY/MM/DD/project-id/
 
 Purpose:
 
-Platform-specific final or review exports.
+Planned location for platform-specific final or review exports. This folder should be created only when V1 export work begins.
 
 Recommended dated pattern:
 
@@ -79,7 +79,7 @@ Product reference images, brand images, and reusable image assets.
 
 Purpose:
 
-General studio outputs and reports. Temple Product Video Generator should avoid duplicating final video exports here unless a specific reporting need exists.
+Optional future location for general studio outputs and reports. Temple Product Video Generator should avoid creating or duplicating final video exports here unless a specific reporting need exists.
 
 ### `evaluations/`
 

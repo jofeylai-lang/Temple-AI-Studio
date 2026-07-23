@@ -65,7 +65,7 @@ Recommended scope:
 - Input: product name, one product image, target platform, short selling point
 - Output: 9:16 video, caption, subtitles, metadata
 - First provider path: manual/cloud or ComfyUI-assisted, not a universal engine
-- Reuse: `videos/factory`, `prompts/video-factory`, `outputs/video-factory`, platform export folders
+- Reuse: `videos/factory`, `prompts/video-factory`, and V1 export folders created only when needed
 
 ### 2. Social Post Generator
 
@@ -83,7 +83,7 @@ Recommended scope:
 
 - Input: topic, audience, platform, image style
 - Output: image prompt, post text, hashtags, metadata, one generated/static visual when provider is available
-- Reuse: `image_factory`, `prompts`, `images`, `outputs`
+- Reuse: `prompts`, `images`, and V1 output folders created only when needed
 
 ### 3. Temple Reels Generator
 
@@ -271,13 +271,14 @@ This is a future recommendation, not an implemented change.
 
 ### Reuse Existing Experiments
 
-Use existing experiment folders as references:
+Earlier experiment folders were removed from the active repository after the V1 baseline cleanup.
 
-- `vf-demo-0001`: reference for assembling images, narration, subtitles, and exports
-- `vf-liveportrait-0001`: reference for local portrait animation
-- `vf-speaking-demo-0001`: reference for portrait motion plus Mandarin narration
-- `vf-fullbody-0001`: evidence that local SVD is not enough for realistic full-body motion
-- `vf-cloud-platform-0001`: reference for cloud platform testing
+The project should preserve only the lessons learned in documentation:
+
+- Static keyframe assembly was useful as a concept, but not an active V1 asset.
+- LivePortrait proved local portrait motion can work, but it is not part of Product Video Generator V1.
+- Stable Video Diffusion full-body tests were not suitable for V1 quality.
+- Cloud platform handoff notes informed the local/cloud/hybrid decision model, but old handoff assets are not active V1 inputs.
 
 ### Separate Experiment From Product
 

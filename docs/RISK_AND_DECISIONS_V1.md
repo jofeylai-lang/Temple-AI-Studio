@@ -82,7 +82,19 @@ Medium.
 
 Disposition:
 
-Not blocking V1 readiness because V1-critical docs have been repaired or written cleanly.
+Not blocking V1 readiness because V1-critical docs have been repaired or written cleanly, and old active references have been removed where they conflicted with V1.
+
+### Old Experiment Cleanup
+
+Old experiment folders and old Image Factory planning assets were removed from the active repository after baseline.
+
+Risk level:
+
+Low.
+
+Disposition:
+
+Accepted. The active project now favors V1 readiness over preserving exploratory artifacts in the working tree.
 
 ### Git Ownership
 
@@ -145,4 +157,3 @@ CEO should approve:
 ## Definition of Done
 
 Risk and Decisions V1 is complete when key V1 decisions and non-blocking risks are documented.
-
