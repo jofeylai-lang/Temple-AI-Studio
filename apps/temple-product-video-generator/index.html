@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Temple Product Video Generator Alpha</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <div class="brand">
+          <span class="brand-mark">T</span>
+          <div>
+            <strong>Temple AI Studio</strong>
+            <span>Product Video Generator Alpha</span>
+          </div>
+        </div>
+        <nav class="nav">
+          <button class="nav-item" data-route="home">Home</button>
+          <button class="nav-item" data-route="library">Product Library</button>
+          <button class="nav-item" data-route="create">Create Video</button>
+          <button class="nav-item" data-route="progress">Generation Progress</button>
+          <button class="nav-item" data-route="preview">Preview</button>
+          <button class="nav-item" data-route="scene">Scene Detail</button>
+          <button class="nav-item" data-route="export">Export</button>
+        </nav>
+        <div class="sidebar-note">
+          <strong>V1 Alpha</strong>
+          <span>AI engines are placeholders. Workflow, navigation, validation, and pipeline boundaries are runnable.</span>
+        </div>
+      </aside>
+
+      <div class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Runnable Prototype</p>
+            <h1 id="screen-title">Temple Product Video Generator</h1>
+          </div>
+          <div class="status-strip" id="status-strip"></div>
+        </header>
+
+        <main id="app" class="content" tabindex="-1"></main>
+      </div>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

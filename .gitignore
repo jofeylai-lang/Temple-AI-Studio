@@ -29,6 +29,7 @@ Desktop.ini
 *.jpg
 *.jpeg
 *.webp
+!apps/temple-product-video-generator/assets/screenshots/*.png
 
 # AI model files and local model artifacts
 *.safetensors
@@ -65,4 +66,3 @@ videos/factory/**/preview/
 videos/factory/**/audio/
 image_factory/output/
 outputs/
-
