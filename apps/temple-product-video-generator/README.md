@@ -1,42 +1,44 @@
 # Temple Product Video Generator V1
 
-Temple Product Video Generator 是 Temple AI Studio 的第一個可實際使用產品。
+Temple Product Video Generator 是 Temple AI Studio 的第一個可日常使用產品。
 
-V1 採用本機優先，不呼叫付費 API，不需要 GitHub CLI。即使沒有 ComfyUI、Whisper 或 TTS，也可以使用商品照片、繁體中文內容模板與 FFmpeg 產生可播放的 9:16 MP4。
+V1 使用本機流程，不會自動呼叫付費 API。系統會使用商品資料、商品照片、中文描述、內容模型與 FFmpeg 建立 9:16 MP4 影片和完整交付包。ComfyUI、Whisper、TTS 在 V1 中屬於可設定的未來整合項目；沒有連線時會使用本機備援流程。
 
-## 啟動方式
+## 啟動
 
-雙擊：
+開發版本：
 
 ```text
 start.bat
 ```
 
-或執行：
+或：
 
 ```powershell
-cd "D:\AI\Jofey AI Studio\apps\temple-product-video-generator"
 python server.py
 ```
 
-啟動後開啟：
+瀏覽器網址：
 
 ```text
 http://127.0.0.1:4173
 ```
 
-使用期間請保留啟動視窗開啟。
+正式安裝版請使用：
 
-## 一鍵驗證
+```text
+D:\AI\Temple Product Video Generator\start.bat
+```
+
+## 一鍵測試
 
 ```powershell
-cd "D:\AI\Jofey AI Studio\apps\temple-product-video-generator"
 python server.py --smoke-test
 ```
 
-驗證會建立示範商品、建立影片專案、重生一個場景、批准專案、輸出 MP4，並檢查完整內容包。
+測試會建立示範商品、商品照片、影片專案、場景、字幕、預覽影片、核准狀態與 MP4 輸出包。
 
-## 本機需求
+## 需要的本機工具
 
 必要：
 
@@ -44,37 +46,37 @@ python server.py --smoke-test
 - Pillow
 - FFmpeg
 
-本機驗收時偵測到的 FFmpeg：
+目前偵測到的 FFmpeg 路徑：
 
 ```text
 C:\Program Files\Softdeluxe\Free Download Manager\ffmpeg.exe
 ```
 
-若 FFmpeg 不存在，系統仍能保存商品、照片、腳本、場景、字幕、Prompt 與 Metadata，但不會假裝輸出 MP4。
+如果 FFmpeg 不可用，系統仍可建立商品資料、場景、字幕、文案、生成提示詞與 metadata，但無法輸出 MP4。
 
-選用：
+可選：
 
 - ComfyUI
 - Whisper
 - 本機 TTS
 
-## 使用流程
+## 操作流程
 
-1. 進入「商品資料庫」。
+1. 開啟「商品資料庫」。
 2. 建立或選擇商品。
 3. 上傳一張或多張商品照片。
-4. 需要時排序、替換或移除照片。
-5. 進入「建立影片」。
-6. 輸入繁體中文影片需求。
-7. 產生腳本、場景、旁白、字幕、Prompt、Caption、SEO、Metadata 與預覽影片。
-8. 在「影片預覽」檢查整支影片。
-9. 在「場景細節」編輯、批准或重生單一場景。
-10. 批准整支影片。
-11. 匯出完整內容包。
+4. 排序、替換或移除照片。
+5. 開啟「建立影片」。
+6. 輸入中文影片需求。
+7. 產生內容包與影片。
+8. 前往「影片預覽」檢查影片與文案。
+9. 前往「場景細節」修改、核准或只重產單一場景。
+10. 核准完整影片。
+11. 前往「輸出」建立完整交付包。
 
-## 匯出內容包
+## 輸出內容
 
-每個完成專案會輸出：
+每個影片專案會輸出：
 
 - `final_video.mp4`
 - `final_video_subtitled.mp4`
@@ -87,56 +89,91 @@ C:\Program Files\Softdeluxe\Free Download Manager\ffmpeg.exe
 - `thumbnail_suggestion.txt`
 - `materials_used.txt`
 
-預設輸出位置：
+輸出位置：
 
 ```text
-apps/temple-product-video-generator/data/exports/<project-id>/
+data\exports\<project-id>\
+```
+
+正式安裝版輸出位置：
+
+```text
+D:\AI\Temple Product Video Generator\data\exports\
 ```
 
 ## 資料位置
 
-預設資料位置：
+開發版本資料：
 
 ```text
-apps/temple-product-video-generator/data/
+apps\temple-product-video-generator\data\
 ```
 
-此資料夾保存商品、照片、專案、備份與輸出檔，已被 Git 忽略，避免把私人素材或生成影片提交到版本庫。
+正式安裝版資料：
+
+```text
+D:\AI\Temple Product Video Generator\data\
+```
+
+`data`、`runtime`、`release` 與快取檔案不納入 Git。
 
 ## 備份與還原
 
-在「設定」頁可以：
+「設定」頁提供：
 
 - 建立資料備份
 - 還原備份 zip
-- 產生操作證據圖
-- 建立 release package
+- 建立畫面證據
+- 建立發行包
+- 建立支援包
 
-還原備份前必須輸入：
+還原備份時必須輸入：
 
 ```text
 RESTORE
 ```
 
-系統會先建立安全備份，再執行還原。
+系統會先建立還原前安全備份，再執行還原。
+
+## 支援包
+
+在「設定」頁點擊：
+
+```text
+建立支援包
+```
+
+支援包輸出到：
+
+```text
+data\support\
+```
+
+支援包只包含版本資訊、工具狀態、已遮蔽敏感資訊的設定摘要與 logs。支援包不包含 API key、token、密碼、商品照片、生成影片、資料庫、生成提示詞、字幕、旁白或客戶敏感輸出。
 
 ## ComfyUI
 
-ComfyUI 是 V1 選用項目。
+ComfyUI 是 V1 的未來可替換 provider。
 
-可在「設定」頁填寫：
+目前可在「設定」頁填寫：
 
-- ComfyUI 位址
-- ComfyUI 工作流
+- ComfyUI 連線網址
+- ComfyUI 工作流程
 
-若 ComfyUI 尚未連線，V1 會使用可靠 fallback：
+沒有 ComfyUI 時，V1 會使用本機備援：
 
 ```text
-真實商品照片 + 場景圖片 + Ken Burns 動態 + 字幕 + FFmpeg MP4
+商品照片 + 場景文字 + Ken Burns 動態 + 字幕 + FFmpeg MP4
 ```
 
-## 移除方式
+## 安全原則
 
-若要移除程式，可刪除應用程式資料夾。
+刪除操作只移除應用內記錄，不會自動刪除正式安裝資料夾外的使用者檔案。
 
-請注意：刪除前請先備份 `data/`，否則商品、照片、專案和輸出影片會一起消失。
+不要手動刪除：
+
+```text
+data\
+```
+
+此資料夾包含商品、照片、專案、輸出、備份與操作證據。

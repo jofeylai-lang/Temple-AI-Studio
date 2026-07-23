@@ -1,56 +1,94 @@
 # V1 Backup And Recovery
 
-## 資料位置
+Product: Temple Product Video Generator
 
-預設資料夾：
+Version: 1.0.0
+
+## Data Location
+
+Development data:
 
 ```text
-apps/temple-product-video-generator/data/
+apps\temple-product-video-generator\data\
 ```
 
-包含：
+Production data:
 
-- 商品資料
-- 商品照片
-- 影片專案
-- 預覽影片
-- 匯出內容包
-- 備份
-- 操作證據圖
+```text
+D:\AI\Temple Product Video Generator\data\
+```
 
-## 建立備份
+The data folder contains:
 
-在應用程式「設定」頁按：
+- product records
+- uploaded product photos
+- video projects
+- scene data
+- preview videos
+- export packages
+- backups
+- evidence screenshots
+- logs
+- support packages
+
+## Create Backup
+
+From the Settings screen, click:
 
 ```text
 建立資料備份
 ```
 
-備份會建立在：
+Production backups are saved in:
 
 ```text
-apps/temple-product-video-generator/data/backups/
+D:\AI\Temple Product Video Generator\data\backups\
 ```
 
-## 還原備份
+Backup folders and ZIP files are timestamped.
 
-1. 到「設定」頁。
-2. 選擇備份 zip。
-3. 在確認欄輸入 `RESTORE`。
-4. 按「還原備份」。
+## Restore Backup
 
-系統會先建立一份安全備份，再執行還原。
-
-## 手動備份
-
-關閉應用程式後，複製整個資料夾：
+1. Open Settings.
+2. Select the backup `.zip` file.
+3. Type:
 
 ```text
-apps/temple-product-video-generator/data/
+RESTORE
 ```
 
-## 復原原則
+4. Click:
 
-- 不會在未確認情況下覆蓋資料。
-- 刪除商品或專案紀錄不會自動刪除原始輸出檔。
-- 若專案狀態不完整，可從「生成進度」重新組裝預覽或重新匯出。
+```text
+還原備份
+```
+
+Before restore, the application creates a safety backup of the current data. Restore never overwrites data without the `RESTORE` confirmation text.
+
+## Recovery Validation
+
+The production rehearsal verified that a restored project can:
+
+- open successfully
+- display scenes
+- retain product photos
+- retain settings
+- export again
+
+Validated production rehearsal backup:
+
+```text
+D:\AI\Temple Product Video Generator\data\backups\temple-product-video-generator-backup-20260724-013040.zip
+```
+
+## Safe Cleanup
+
+Temporary frame and clip files can be cleaned after a successful backup if the final MP4 no longer needs regeneration.
+
+Do not delete:
+
+```text
+D:\AI\Temple Product Video Generator\data\
+```
+
+This folder contains operational product, project, upload, export and recovery data.

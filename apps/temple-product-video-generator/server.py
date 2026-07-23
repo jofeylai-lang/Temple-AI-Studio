@@ -30,8 +30,11 @@ EXPORT_ROOT = DATA_ROOT / "exports"
 RUNTIME_ROOT = APP_ROOT / "runtime"
 BACKUP_ROOT = DATA_ROOT / "backups"
 EVIDENCE_ROOT = DATA_ROOT / "evidence"
+LOG_ROOT = DATA_ROOT / "logs"
+SUPPORT_ROOT = DATA_ROOT / "support"
 RELEASE_ROOT = APP_ROOT / "release"
 VERSION = "1.0.0"
+CURRENT_SCHEMA_VERSION = 1
 
 FRAME_SIZE = (1080, 1920)
 FPS = 25
@@ -64,8 +67,17 @@ def safe_name(value: str, fallback: str = "item") -> str:
 
 
 def ensure_dirs() -> None:
-    for path in [DATA_ROOT, UPLOAD_ROOT, PROJECT_ROOT, EXPORT_ROOT, RUNTIME_ROOT, BACKUP_ROOT, EVIDENCE_ROOT, RELEASE_ROOT]:
+    for path in [DATA_ROOT, UPLOAD_ROOT, PROJECT_ROOT, EXPORT_ROOT, RUNTIME_ROOT, BACKUP_ROOT, EVIDENCE_ROOT, LOG_ROOT, SUPPORT_ROOT, RELEASE_ROOT]:
         path.mkdir(parents=True, exist_ok=True)
+
+
+def append_log(name: str, message: str, payload: dict | None = None) -> None:
+    ensure_dirs()
+    record = {"time": now_iso(), "message": message}
+    if payload:
+        record["details"] = payload
+    with (LOG_ROOT / name).open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
 def atomic_write_json(path: Path, payload: dict) -> None:
@@ -144,9 +156,26 @@ def load_db() -> dict:
     if not DB_PATH.exists():
         atomic_write_json(DB_PATH, empty_db())
     db = json.loads(DB_PATH.read_text(encoding="utf-8"))
+    db = migrate_db(db)
     db.setdefault("products", [])
     db.setdefault("projects", [])
     db.setdefault("errors", [])
+    return db
+
+
+def migrate_db(db: dict) -> dict:
+    version = int(db.get("schemaVersion", 0) or 0)
+    if version > CURRENT_SCHEMA_VERSION:
+        raise ValueError("資料版本高於目前程式可支援版本，請先備份並使用相容版本。")
+    if version < CURRENT_SCHEMA_VERSION:
+        migration_dir = BACKUP_ROOT / "migrations"
+        migration_dir.mkdir(parents=True, exist_ok=True)
+        backup_path = migration_dir / f"database-before-schema-{CURRENT_SCHEMA_VERSION}-{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+        backup_path.write_text(json.dumps(db, ensure_ascii=False, indent=2), encoding="utf-8")
+        db["schemaVersion"] = CURRENT_SCHEMA_VERSION
+        db["migratedAt"] = now_iso()
+        atomic_write_json(DB_PATH, db)
+        append_log("recovery.log", "database-migrated", {"from": version, "to": CURRENT_SCHEMA_VERSION, "backup": str(backup_path)})
     return db
 
 
@@ -201,6 +230,7 @@ def health_payload() -> dict:
         "status": "ok",
         "time": now_iso(),
         "dataRoot": str(DATA_ROOT),
+        "logRoot": str(LOG_ROOT),
         "ffmpeg": {
             "path": ffmpeg,
             "available": bool(ffmpeg and Path(ffmpeg).exists()),
@@ -620,6 +650,7 @@ def create_project(payload: dict) -> dict:
         }
         db["projects"].append(project)
         save_db(db)
+    append_log("generation.log", "project-created", {"projectId": project_id, "productId": product["id"], "platform": project["platform"]})
     return render_project(project_id, preview=True)
 
 
@@ -734,9 +765,10 @@ def render_project(project_id: str, preview: bool) -> dict:
             project = find_item(db["projects"], project_id)
             project["status"] = "Partially Failed"
             project.setdefault("errors", []).append({"message": message, "at": now_iso()})
-            db.setdefault("errors", []).append({"projectId": project_id, "message": message, "at": now_iso()})
-            save_db(db)
-            return project
+        db.setdefault("errors", []).append({"projectId": project_id, "message": message, "at": now_iso()})
+        save_db(db)
+        append_log("recovery.log", "project-render-failed", {"projectId": project_id, "message": message})
+        return project
 
 
 def export_project(project_id: str) -> dict:
@@ -746,6 +778,7 @@ def export_project(project_id: str) -> dict:
             raise ValueError("專案尚未準備好匯出")
     project = render_project(project_id, preview=False)
     write_export_package(project)
+    append_log("generation.log", "project-exported", {"projectId": project_id, "outputDir": project.get("outputDir")})
     return project
 
 
@@ -760,7 +793,9 @@ def create_backup() -> dict:
             if BACKUP_ROOT in path.parents or EVIDENCE_ROOT in path.parents:
                 continue
             archive.write(path, path.relative_to(DATA_ROOT))
-    return {"path": str(backup_path), "url": file_url(backup_path), "createdAt": now_iso()}
+    result = {"path": str(backup_path), "url": file_url(backup_path), "createdAt": now_iso()}
+    append_log("recovery.log", "backup-created", {"path": str(backup_path)})
+    return result
 
 
 def restore_backup(file_payload: dict, confirm: str) -> dict:
@@ -793,7 +828,41 @@ def restore_backup(file_payload: dict, confirm: str) -> dict:
                 target.unlink()
         shutil.move(str(child), str(target))
     shutil.rmtree(restore_root, ignore_errors=True)
+    append_log("recovery.log", "backup-restored", {"source": str(backup), "safetyBackup": safety.get("path")})
     return {"restored": True, "safetyBackup": safety}
+
+
+def sanitize_config(config: dict) -> dict:
+    blocked = ["api", "key", "token", "secret", "password"]
+    result = {}
+    for key, value in config.items():
+        if any(word in key.lower() for word in blocked):
+            result[key] = "[redacted]"
+        else:
+            result[key] = value
+    return result
+
+
+def create_support_package() -> dict:
+    ensure_dirs()
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    package_path = SUPPORT_ROOT / f"temple-product-video-generator-support-{stamp}.zip"
+    summary = {
+        "version": VERSION,
+        "createdAt": now_iso(),
+        "health": health_payload(),
+        "config": sanitize_config(load_config()),
+        "privacy": "Support package excludes product photos, generated videos, database contents, prompts, captions, narration, and customer-sensitive exports.",
+    }
+    summary_path = SUPPORT_ROOT / f"support-summary-{stamp}.json"
+    summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    with zipfile.ZipFile(package_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.write(summary_path, "support-summary.json")
+        for path in LOG_ROOT.glob("*.log"):
+            archive.write(path, f"logs/{path.name}")
+    summary_path.unlink(missing_ok=True)
+    append_log("app.log", "support-package-created", {"path": str(package_path)})
+    return {"path": str(package_path), "url": file_url(package_path), "createdAt": now_iso()}
 
 
 def create_evidence_screenshots() -> dict:
@@ -907,8 +976,13 @@ def create_release_package() -> dict:
         "V1_IMPLEMENTATION_REPORT.md",
         "V1_USER_QUICKSTART_ZH_TW.md",
         "V1_KNOWN_LIMITATIONS.md",
+        "V1_OPERATOR_HANDOFF.md",
+        "V1_PRODUCTION_DEPLOYMENT_REPORT.md",
+        "V1_PRODUCTION_PATHS.md",
         "V1_RELEASE_MANIFEST.md",
         "V1_RELEASE_NOTES.md",
+        "V1_SUPPORT_AND_DIAGNOSTICS.md",
+        "V1_UPGRADE_AND_ROLLBACK.md",
         "V1_VALIDATION_REPORT.md",
     ]:
         source = APP_ROOT.parent.parent / "docs" / name
@@ -1075,7 +1149,9 @@ def make_clip(ffmpeg: str, frame: Path, output: Path, duration: int) -> None:
 def run_ffmpeg(cmd: list[str]) -> None:
     result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
     if result.returncode != 0:
-        raise RuntimeError(result.stderr.strip() or "FFmpeg 執行失敗")
+        error = result.stderr.strip() or "FFmpeg 執行失敗"
+        append_log("ffmpeg-error.log", "ffmpeg-failed", {"command": cmd[:3] + ["..."], "error": error[-2000:]})
+        raise RuntimeError(error)
 
 
 def build_srt(scenes: list[dict]) -> str:
@@ -1147,7 +1223,9 @@ class AppHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=str(APP_ROOT), **kwargs)
 
     def log_message(self, fmt, *args):
-        sys.stdout.write("[%s] %s\n" % (now_iso(), fmt % args))
+        message = fmt % args
+        sys.stdout.write("[%s] %s\n" % (now_iso(), message))
+        append_log("app.log", "http-request", {"message": message})
 
     def do_GET(self):
         try:
@@ -1156,7 +1234,6 @@ class AppHandler(SimpleHTTPRequestHandler):
             if path == "/api/health":
                 return json_response(self, health_payload())
             if path == "/api/state":
-                seed_demo_data()
                 return json_response(self, {"db": load_db(), "config": load_config(), "health": health_payload()})
             if path.startswith("/api/files/"):
                 return self.serve_data_file(path.removeprefix("/api/files/"))
@@ -1166,6 +1243,8 @@ class AppHandler(SimpleHTTPRequestHandler):
                 return json_response(self, {"ok": True, **create_evidence_screenshots()})
             if path == "/api/release/package":
                 return json_response(self, {"ok": True, **create_release_package()})
+            if path == "/api/support/package":
+                return json_response(self, {"ok": True, "supportPackage": create_support_package()})
             if path.startswith("/api/export-package/"):
                 project_id = path.rsplit("/", 1)[-1]
                 project = find_item(load_db()["projects"], project_id)
@@ -1346,7 +1425,6 @@ def smoke_test() -> int:
 
 def main() -> int:
     ensure_dirs()
-    seed_demo_data()
     if "--smoke-test" in sys.argv:
         return smoke_test()
     host = "127.0.0.1"
@@ -1354,6 +1432,7 @@ def main() -> int:
     server = ThreadingHTTPServer((host, port), AppHandler)
     print(f"Temple Product Video Generator V1 running at http://{host}:{port}")
     print(f"Data: {DATA_ROOT}")
+    append_log("app.log", "server-started", {"host": host, "port": port, "dataRoot": str(DATA_ROOT), "version": VERSION})
     try:
         server.serve_forever()
     except KeyboardInterrupt:
