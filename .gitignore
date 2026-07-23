@@ -1,0 +1,68 @@
+# System files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.old
+
+# Local notes and private workspace files
+.env
+.env.*
+*.local
+
+# Generated media and binary assets
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.gif
+*.wav
+*.mp3
+*.flac
+*.aac
+*.png
+*.jpg
+*.jpeg
+*.webp
+
+# AI model files and local model artifacts
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.onnx
+*.gguf
+*.bin
+
+# Python and local runtime artifacts
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Node and website runtime artifacts
+node_modules/
+.next/
+dist/
+build/
+
+# Local caches and generated working folders
+.cache/
+cache/
+tmp/
+temp/
+
+# Large product generation outputs
+videos/factory/exports/
+videos/factory/**/outputs/
+videos/factory/**/preview/
+videos/factory/**/audio/
+image_factory/output/
+outputs/
+

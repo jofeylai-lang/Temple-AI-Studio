@@ -1,0 +1,13 @@
+speaker_id: speaker_001
+authorized: false
+authorized_by: ""
+authorized_at: ""
+scope:
+  private_use: false
+  public_release: false
+  commercial_use: false
+  persistent_voice_model: false
+source_audio:
+  - ""
+notes: ""
+

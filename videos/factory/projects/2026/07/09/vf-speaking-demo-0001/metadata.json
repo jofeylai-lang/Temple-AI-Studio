@@ -1,0 +1,16 @@
+{
+  "project_id": "vf-speaking-demo-0001",
+  "created_date": "2026-07-09",
+  "source_image": "D:/人物卡/grok-image-9202c419-fb1e-4a09-b8da-63b7dec2b3d1.jpg",
+  "prompt": "Keep image quality, make the person gently turn her head left and right, smile naturally, and say: 大家好，這是測試影片",
+  "motion_provider": "LivePortrait",
+  "motion_template": "d5.pkl",
+  "voice_provider": "Windows SAPI",
+  "voice_text": "大家好，這是測試影片",
+  "output_ratio": "816x1264",
+  "duration_seconds": 4.93,
+  "notes": [
+    "The final MP4 preserves the animated video stream without re-encoding.",
+    "This is a head-motion and narration demo, not exact lip-sync."
+  ]
+}

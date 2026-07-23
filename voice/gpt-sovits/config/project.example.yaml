@@ -1,0 +1,29 @@
+project_id: speaker_001_v1
+display_name: "說話者名稱"
+language: zh
+authorized: false
+
+dataset:
+  raw_audio_dir: "datasets/raw/voice/speaker_001"
+  license_record: "datasets/licensed/voice/speaker_001/authorization.yaml"
+  processed_dir: "datasets/processed/gpt-sovits/speaker_001/v1"
+  transcript_manifest: "datasets/processed/gpt-sovits/speaker_001/v1/train.list"
+
+audio:
+  target_format: wav
+  sample_rate: 48000
+  channels: 1
+  sample_format: pcm_s16le
+  minimum_clip_seconds: 3
+  maximum_clip_seconds: 10
+
+training:
+  environment: "D:/AI/tools/GPT-SoVITS"
+  device: cuda
+  version: "待安裝時確認"
+  experiment_name: speaker_001_v1
+
+outputs:
+  weights_dir: "models/voice/gpt-sovits/speaker_001/v1"
+  inference_dir: "outputs/voice/gpt-sovits/speaker_001/v1"
+
