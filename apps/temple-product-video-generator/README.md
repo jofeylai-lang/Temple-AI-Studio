@@ -1,61 +1,148 @@
-# Temple Product Video Generator Alpha
+# Temple Product Video Generator V1
 
-This is the first runnable prototype for Temple Product Video Generator.
+Temple Product Video Generator is the first runnable product built on Temple AI Studio.
 
-It is a zero-install static application shell based on the approved V1 documentation.
+V1 is local-first. It does not call paid APIs, does not require GitHub CLI, and can still produce a usable 9:16 MP4 when ComfyUI, Whisper, or TTS are not connected.
 
 ## Launch
 
-From this folder:
+Double-click:
 
-```powershell
-python -m http.server 4173
+```text
+start.bat
 ```
 
-Then open:
+Or run:
+
+```powershell
+cd "D:\AI\Jofey AI Studio\apps\temple-product-video-generator"
+python server.py
+```
+
+Open:
 
 ```text
 http://127.0.0.1:4173
 ```
 
-Demo state:
+## One Command Validation
 
-```text
-http://127.0.0.1:4173/?demo=generated#preview
+```powershell
+cd "D:\AI\Jofey AI Studio\apps\temple-product-video-generator"
+python server.py --smoke-test
 ```
 
-## Included Modules
+The smoke test creates a demo product, creates a video project, regenerates one scene, approves the project, exports MP4, and verifies the required output package files.
 
-- Home
-- Product Library
-- Create Video
-- Generation Progress
-- Preview
-- Scene Detail
-- Export
+## Local Dependencies
 
-## Current Scope
+Required:
 
-The Alpha prototype provides real navigation, browser-local state, input validation, placeholder scene generation, scene-level regeneration, preview approval, and export package preparation.
-
-AI engines are not connected yet.
-
-Prepared provider slots:
-
-- Local ComfyUI
-- Local Whisper
+- Python 3
+- Pillow
 - FFmpeg
-- Future Cloud Provider
 
-## Source Documents
+Detected FFmpeg during V1 validation:
 
-This prototype follows:
+```text
+C:\Program Files\Softdeluxe\Free Download Manager\ffmpeg.exe
+```
 
-- `docs/PRODUCT_SPEC_V1.md`
-- `docs/USER_JOURNEY_V1.md`
-- `docs/CONTENT_MODEL_V1.md`
-- `docs/AI_REASONING_PIPELINE_V1.md`
-- `docs/APP_BLUEPRINT_V1.md`
-- `docs/VALIDATION_RULES_V1.md`
-- `docs/TECH_PLAN_V1.md`
-- `docs/DATA_MODEL_V1.md`
+If FFmpeg is not found, V1 will still save products, photos, scripts, scenes, subtitles, prompts, and metadata, but it cannot honestly export MP4.
+
+Optional:
+
+- ComfyUI
+- Whisper
+- Local TTS
+
+## ComfyUI
+
+ComfyUI is optional for V1.
+
+Use Settings to configure:
+
+- ComfyUI URL
+- Workflow name or path
+
+If ComfyUI is unavailable, V1 uses the reliable fallback path:
+
+```text
+real product photos + scene frames + Ken Burns motion + subtitles + FFmpeg MP4
+```
+
+## Workflow
+
+1. Open Product Library.
+2. Create or select a product.
+3. Upload one or more real product photos.
+4. Open Create Video.
+5. Enter the Traditional Chinese video request.
+6. Generate script, scenes, preview video, subtitles, caption, prompts, and metadata.
+7. Open Preview.
+8. Review the video and scene list.
+9. Open Scene Detail if one scene needs editing or regeneration.
+10. Approve the project.
+11. Export the complete content package.
+
+## Output Package
+
+Each completed project exports:
+
+- `final_video.mp4`
+- `final_video_subtitled.mp4`
+- `subtitles.srt`
+- `narration.txt`
+- `caption.txt`
+- `metadata.json`
+- `scenes.json`
+- `prompts.json`
+- `thumbnail_suggestion.txt`
+- `materials_used.txt`
+
+Default output location:
+
+```text
+apps/temple-product-video-generator/data/exports/<project-id>/
+```
+
+## Data Location
+
+Default data location:
+
+```text
+apps/temple-product-video-generator/data/
+```
+
+The data folder contains local products, projects, uploaded images, generated preview files, and exports. It is ignored by Git to avoid committing private materials or generated media.
+
+## Common Errors
+
+### FFmpeg Not Found
+
+Set the FFmpeg path in Settings.
+
+V1 validation found an existing FFmpeg at:
+
+```text
+C:\Program Files\Softdeluxe\Free Download Manager\ffmpeg.exe
+```
+
+### ComfyUI Not Connected
+
+This is not a V1 blocker. The app will show the connection status and continue using the local fallback generator.
+
+### No Product Photo
+
+Upload at least one product photo before creating a video.
+
+### MP4 Export Failed
+
+Open Generation Progress to read the user-facing error, then retry preview render or export.
+
+## Notes
+
+- User-facing copy defaults to Traditional Chinese and Taiwan usage.
+- V1 does not perform voice cloning.
+- V1 does not call paid cloud APIs.
+- V1 burns subtitles into scene frames and also exports `subtitles.srt`.

@@ -30,6 +30,8 @@ Desktop.ini
 *.jpeg
 *.webp
 !apps/temple-product-video-generator/assets/screenshots/*.png
+apps/temple-product-video-generator/data/
+apps/temple-product-video-generator/runtime/
 
 # AI model files and local model artifacts
 *.safetensors

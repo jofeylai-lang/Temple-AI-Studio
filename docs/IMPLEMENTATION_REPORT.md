@@ -8,6 +8,14 @@ Date: 2026-07-23
 
 Status: Alpha Ready Candidate
 
+Superseded by:
+
+- `V1_IMPLEMENTATION_REPORT.md`
+- `V1_VALIDATION_REPORT.md`
+- `V1_RELEASE_NOTES.md`
+
+This report is preserved as Alpha history. Current implementation status is V1.
+
 ## Source of Truth
 
 Implementation follows the approved V1 documents:

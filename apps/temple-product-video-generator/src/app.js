@@ -1,393 +1,373 @@
-import { platforms } from "./fixtures.js";
-import {
-  approvePreview,
-  buildPreviewPackage,
-  createDraftProject,
-  pipelineStages,
-  prepareExportPackage,
-  providerRegistry,
-  regenerateScene,
-  validateProjectInput
-} from "./pipeline.js";
-import {
-  createProjectId,
-  getSelectedProduct,
-  loadState,
-  resetState,
-  saveState
-} from "./state.js";
-
 const app = document.querySelector("#app");
-const screenTitle = document.querySelector("#screen-title");
+const title = document.querySelector("#screen-title");
 const statusStrip = document.querySelector("#status-strip");
 const navItems = [...document.querySelectorAll(".nav-item")];
 
-let state = loadState();
 let route = normalizeRoute(location.hash.replace("#", "") || "home");
-let progressTimer = null;
-
-if (new URLSearchParams(location.search).get("demo") === "generated") {
-  ensureGeneratedDemo();
-}
-
-render();
+let state = {
+  db: { products: [], projects: [] },
+  config: {},
+  health: {},
+  selectedProductId: "",
+  selectedProjectId: "",
+  selectedSceneId: "",
+  busy: false,
+  notice: "正在載入本機資料..."
+};
 
 window.addEventListener("hashchange", () => {
   route = normalizeRoute(location.hash.replace("#", "") || "home");
   render();
 });
 
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
   const target = event.target.closest("[data-action], [data-route]");
-  if (!target) return;
-
+  if (!target || state.busy) return;
   if (target.dataset.route) {
     navigate(target.dataset.route);
     return;
   }
-
-  handleAction(target.dataset.action, target);
+  await handleAction(target.dataset.action, target);
 });
 
-document.addEventListener("change", (event) => {
-  if (event.target.matches("[data-select-product]")) {
+document.addEventListener("change", async (event) => {
+  if (event.target.matches("[data-product-select]")) {
     state.selectedProductId = event.target.value;
-    state.lastNotice = "Selected product updated.";
-    saveAndRender();
+    state.notice = "已切換商品。";
+    render();
+  }
+  if (event.target.matches("[data-project-select]")) {
+    state.selectedProjectId = event.target.value;
+    const project = getProject();
+    state.selectedSceneId = project?.scenes?.[0]?.id || "";
+    state.notice = "已切換影片專案。";
+    render();
   }
 });
 
-function handleAction(action, target) {
-  const product = getSelectedProduct(state);
+boot();
 
-  if (action === "reset-demo") {
-    state = resetState();
-    navigate("home");
-    return;
-  }
+async function boot() {
+  await refreshState();
+  const product = getProduct();
+  const project = getProject();
+  state.selectedProductId ||= product?.id || "";
+  state.selectedProjectId ||= project?.id || "";
+  state.selectedSceneId ||= project?.scenes?.[0]?.id || "";
+  render();
+}
 
-  if (action === "save-product") {
-    const form = target.closest("form");
-    const formData = new FormData(form);
-    const id = `product-${Date.now()}`;
-    state.products = [
-      ...state.products,
-      {
-        id,
-        name: formData.get("name").trim(),
-        category: formData.get("category").trim(),
-        description: formData.get("description").trim(),
-        sellingPoint: formData.get("sellingPoint").trim(),
-        mainImage: formData.get("mainImage").trim(),
-        tags: []
-      }
-    ];
-    state.selectedProductId = id;
-    state.lastNotice = "Product saved to library.";
-    saveAndRender();
-    return;
-  }
+async function refreshState() {
+  const payload = await api("/api/state");
+  state.db = payload.db;
+  state.config = payload.config;
+  state.health = payload.health;
+  if (!state.selectedProductId && state.db.products[0]) state.selectedProductId = state.db.products[0].id;
+  if (!state.selectedProjectId && state.db.projects[0]) state.selectedProjectId = state.db.projects.at(-1).id;
+}
 
-  if (action === "start-create") {
-    navigate("create");
-    return;
-  }
-
-  if (action === "select-product") {
-    state.selectedProductId = target.dataset.productId;
-    state.lastNotice = "Product selected.";
-    saveState(state);
-    navigate("create");
-    return;
-  }
-
-  if (action === "start-generation") {
-    const form = document.querySelector("#create-form");
-    const formData = new FormData(form);
-    const draft = {
-      targetPlatform: formData.get("targetPlatform"),
-      tone: formData.get("tone"),
-      lengthTarget: formData.get("lengthTarget"),
-      materialNotes: formData.get("materialNotes"),
-      chineseDescription: formData.get("chineseDescription")
-    };
-    const validation = validateProjectInput(product, draft);
-
-    if (!validation.ok) {
-      renderValidationErrors(validation.errors);
-      return;
-    }
-
-    state.currentProject = createDraftProject(product, draft, createProjectId());
-    state.progressIndex = 0;
-    state.exportPackage = null;
-    state.lastNotice = "Generation pipeline started.";
-    saveState(state);
-    navigate("progress");
-    startProgress();
-    return;
-  }
-
-  if (action === "complete-generation") {
-    finishGeneration();
-    return;
-  }
-
-  if (action === "approve-preview") {
-    state.currentProject = approvePreview(state.currentProject);
-    state.lastNotice = "Preview approved.";
-    saveAndRender();
-    return;
-  }
-
-  if (action === "open-scene") {
-    state.selectedSceneId = target.dataset.sceneId;
-    saveState(state);
-    navigate("scene");
-    return;
-  }
-
-  if (action === "regenerate-scene") {
-    const sceneId = target.dataset.sceneId || state.selectedSceneId;
-    state.currentProject = regenerateScene(state.currentProject, sceneId);
-    state.selectedSceneId = sceneId;
-    state.lastNotice = "Scene regenerated as a placeholder version.";
-    saveAndRender();
-    return;
-  }
-
-  if (action === "prepare-export") {
-    const result = prepareExportPackage(state.currentProject);
-    if (!result.ok) {
-      state.lastNotice = result.reason;
-      saveAndRender();
-      return;
-    }
-    state.exportPackage = result.package;
-    state.currentProject = {
-      ...state.currentProject,
-      reviewStatus: "Exported",
-      metadata: {
-        ...state.currentProject.metadata,
-        exportStatus: "Prepared Placeholder"
-      }
-    };
-    state.lastNotice = "Export package prepared.";
-    saveAndRender();
+async function handleAction(action, target) {
+  try {
+    setBusy(true);
+    if (action === "save-product") await saveProduct();
+    if (action === "update-product") await updateProduct();
+    if (action === "delete-product") await deleteProduct(target.dataset.productId);
+    if (action === "upload-materials") await uploadMaterials();
+    if (action === "delete-material") await deleteMaterial(target.dataset.productId, target.dataset.materialId);
+    if (action === "create-project") await createProject();
+    if (action === "run-demo") await runDemo();
+    if (action === "open-project") openProject(target.dataset.projectId);
+    if (action === "open-scene") openScene(target.dataset.sceneId);
+    if (action === "save-scene") await saveScene();
+    if (action === "approve-scene") await approveScene(target.dataset.sceneId || state.selectedSceneId);
+    if (action === "regenerate-scene") await regenerateScene(target.dataset.sceneId || state.selectedSceneId);
+    if (action === "approve-project") await approveProject();
+    if (action === "render-project") await renderProject();
+    if (action === "export-project") await exportProject();
+    if (action === "save-settings") await saveSettings();
+    await refreshState();
+  } catch (error) {
+    state.notice = error.message || "操作失敗。";
+  } finally {
+    setBusy(false);
   }
 }
 
-function startProgress() {
-  clearInterval(progressTimer);
-  progressTimer = setInterval(() => {
-    state.progressIndex += 1;
-    if (state.progressIndex >= pipelineStages.length) {
-      clearInterval(progressTimer);
-      finishGeneration();
-      return;
-    }
-    saveAndRender();
-  }, 650);
+async function saveProduct() {
+  const data = formData("#product-form");
+  const result = await api("/api/products", { method: "POST", body: data });
+  state.selectedProductId = result.product.id;
+  state.notice = "商品已建立並保存。";
 }
 
-function finishGeneration() {
-  const product = getSelectedProduct(state);
-  state.progressIndex = pipelineStages.length;
-  state.currentProject = buildPreviewPackage(state.currentProject, product);
-  state.lastNotice = "Preview package is ready.";
-  saveState(state);
+async function updateProduct() {
+  const product = getProduct();
+  if (!product) throw new Error("請先選擇商品。");
+  await api(`/api/products/${product.id}`, { method: "PUT", body: formData("#product-form") });
+  state.notice = "商品資料已更新。";
+}
+
+async function deleteProduct(productId) {
+  if (!confirm("確定要刪除此商品資料？原始圖片檔會保留在本機資料夾。")) return;
+  await api(`/api/products/${productId}`, { method: "DELETE" });
+  state.selectedProductId = "";
+  state.notice = "商品資料已刪除。";
+}
+
+async function uploadMaterials() {
+  const product = getProduct();
+  if (!product) throw new Error("請先建立或選擇商品。");
+  const input = document.querySelector("#material-files");
+  const files = [...input.files];
+  if (!files.length) throw new Error("請先選擇商品照片。");
+  const encoded = [];
+  for (const file of files) {
+    encoded.push({ name: file.name, type: file.type, data: await fileToDataUrl(file) });
+  }
+  await api(`/api/products/${product.id}/materials`, { method: "POST", body: { files: encoded } });
+  input.value = "";
+  state.notice = "商品照片已上傳，原始檔已保留。";
+}
+
+async function deleteMaterial(productId, materialId) {
+  await api(`/api/products/${productId}/materials/${materialId}`, { method: "DELETE" });
+  state.notice = "照片已從商品中移除，原始檔仍保留。";
+}
+
+async function createProject() {
+  const product = getProduct();
+  if (!product) throw new Error("請先選擇商品。");
+  const data = formData("#create-form");
+  data.productId = product.id;
+  const result = await api("/api/projects", { method: "POST", body: data });
+  state.selectedProjectId = result.project.id;
+  state.selectedSceneId = result.project.scenes[0]?.id || "";
+  state.notice = result.project.status === "Partially Failed" ? "內容已建立，但影片生成失敗，請到進度頁查看。" : "影片草稿與預覽 MP4 已生成。";
   navigate("preview");
 }
 
-function ensureGeneratedDemo() {
-  const product = getSelectedProduct(state);
-  if (!state.currentProject?.preview) {
-    const project = createDraftProject(
-      product,
-      {
-        targetPlatform: "Instagram Reels",
-        tone: "Calm, warm, premium",
-        lengthTarget: "30 seconds",
-        materialNotes: "Main product photo plus optional packaging reference.",
-        chineseDescription: "請幫我做一支溫柔、有儀式感的產品短影片，適合社群發布。"
-      },
-      "tpvg-alpha-demo"
-    );
-    state.currentProject = buildPreviewPackage(project, product);
-    state.progressIndex = pipelineStages.length;
-    state.lastNotice = "Generated demo loaded.";
-    saveState(state);
-  }
+async function runDemo() {
+  const result = await api("/api/demo/run", { method: "POST", body: {} });
+  state.selectedProjectId = result.project.id;
+  state.selectedProductId = result.project.productId;
+  state.selectedSceneId = result.project.scenes[0]?.id || "";
+  state.notice = "示範專案已完整跑通並匯出。";
+  navigate("export");
+}
+
+function openProject(projectId) {
+  state.selectedProjectId = projectId;
+  const project = getProject();
+  state.selectedProductId = project?.productId || state.selectedProductId;
+  state.selectedSceneId = project?.scenes?.[0]?.id || "";
+  navigate("preview");
+}
+
+function openScene(sceneId) {
+  state.selectedSceneId = sceneId;
+  navigate("scene");
+}
+
+async function saveScene() {
+  const project = getProject();
+  const scene = getScene();
+  if (!project || !scene) throw new Error("請先選擇場景。");
+  await api(`/api/projects/${project.id}/scenes/${scene.id}/update`, { method: "POST", body: formData("#scene-form") });
+  state.notice = "場景文字已更新。";
+}
+
+async function approveScene(sceneId) {
+  const project = getProject();
+  if (!project) throw new Error("請先選擇專案。");
+  await api(`/api/projects/${project.id}/scenes/${sceneId}/approve`, { method: "POST", body: {} });
+  state.notice = "場景已批准。";
+}
+
+async function regenerateScene(sceneId) {
+  const project = getProject();
+  if (!project) throw new Error("請先選擇專案。");
+  const result = await api(`/api/projects/${project.id}/scenes/${sceneId}/regenerate`, { method: "POST", body: {} });
+  state.selectedProjectId = result.project.id;
+  state.selectedSceneId = sceneId;
+  state.notice = result.project.status === "Partially Failed" ? "場景已重生，但影片重新組裝失敗。" : "指定場景已重生，其他場景未被改動。";
+}
+
+async function approveProject() {
+  const project = getProject();
+  if (!project) throw new Error("請先選擇專案。");
+  await api(`/api/projects/${project.id}/approve`, { method: "POST", body: {} });
+  state.notice = "整支影片已批准，可以匯出。";
+}
+
+async function renderProject() {
+  const project = getProject();
+  if (!project) throw new Error("請先選擇專案。");
+  await api(`/api/projects/${project.id}/render`, { method: "POST", body: {} });
+  state.notice = "預覽影片已重新組裝。";
+}
+
+async function exportProject() {
+  const project = getProject();
+  if (!project) throw new Error("請先選擇專案。");
+  const result = await api(`/api/projects/${project.id}/export`, { method: "POST", body: {} });
+  state.selectedProjectId = result.project.id;
+  state.notice = result.project.status === "Completed" ? "影片與完整內容包已匯出。" : "匯出未完成，請查看錯誤紀錄。";
+}
+
+async function saveSettings() {
+  await api("/api/settings", { method: "POST", body: formData("#settings-form") });
+  state.notice = "設定已保存。";
 }
 
 function render() {
   navItems.forEach((item) => item.classList.toggle("active", item.dataset.route === route));
-  screenTitle.textContent = titleForRoute(route);
+  title.textContent = routeTitle(route);
   statusStrip.innerHTML = renderStatus();
-
   const screens = {
     home: renderHome,
     library: renderLibrary,
     create: renderCreate,
     progress: renderProgress,
     preview: renderPreview,
-    scene: renderSceneDetail,
-    export: renderExport
+    scene: renderScene,
+    export: renderExport,
+    settings: renderSettings
   };
-
   app.innerHTML = screens[route]();
-  app.focus({ preventScroll: true });
 }
 
 function renderStatus() {
-  const project = state.currentProject;
+  const project = getProject();
+  const ffmpeg = state.health.ffmpeg?.available ? "FFmpeg 可用" : "FFmpeg 未連線";
   return [
-    `<span class="pill">Branch: main</span>`,
-    `<span class="pill ${project?.reviewStatus === "Exported" ? "ok" : ""}">Status: ${project?.reviewStatus || "No active project"}</span>`,
-    `<span class="pill">Project: ${project?.id || "None"}</span>`
+    pill(ffmpeg, state.health.ffmpeg?.available ? "ok" : "warn"),
+    pill(project?.status || "尚未選擇專案", project?.status === "Completed" ? "ok" : ""),
+    pill(state.notice, state.notice.includes("失敗") || state.notice.includes("錯誤") ? "warn" : "")
   ].join("");
 }
 
 function renderHome() {
-  const product = getSelectedProduct(state);
+  const latest = [...state.db.projects].reverse()[0];
   return `
     <section class="grid two">
       <div class="panel">
-        <h2>Start one Temple product video</h2>
-        <p class="muted">This Alpha converts the approved V1 workflow into a runnable prototype. AI generation is simulated, but navigation, validation, scenes, review, regeneration, and export states are real in the browser.</p>
+        <h2>建立一支可用的商品短影片</h2>
+        <p class="muted">V1 使用本機資料儲存、商品照片、繁體中文內容模板與 FFmpeg，產生可播放的 9:16 MP4 與完整內容包。</p>
         <div class="actions">
-          <button class="button" data-action="start-create">Start New Product Video</button>
-          <button class="button secondary" data-route="library">Open Product Library</button>
-          <button class="button secondary" data-route="preview">Review Preview</button>
+          <button class="button" data-route="library">管理商品</button>
+          <button class="button secondary" data-route="create">建立影片</button>
+          <button class="button secondary" data-action="run-demo">跑完整示範</button>
         </div>
       </div>
       <div class="panel">
-        <h3>Current product</h3>
-        <p><strong>${escapeHtml(product.name)}</strong></p>
-        <p class="muted">${escapeHtml(product.description)}</p>
-        <p><strong>Main selling point:</strong> ${escapeHtml(product.sellingPoint)}</p>
+        <h2>本機狀態</h2>
+        <table class="table"><tbody>
+          <tr><th>資料位置</th><td>${escapeHtml(state.health.dataRoot || "")}</td></tr>
+          <tr><th>FFmpeg</th><td>${escapeHtml(state.health.ffmpeg?.path || "未找到")}</td></tr>
+          <tr><th>ComfyUI</th><td>${escapeHtml(state.health.comfyui?.message || "")}</td></tr>
+          <tr><th>Whisper</th><td>${state.health.whisper?.available ? "已設定" : "未設定，V1 使用字幕時間軸 fallback"}</td></tr>
+        </tbody></table>
       </div>
     </section>
     <section class="grid three" style="margin-top:18px">
-      ${renderMetric("Products", state.products.length)}
-      ${renderMetric("Scenes", state.currentProject?.scenes?.length || 0)}
-      ${renderMetric("Providers Prepared", providerRegistry.length)}
+      ${metric("商品", state.db.products.length)}
+      ${metric("影片專案", state.db.projects.length)}
+      ${metric("最新專案", latest ? latest.status : "尚無")}
     </section>
   `;
 }
 
 function renderLibrary() {
+  const product = getProduct();
   return `
     <section class="grid two">
       <div class="panel">
-        <h2>Product Library</h2>
-        <p class="muted">Choose the product identity before creating a video.</p>
-        <div class="list">
-          ${state.products.map((product) => `
-            <article class="list-item">
-              <div>
-                <h3>${escapeHtml(product.name)}</h3>
-                <p class="muted">${escapeHtml(product.category)} - ${escapeHtml(product.description)}</p>
-                <p><strong>Selling point:</strong> ${escapeHtml(product.sellingPoint)}</p>
-              </div>
-              <button class="button secondary" data-action="select-product" data-product-id="${product.id}">Use</button>
-            </article>
-          `).join("")}
+        <h2>商品資料</h2>
+        <div class="field">
+          <label>選擇商品</label>
+          <select data-product-select>${state.db.products.map((item) => option(item.id, item.name, item.id === state.selectedProductId)).join("")}</select>
         </div>
+        <form id="product-form" class="form-grid">
+          ${input("商品名稱", "name", product?.name || "")}
+          ${input("商品類型", "category", product?.category || "")}
+          ${textarea("商品說明", "description", product?.description || "")}
+          ${textarea("商品特色", "sellingPoint", product?.sellingPoint || "")}
+          ${textarea("靈性／文化資訊", "spiritualInfo", product?.spiritualInfo || "")}
+          ${textarea("目標受眾", "targetAudience", product?.targetAudience || "")}
+          <div class="actions">
+            <button class="button" type="button" data-action="save-product">建立新商品</button>
+            <button class="button secondary" type="button" data-action="update-product">更新目前商品</button>
+            ${product ? `<button class="button danger" type="button" data-action="delete-product" data-product-id="${product.id}">刪除商品</button>` : ""}
+          </div>
+        </form>
       </div>
-      <form class="panel form-grid">
-        <h2>Add product</h2>
-        ${field("Product name", "name", "Temple Ritual Oil")}
-        ${field("Category", "category", "Ritual product")}
-        ${textarea("Product description", "description", "A product prepared for calm daily ritual.")}
-        ${textarea("Main selling point", "sellingPoint", "Makes it easier to create a clear and focused moment.")}
-        ${field("Main image reference", "mainImage", "materials/product-main.jpg")}
-        <button class="button" type="button" data-action="save-product">Save Product</button>
-      </form>
+      <div class="panel">
+        <h2>商品照片</h2>
+        <p class="muted">可上傳多張照片。系統會保留原始檔，生成影片時建立工作副本。</p>
+        <div class="field">
+          <label>新增照片</label>
+          <input id="material-files" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" multiple>
+        </div>
+        <button class="button" data-action="upload-materials">上傳照片</button>
+        <div class="media-grid" style="margin-top:16px">${renderMaterials(product)}</div>
+      </div>
     </section>
   `;
 }
 
 function renderCreate() {
-  const product = getSelectedProduct(state);
+  const product = getProduct();
   return `
     <section class="grid two">
       <form id="create-form" class="panel form-grid">
-        <h2>Create Video</h2>
+        <h2>建立影片</h2>
         <div class="field">
-          <label>Selected product</label>
-          <select data-select-product>
-            ${state.products.map((item) => `<option value="${item.id}" ${item.id === product.id ? "selected" : ""}>${escapeHtml(item.name)}</option>`).join("")}
-          </select>
+          <label>商品</label>
+          <select data-product-select>${state.db.products.map((item) => option(item.id, item.name, item.id === state.selectedProductId)).join("")}</select>
         </div>
-        <div class="field">
-          <label>Target platform</label>
-          <select name="targetPlatform">
-            ${platforms.map((platform) => `<option>${platform}</option>`).join("")}
-          </select>
-        </div>
-        ${field("Tone", "tone", "Calm, warm, premium")}
-        ${field("Length target", "lengthTarget", "30 seconds")}
-        ${textarea("Photos / materials notes", "materialNotes", "Use the main product photo and keep product identity stable.")}
-        ${textarea("Chinese description", "chineseDescription", "請幫我做一支溫柔、有儀式感的產品短影片，適合社群發布。")}
-        <div id="validation-errors"></div>
-        <div class="actions">
-          <button class="button" type="button" data-action="start-generation">Start Generation</button>
-          <button class="button secondary" type="button" data-route="library">Change Product</button>
-        </div>
+        ${select("平台", "platform", ["Instagram Reels", "TikTok", "YouTube Shorts", "Shorts"], "Instagram Reels")}
+        ${input("影片長度秒數", "duration", state.config.defaultDuration || 30, "number")}
+        ${textarea("目標受眾", "targetAudience", product?.targetAudience || "")}
+        ${textarea("靈性／文化資訊", "spiritualInfo", product?.spiritualInfo || "")}
+        ${textarea("繁體中文影片需求", "requirement", "請製作一支溫柔、清楚、有儀式感的商品短影片。")}
+        <button class="button" type="button" data-action="create-project">產生腳本、場景與預覽影片</button>
       </form>
       <aside class="panel">
-        <h2>Input readiness</h2>
-        <table class="table">
-          <tbody>
-            ${readinessRow("Product name", product.name)}
-            ${readinessRow("Description", product.description)}
-            ${readinessRow("Selling point", product.sellingPoint)}
-            ${readinessRow("Main image", product.mainImage)}
-            ${readinessRow("Output format", "Vertical 9:16, manual posting")}
-          </tbody>
-        </table>
+        <h2>生成前檢查</h2>
+        <table class="table"><tbody>
+          <tr><th>商品名稱</th><td>${escapeHtml(product?.name || "未選擇")}</td></tr>
+          <tr><th>照片數</th><td>${product?.materials?.length || 0}</td></tr>
+          <tr><th>輸出規格</th><td>1080 × 1920 / MP4 / 9:16</td></tr>
+          <tr><th>雲端 API</th><td>未啟用</td></tr>
+        </tbody></table>
       </aside>
     </section>
   `;
 }
 
 function renderProgress() {
-  const complete = Math.min(state.progressIndex, pipelineStages.length);
-  const percent = Math.round((complete / pipelineStages.length) * 100);
+  const project = getProject();
+  if (!project) return empty("尚無專案", "請先建立影片專案。", "create");
+  const steps = ["Draft", "Planning", "Generating", "Partially Failed", "Ready for Preview", "Approved", "Exporting", "Completed"];
+  const current = steps.indexOf(project.status);
   return `
     <section class="grid two">
       <div class="panel">
-        <h2>Generation Progress</h2>
-        <p class="muted">The Alpha simulates the V1 reasoning pipeline without calling paid APIs or local AI engines.</p>
-        <div class="progress-bar" aria-label="Progress"><span style="width:${percent}%"></span></div>
-        <p style="margin-top:12px"><strong>${percent}% complete</strong></p>
-        <div class="list">
-          ${pipelineStages.map((step, index) => `
-            <div class="step ${index < complete ? "done" : ""} ${index === complete ? "active" : ""}">
-              <span class="step-index">${index + 1}</span>
-              <div>
-                <strong>${step.name}</strong>
-                <p class="muted">${step.description}</p>
-              </div>
-            </div>
-          `).join("")}
+        <h2>生成進度</h2>
+        <div class="field">
+          <label>選擇專案</label>
+          <select data-project-select>${state.db.projects.map((item) => option(item.id, `${item.productName}｜${item.status}`, item.id === project.id)).join("")}</select>
         </div>
-        <div class="actions" style="margin-top:16px">
-          <button class="button" data-action="complete-generation">Complete Demo Generation</button>
-          <button class="button secondary" data-route="create">Back to Create Video</button>
+        <div class="list">
+          ${steps.map((step, index) => `<div class="step ${index <= current ? "done" : ""}"><span class="step-index">${index + 1}</span><div><strong>${stateLabel(step)}</strong><p class="muted">${stepDescription(step)}</p></div></div>`).join("")}
         </div>
       </div>
       <aside class="panel">
-        <h2>Provider slots</h2>
-        <div class="list">
-          ${providerRegistry.map((provider) => `
-            <article class="card">
-              <h3>${provider.name}</h3>
-              <p class="muted">${provider.role}</p>
-              <span class="pill warn">${provider.status}</span>
-            </article>
-          `).join("")}
+        <h2>錯誤與恢復</h2>
+        ${project.errors?.length ? project.errors.map((error) => `<div class="notice error-list">${escapeHtml(error.message)}<br>${escapeHtml(error.at)}</div>`).join("") : "<p class='muted'>目前沒有錯誤。</p>"}
+        <div class="actions">
+          <button class="button secondary" data-action="render-project">重新組裝預覽影片</button>
+          <button class="button secondary" data-route="preview">前往預覽</button>
         </div>
       </aside>
     </section>
@@ -395,221 +375,278 @@ function renderProgress() {
 }
 
 function renderPreview() {
-  const project = state.currentProject;
-  if (!project?.preview) return renderEmpty("No preview yet.", "Create a video first.", "create");
-
+  const project = getProject();
+  if (!project) return empty("尚無預覽", "請先建立影片。", "create");
   return `
     <section class="grid two">
       <div class="panel">
-        <h2>Preview</h2>
-        <div class="placeholder-video">
-          <div>
-            <strong>${escapeHtml(project.preview.title)}</strong>
-            <span>${escapeHtml(project.targetPlatform)} placeholder preview</span>
-          </div>
+        <h2>影片預覽</h2>
+        ${project.previewVideo ? `<video class="video-preview" src="${project.previewVideo}" controls></video>` : "<div class='placeholder-video'>尚未產生預覽影片</div>"}
+        <div class="actions" style="margin-top:14px">
+          <button class="button" data-action="approve-project">批准整支影片</button>
+          <button class="button secondary" data-action="render-project">重新組裝</button>
+          <button class="button secondary" data-route="export">前往匯出</button>
         </div>
       </div>
       <aside class="panel">
-        <h2>Review package</h2>
-        <p><strong>Caption:</strong> ${escapeHtml(project.preview.caption)}</p>
-        <p><strong>Thumbnail:</strong> ${escapeHtml(project.preview.thumbnailSuggestion)}</p>
-        <p><strong>Review status:</strong> ${escapeHtml(project.reviewStatus)}</p>
-        <div class="actions">
-          <button class="button" data-action="approve-preview">Approve Preview</button>
-          <button class="button secondary" data-route="export">Go to Export</button>
-        </div>
+        <h2>內容包摘要</h2>
+        <p><strong>Caption：</strong>${escapeHtml(project.caption)}</p>
+        <p><strong>SEO：</strong>${escapeHtml(project.seoKeywords?.join("、") || "")}</p>
+        <p><strong>縮圖建議：</strong>${escapeHtml(project.thumbnailSuggestion)}</p>
       </aside>
     </section>
     <section class="panel" style="margin-top:18px">
-      <h2>Scenes</h2>
-      <div class="list">
-        ${project.scenes.map((scene) => renderSceneRow(scene)).join("")}
-      </div>
+      <h2>場景列表</h2>
+      <div class="list">${project.scenes.map(renderSceneRow).join("")}</div>
     </section>
   `;
 }
 
-function renderSceneDetail() {
-  const project = state.currentProject;
-  if (!project?.scenes?.length) return renderEmpty("No scene yet.", "Generate a preview first.", "create");
-
-  const scene = project.scenes.find((item) => item.id === state.selectedSceneId) || project.scenes[0];
+function renderScene() {
+  const project = getProject();
+  const scene = getScene();
+  if (!project || !scene) return empty("尚無場景", "請先建立影片。", "create");
   return `
     <section class="grid two">
-      <div class="panel">
-        <h2>Scene Detail</h2>
-        <p class="muted">Scene-level review and regeneration are isolated from the full video.</p>
-        <table class="table">
-          <tbody>
-            <tr><th>Purpose</th><td>${escapeHtml(scene.purpose)}</td></tr>
-            <tr><th>Duration</th><td>${scene.duration} seconds</td></tr>
-            <tr><th>Version</th><td>${scene.version}</td></tr>
-            <tr><th>Status</th><td>${escapeHtml(scene.status)}</td></tr>
-            <tr><th>Visual</th><td>${escapeHtml(scene.visualDescription)}</td></tr>
-            <tr><th>Narration</th><td>${escapeHtml(scene.narration)}</td></tr>
-            <tr><th>Subtitle</th><td>${escapeHtml(scene.subtitle)}</td></tr>
-            <tr><th>Prompt direction</th><td>${escapeHtml(scene.promptDirection)}</td></tr>
-            <tr><th>Music</th><td>${escapeHtml(scene.music)}</td></tr>
-            <tr><th>Transition</th><td>${escapeHtml(scene.transition)}</td></tr>
-          </tbody>
-        </table>
-        <div class="actions" style="margin-top:16px">
-          <button class="button warning" data-action="regenerate-scene" data-scene-id="${scene.id}">Regenerate This Scene</button>
-          <button class="button secondary" data-route="preview">Back to Preview</button>
+      <form id="scene-form" class="panel form-grid">
+        <h2>場景細節</h2>
+        <p class="muted">第 ${scene.order} 場｜${scene.purpose}｜版本 ${scene.version}｜${scene.approved ? "已批准" : "未批准"}</p>
+        ${textarea("畫面說明", "visualDescription", scene.visualDescription)}
+        ${textarea("旁白", "narration", scene.narration)}
+        ${textarea("字幕", "subtitle", scene.subtitle)}
+        ${textarea("Prompt", "prompt", scene.prompt)}
+        <div class="actions">
+          <button class="button" type="button" data-action="save-scene">保存文字</button>
+          <button class="button secondary" type="button" data-action="approve-scene" data-scene-id="${scene.id}">批准場景</button>
+          <button class="button warning" type="button" data-action="regenerate-scene" data-scene-id="${scene.id}">重生此場景</button>
+          <button class="button secondary" type="button" data-route="preview">返回預覽</button>
         </div>
-      </div>
+      </form>
       <aside class="panel">
-        <h2>Scene list</h2>
-        <div class="list">
-          ${project.scenes.map((item) => `
-            <button class="nav-item ${item.id === scene.id ? "active" : ""}" data-action="open-scene" data-scene-id="${item.id}">${item.order}. ${escapeHtml(item.purpose)}</button>
-          `).join("")}
-        </div>
+        <h2>切換場景</h2>
+        <div class="list">${project.scenes.map((item) => `<button class="nav-item ${item.id === scene.id ? "active" : ""}" data-action="open-scene" data-scene-id="${item.id}">${item.order}. ${escapeHtml(item.purpose)}｜V${item.version}</button>`).join("")}</div>
       </aside>
     </section>
   `;
 }
 
 function renderExport() {
-  const project = state.currentProject;
-  if (!project?.preview) return renderEmpty("No export package yet.", "Create and approve a preview first.", "create");
-
-  const canExport = project.reviewStatus === "Approved" || project.reviewStatus === "Exported";
+  const project = getProject();
+  if (!project) return empty("尚無可匯出專案", "請先建立影片。", "create");
   return `
     <section class="grid two">
       <div class="panel">
-        <h2>Export</h2>
-        ${canExport ? "" : `<div class="notice"><strong>Preview approval required.</strong><br>Approve the preview before preparing the export package.</div>`}
-        <table class="table" style="margin-top:16px">
-          <tbody>
-            <tr><th>Project</th><td>${escapeHtml(project.id)}</td></tr>
-            <tr><th>Target platform</th><td>${escapeHtml(project.targetPlatform)}</td></tr>
-            <tr><th>Format</th><td>Vertical 9:16 MP4 placeholder</td></tr>
-            <tr><th>Caption</th><td>${escapeHtml(project.preview.caption)}</td></tr>
-            <tr><th>Subtitles</th><td>${project.scenes.length} subtitle lines prepared</td></tr>
-            <tr><th>Metadata</th><td>${project.metadata ? "Ready" : "Missing"}</td></tr>
-          </tbody>
-        </table>
+        <h2>匯出</h2>
+        <p class="muted">匯出會建立 MP4、SRT、旁白稿、Caption、Metadata、Scenes、Prompts、縮圖建議與素材清單。</p>
+        <table class="table"><tbody>
+          <tr><th>狀態</th><td>${stateLabel(project.status)}</td></tr>
+          <tr><th>輸出資料夾</th><td>${escapeHtml(project.outputDir)}</td></tr>
+          <tr><th>預覽影片</th><td>${project.previewVideo ? link(project.previewVideo, "開啟 preview.mp4") : "尚無"}</td></tr>
+          <tr><th>最終影片</th><td>${project.finalVideo ? link(project.finalVideo, "開啟 final_video.mp4") : "尚未匯出"}</td></tr>
+          <tr><th>字幕</th><td>${project.subtitles ? link(project.subtitles, "開啟 subtitles.srt") : "尚無"}</td></tr>
+        </tbody></table>
         <div class="actions" style="margin-top:16px">
-          <button class="button" data-action="prepare-export" ${canExport ? "" : "disabled"}>Prepare Export Package</button>
-          <button class="button secondary" data-route="preview">Back to Preview</button>
+          <button class="button" data-action="export-project">匯出完整內容包</button>
+          <button class="button secondary" data-route="preview">返回預覽</button>
         </div>
       </div>
       <aside class="panel">
-        <h2>Export result</h2>
-        ${state.exportPackage ? renderExportPackage(state.exportPackage) : `<p class="muted">No export package prepared yet.</p>`}
+        <h2>應包含檔案</h2>
+        <ul>
+          <li>final_video.mp4</li>
+          <li>final_video_subtitled.mp4</li>
+          <li>subtitles.srt</li>
+          <li>narration.txt</li>
+          <li>caption.txt</li>
+          <li>metadata.json</li>
+          <li>scenes.json</li>
+          <li>prompts.json</li>
+          <li>thumbnail_suggestion.txt</li>
+          <li>materials_used.txt</li>
+        </ul>
       </aside>
     </section>
   `;
 }
 
+function renderSettings() {
+  const config = state.config;
+  return `
+    <form id="settings-form" class="panel form-grid">
+      <h2>設定</h2>
+      ${input("ComfyUI 位址", "comfyuiUrl", config.comfyuiUrl || "")}
+      ${input("ComfyUI 工作流", "comfyuiWorkflow", config.comfyuiWorkflow || "")}
+      ${input("FFmpeg 路徑", "ffmpegPath", config.ffmpegPath || "")}
+      ${input("Whisper 路徑", "whisperPath", config.whisperPath || "")}
+      ${select("TTS 選項", "ttsProvider", ["none", "local"], config.ttsProvider || "none")}
+      ${input("輸出資料夾", "outputDir", config.outputDir || "")}
+      ${input("預設影片長度", "defaultDuration", config.defaultDuration || 30, "number")}
+      ${select("是否加入 Logo", "includeLogo", ["true", "false"], String(config.includeLogo ?? true))}
+      ${input("字幕樣式", "subtitleStyle", config.subtitleStyle || "")}
+      ${select("Provider 選擇", "providerMode", ["local-first", "comfyui-preferred", "cloud-disabled"], config.providerMode || "local-first")}
+      <div class="notice">V1 預設本機優先，不會呼叫付費 API。雲端 Provider 保留為未啟用。</div>
+      <button class="button" type="button" data-action="save-settings">保存設定</button>
+    </form>
+  `;
+}
+
+function renderMaterials(product) {
+  if (!product?.materials?.length) return "<p class='muted'>尚未上傳照片。</p>";
+  return product.materials
+    .sort((a, b) => a.order - b.order)
+    .map((item) => `
+      <article class="media-card">
+        <img src="${item.url}" alt="${escapeHtml(item.fileName)}">
+        <strong>${escapeHtml(item.role)}</strong>
+        <span>${escapeHtml(item.fileName)}</span>
+        <button class="button secondary" data-action="delete-material" data-product-id="${product.id}" data-material-id="${item.id}">移除</button>
+      </article>
+    `)
+    .join("");
+}
+
 function renderSceneRow(scene) {
   return `
     <article class="scene-row">
-      <span class="pill">${scene.order}. ${scene.duration}s</span>
+      <span class="pill ${scene.approved ? "ok" : ""}">${scene.order}. ${scene.duration}s</span>
       <div>
-        <h3>${escapeHtml(scene.purpose)}</h3>
+        <h3>${escapeHtml(scene.purpose)}｜V${scene.version}</h3>
         <p class="muted">${escapeHtml(scene.visualDescription)}</p>
-        <p><strong>Subtitle:</strong> ${escapeHtml(scene.subtitle)}</p>
+        <p><strong>字幕：</strong>${escapeHtml(scene.subtitle)}</p>
       </div>
       <div class="actions">
-        <button class="button secondary" data-action="open-scene" data-scene-id="${scene.id}">Open</button>
-        <button class="button secondary" data-action="regenerate-scene" data-scene-id="${scene.id}">Regenerate</button>
+        <button class="button secondary" data-action="open-scene" data-scene-id="${scene.id}">查看</button>
+        <button class="button secondary" data-action="approve-scene" data-scene-id="${scene.id}">批准</button>
+        <button class="button secondary" data-action="regenerate-scene" data-scene-id="${scene.id}">重生</button>
       </div>
     </article>
   `;
 }
 
-function renderExportPackage(pack) {
-  return `
-    <table class="table">
-      <tbody>
-        <tr><th>Status</th><td>${escapeHtml(pack.status)}</td></tr>
-        <tr><th>Final MP4</th><td>${escapeHtml(pack.finalMp4Reference)}</td></tr>
-        <tr><th>Caption</th><td>${escapeHtml(pack.captionReference)}</td></tr>
-        <tr><th>Subtitles</th><td>${escapeHtml(pack.subtitleReference)}</td></tr>
-        <tr><th>Metadata</th><td>${escapeHtml(pack.metadataReference)}</td></tr>
-      </tbody>
-    </table>
-  `;
+async function api(path, options = {}) {
+  const init = { method: options.method || "GET", headers: {} };
+  if (options.body !== undefined) {
+    init.headers["Content-Type"] = "application/json";
+    init.body = JSON.stringify(options.body);
+  }
+  const response = await fetch(path, init);
+  const payload = await response.json();
+  if (!response.ok || payload.ok === false) {
+    throw new Error(payload.message || "本機服務回應失敗。");
+  }
+  return payload;
 }
 
-function renderMetric(label, value) {
-  return `
-    <div class="card">
-      <p class="muted">${label}</p>
-      <h2>${value}</h2>
-    </div>
-  `;
+function formData(selector) {
+  return Object.fromEntries(new FormData(document.querySelector(selector)).entries());
 }
 
-function renderEmpty(title, message, destination) {
-  return `
-    <section class="panel">
-      <h2>${title}</h2>
-      <p class="muted">${message}</p>
-      <button class="button" data-route="${destination}">Continue</button>
-    </section>
-  `;
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("圖片讀取失敗。"));
+    reader.readAsDataURL(file);
+  });
 }
 
-function renderValidationErrors(errors) {
-  const container = document.querySelector("#validation-errors");
-  container.innerHTML = `
-    <div class="notice error-list">
-      <strong>Required information is missing:</strong>
-      <ul>${errors.map((error) => `<li>${escapeHtml(error)}</li>`).join("")}</ul>
-    </div>
-  `;
+function getProduct() {
+  return state.db.products.find((item) => item.id === state.selectedProductId) || state.db.products[0];
 }
 
-function field(label, name, value) {
-  return `
-    <div class="field">
-      <label>${label}</label>
-      <input name="${name}" value="${escapeHtml(value)}">
-    </div>
-  `;
+function getProject() {
+  return state.db.projects.find((item) => item.id === state.selectedProjectId) || state.db.projects.at(-1);
 }
 
-function textarea(label, name, value) {
-  return `
-    <div class="field">
-      <label>${label}</label>
-      <textarea name="${name}">${escapeHtml(value)}</textarea>
-    </div>
-  `;
+function getScene() {
+  const project = getProject();
+  return project?.scenes?.find((item) => item.id === state.selectedSceneId) || project?.scenes?.[0];
 }
 
-function readinessRow(label, value) {
-  return `<tr><th>${label}</th><td>${value ? escapeHtml(value) : "<span class='error-list'>Missing</span>"}</td></tr>`;
+function setBusy(value) {
+  state.busy = value;
+  document.body.classList.toggle("busy", value);
+  if (value) state.notice = "正在處理，請稍候...";
+  statusStrip.innerHTML = renderStatus();
 }
 
 function navigate(nextRoute) {
   location.hash = normalizeRoute(nextRoute);
 }
 
-function normalizeRoute(nextRoute) {
-  const allowed = ["home", "library", "create", "progress", "preview", "scene", "export"];
-  return allowed.includes(nextRoute) ? nextRoute : "home";
+function normalizeRoute(value) {
+  return ["home", "library", "create", "progress", "preview", "scene", "export", "settings"].includes(value) ? value : "home";
 }
 
-function titleForRoute(currentRoute) {
-  const titles = {
-    home: "Home",
-    library: "Product Library",
-    create: "Create Video",
-    progress: "Generation Progress",
-    preview: "Preview",
-    scene: "Scene Detail",
-    export: "Export"
-  };
-  return titles[currentRoute] || "Temple Product Video Generator";
+function routeTitle(value) {
+  return {
+    home: "首頁",
+    library: "商品資料庫",
+    create: "建立影片",
+    progress: "生成進度",
+    preview: "影片預覽",
+    scene: "場景細節",
+    export: "匯出",
+    settings: "設定"
+  }[value];
 }
 
-function saveAndRender() {
-  saveState(state);
-  render();
+function stateLabel(value) {
+  return {
+    Draft: "草稿",
+    Planning: "規劃中",
+    Generating: "生成中",
+    "Partially Failed": "部分失敗",
+    "Ready for Preview": "可預覽",
+    Approved: "已批准",
+    Exporting: "匯出中",
+    Completed: "已完成"
+  }[value] || value;
+}
+
+function stepDescription(value) {
+  return {
+    Draft: "商品資料與需求已建立。",
+    Planning: "產生腳本、場景、旁白、字幕與 Prompt。",
+    Generating: "使用本機圖片處理與 FFmpeg 組裝影片。",
+    "Partially Failed": "保留已完成資料，可重試失敗步驟。",
+    "Ready for Preview": "可以播放預覽並檢查每個場景。",
+    Approved: "使用者已批准影片方向。",
+    Exporting: "正在輸出完整內容包。",
+    Completed: "MP4、字幕、metadata 與內容包已完成。"
+  }[value] || "";
+}
+
+function input(label, name, value, type = "text") {
+  return `<div class="field"><label>${label}</label><input type="${type}" name="${name}" value="${escapeHtml(value)}"></div>`;
+}
+
+function textarea(label, name, value) {
+  return `<div class="field"><label>${label}</label><textarea name="${name}">${escapeHtml(value)}</textarea></div>`;
+}
+
+function select(label, name, values, current) {
+  return `<div class="field"><label>${label}</label><select name="${name}">${values.map((value) => option(value, value, String(value) === String(current))).join("")}</select></div>`;
+}
+
+function option(value, label, selected) {
+  return `<option value="${escapeHtml(value)}" ${selected ? "selected" : ""}>${escapeHtml(label)}</option>`;
+}
+
+function metric(label, value) {
+  return `<div class="card"><p class="muted">${label}</p><h2>${escapeHtml(value)}</h2></div>`;
+}
+
+function pill(text, mode = "") {
+  return `<span class="pill ${mode}">${escapeHtml(text)}</span>`;
+}
+
+function link(href, text) {
+  return `<a href="${href}" target="_blank" rel="noreferrer">${escapeHtml(text)}</a>`;
+}
+
+function empty(headline, copy, destination) {
+  return `<section class="panel"><h2>${headline}</h2><p class="muted">${copy}</p><button class="button" data-route="${destination}">前往</button></section>`;
 }
 
 function escapeHtml(value) {
