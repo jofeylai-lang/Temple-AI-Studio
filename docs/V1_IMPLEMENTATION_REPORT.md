@@ -185,19 +185,19 @@ V1 cloud provider remains disabled by design.
 Latest validated demo project:
 
 ```text
-project-20260724-1ca7c1f0
+project-20260724-66ce7705
 ```
 
 Demo MP4:
 
 ```text
-D:\AI\Jofey AI Studio\apps\temple-product-video-generator\data\exports\project-20260724-1ca7c1f0\final_video.mp4
+D:\AI\Jofey AI Studio\apps\temple-product-video-generator\data\exports\project-20260724-66ce7705\final_video.mp4
 ```
 
 Export package:
 
 ```text
-D:\AI\Jofey AI Studio\apps\temple-product-video-generator\data\exports\project-20260724-1ca7c1f0\
+D:\AI\Jofey AI Studio\apps\temple-product-video-generator\data\exports\project-20260724-66ce7705\
 ```
 
 ## Files Added Or Changed

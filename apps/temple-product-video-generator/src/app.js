@@ -43,6 +43,13 @@ document.addEventListener("change", async (event) => {
     state.notice = "已切換影片專案。";
     render();
   }
+  if (event.target.matches("[data-replace-material]")) {
+    await replaceMaterial(event.target);
+  }
+  if (event.target.matches("#restore-file")) {
+    state.notice = event.target.files.length ? "已選擇備份檔，按下還原即可執行。" : "尚未選擇備份檔。";
+    render();
+  }
 });
 
 boot();
@@ -74,9 +81,12 @@ async function handleAction(action, target) {
     if (action === "delete-product") await deleteProduct(target.dataset.productId);
     if (action === "upload-materials") await uploadMaterials();
     if (action === "delete-material") await deleteMaterial(target.dataset.productId, target.dataset.materialId);
+    if (action === "move-material") await moveMaterial(target.dataset.productId, target.dataset.materialId, target.dataset.direction);
     if (action === "create-project") await createProject();
     if (action === "run-demo") await runDemo();
     if (action === "open-project") openProject(target.dataset.projectId);
+    if (action === "delete-project") await deleteProject(target.dataset.projectId);
+    if (action === "cancel-project") await cancelProject(target.dataset.projectId);
     if (action === "open-scene") openScene(target.dataset.sceneId);
     if (action === "save-scene") await saveScene();
     if (action === "approve-scene") await approveScene(target.dataset.sceneId || state.selectedSceneId);
@@ -85,17 +95,21 @@ async function handleAction(action, target) {
     if (action === "render-project") await renderProject();
     if (action === "export-project") await exportProject();
     if (action === "save-settings") await saveSettings();
+    if (action === "create-backup") await createBackup();
+    if (action === "restore-backup") await restoreBackup();
+    if (action === "create-evidence") await createEvidence();
+    if (action === "create-release") await createRelease();
     await refreshState();
   } catch (error) {
     state.notice = error.message || "操作失敗。";
   } finally {
     setBusy(false);
+    render();
   }
 }
 
 async function saveProduct() {
-  const data = formData("#product-form");
-  const result = await api("/api/products", { method: "POST", body: data });
+  const result = await api("/api/products", { method: "POST", body: formData("#product-form") });
   state.selectedProductId = result.product.id;
   state.notice = "商品已建立並保存。";
 }
@@ -134,6 +148,30 @@ async function deleteMaterial(productId, materialId) {
   state.notice = "照片已從商品中移除，原始檔仍保留。";
 }
 
+async function moveMaterial(productId, materialId, direction) {
+  await api(`/api/products/${productId}/materials/${materialId}/move`, { method: "PUT", body: { direction } });
+  state.notice = direction === "up" ? "照片已往前排序。" : "照片已往後排序。";
+}
+
+async function replaceMaterial(input) {
+  try {
+    setBusy(true);
+    const file = input.files[0];
+    if (!file) return;
+    await api(`/api/products/${input.dataset.productId}/materials/${input.dataset.materialId}/replace`, {
+      method: "PUT",
+      body: { file: { name: file.name, type: file.type, data: await fileToDataUrl(file) } }
+    });
+    state.notice = "照片已替換，舊檔路徑已保留於紀錄。";
+    await refreshState();
+  } catch (error) {
+    state.notice = error.message || "照片替換失敗。";
+  } finally {
+    setBusy(false);
+    render();
+  }
+}
+
 async function createProject() {
   const product = getProduct();
   if (!product) throw new Error("請先選擇商品。");
@@ -161,6 +199,19 @@ function openProject(projectId) {
   state.selectedProductId = project?.productId || state.selectedProductId;
   state.selectedSceneId = project?.scenes?.[0]?.id || "";
   navigate("preview");
+}
+
+async function deleteProject(projectId) {
+  if (!confirm("確定要刪除此專案紀錄？已輸出的檔案不會自動刪除。")) return;
+  await api(`/api/projects/${projectId}`, { method: "DELETE" });
+  state.selectedProjectId = "";
+  state.selectedSceneId = "";
+  state.notice = "專案紀錄已刪除，輸出檔案保留。";
+}
+
+async function cancelProject(projectId) {
+  await api(`/api/projects/${projectId}/cancel`, { method: "POST", body: {} });
+  state.notice = "未完成專案已取消並回到草稿狀態。";
 }
 
 function openScene(sceneId) {
@@ -219,6 +270,33 @@ async function saveSettings() {
   state.notice = "設定已保存。";
 }
 
+async function createBackup() {
+  const result = await api("/api/backup", { method: "POST", body: {} });
+  state.notice = `備份完成：${result.backup.path}`;
+}
+
+async function restoreBackup() {
+  const input = document.querySelector("#restore-file");
+  const confirmText = document.querySelector("#restore-confirm").value.trim();
+  const file = input.files[0];
+  if (!file) throw new Error("請先選擇備份 zip 檔。");
+  const result = await api("/api/restore", {
+    method: "POST",
+    body: { confirm: confirmText, file: { name: file.name, type: file.type, data: await fileToDataUrl(file) } }
+  });
+  state.notice = `資料已還原。還原前安全備份：${result.safetyBackup.path}`;
+}
+
+async function createEvidence() {
+  const result = await api("/api/evidence/screenshots");
+  state.notice = `證據圖已建立：${result.directory}`;
+}
+
+async function createRelease() {
+  const result = await api("/api/release/package");
+  state.notice = `Release package 已建立：${result.archive}`;
+}
+
 function render() {
   navItems.forEach((item) => item.classList.toggle("active", item.dataset.route === route));
   title.textContent = routeTitle(route);
@@ -241,7 +319,7 @@ function renderStatus() {
   const ffmpeg = state.health.ffmpeg?.available ? "FFmpeg 可用" : "FFmpeg 未連線";
   return [
     pill(ffmpeg, state.health.ffmpeg?.available ? "ok" : "warn"),
-    pill(project?.status || "尚未選擇專案", project?.status === "Completed" ? "ok" : ""),
+    pill(project?.status ? stateLabel(project.status) : "尚未選擇專案", project?.status === "Completed" ? "ok" : ""),
     pill(state.notice, state.notice.includes("失敗") || state.notice.includes("錯誤") ? "warn" : "")
   ].join("");
 }
@@ -272,7 +350,7 @@ function renderHome() {
     <section class="grid three" style="margin-top:18px">
       ${metric("商品", state.db.products.length)}
       ${metric("影片專案", state.db.projects.length)}
-      ${metric("最新專案", latest ? latest.status : "尚無")}
+      ${metric("最新專案", latest ? stateLabel(latest.status) : "尚無")}
     </section>
   `;
 }
@@ -303,7 +381,7 @@ function renderLibrary() {
       </div>
       <div class="panel">
         <h2>商品照片</h2>
-        <p class="muted">可上傳多張照片。系統會保留原始檔，生成影片時建立工作副本。</p>
+        <p class="muted">可上傳多張照片、排序、替換或移除。系統會保留原始檔，生成影片時建立工作副本。</p>
         <div class="field">
           <label>新增照片</label>
           <input id="material-files" type="file" accept="image/png,image/jpeg,image/webp,image/bmp" multiple>
@@ -349,14 +427,14 @@ function renderProgress() {
   const project = getProject();
   if (!project) return empty("尚無專案", "請先建立影片專案。", "create");
   const steps = ["Draft", "Planning", "Generating", "Partially Failed", "Ready for Preview", "Approved", "Exporting", "Completed"];
-  const current = steps.indexOf(project.status);
+  const current = Math.max(0, steps.indexOf(project.status));
   return `
     <section class="grid two">
       <div class="panel">
         <h2>生成進度</h2>
         <div class="field">
           <label>選擇專案</label>
-          <select data-project-select>${state.db.projects.map((item) => option(item.id, `${item.productName}｜${item.status}`, item.id === project.id)).join("")}</select>
+          <select data-project-select>${state.db.projects.map((item) => option(item.id, `${item.productName}｜${stateLabel(item.status)}`, item.id === project.id)).join("")}</select>
         </div>
         <div class="list">
           ${steps.map((step, index) => `<div class="step ${index <= current ? "done" : ""}"><span class="step-index">${index + 1}</span><div><strong>${stateLabel(step)}</strong><p class="muted">${stepDescription(step)}</p></div></div>`).join("")}
@@ -367,6 +445,8 @@ function renderProgress() {
         ${project.errors?.length ? project.errors.map((error) => `<div class="notice error-list">${escapeHtml(error.message)}<br>${escapeHtml(error.at)}</div>`).join("") : "<p class='muted'>目前沒有錯誤。</p>"}
         <div class="actions">
           <button class="button secondary" data-action="render-project">重新組裝預覽影片</button>
+          <button class="button secondary" data-action="cancel-project" data-project-id="${project.id}">取消未完成專案</button>
+          <button class="button danger" data-action="delete-project" data-project-id="${project.id}">刪除專案紀錄</button>
           <button class="button secondary" data-route="preview">前往預覽</button>
         </div>
       </aside>
@@ -486,6 +566,22 @@ function renderSettings() {
       ${select("Provider 選擇", "providerMode", ["local-first", "comfyui-preferred", "cloud-disabled"], config.providerMode || "local-first")}
       <div class="notice">V1 預設本機優先，不會呼叫付費 API。雲端 Provider 保留為未啟用。</div>
       <button class="button" type="button" data-action="save-settings">保存設定</button>
+      <hr>
+      <h2>備份、證據與發行</h2>
+      <div class="actions">
+        <button class="button secondary" type="button" data-action="create-backup">建立資料備份</button>
+        <button class="button secondary" type="button" data-action="create-evidence">產生操作證據圖</button>
+        <button class="button secondary" type="button" data-action="create-release">建立 Release Package</button>
+      </div>
+      <div class="field">
+        <label>還原備份 zip</label>
+        <input id="restore-file" type="file" accept=".zip">
+      </div>
+      <div class="field">
+        <label>還原確認文字</label>
+        <input id="restore-confirm" name="restoreConfirm" placeholder="輸入 RESTORE 才會執行">
+      </div>
+      <button class="button warning" type="button" data-action="restore-backup">還原備份</button>
     </form>
   `;
 }
@@ -499,6 +595,11 @@ function renderMaterials(product) {
         <img src="${item.url}" alt="${escapeHtml(item.fileName)}">
         <strong>${escapeHtml(item.role)}</strong>
         <span>${escapeHtml(item.fileName)}</span>
+        <div class="actions">
+          <button class="button secondary" data-action="move-material" data-direction="up" data-product-id="${product.id}" data-material-id="${item.id}">上移</button>
+          <button class="button secondary" data-action="move-material" data-direction="down" data-product-id="${product.id}" data-material-id="${item.id}">下移</button>
+        </div>
+        <label class="button secondary file-button">替換<input data-replace-material data-product-id="${product.id}" data-material-id="${item.id}" type="file" accept="image/png,image/jpeg,image/webp,image/bmp"></label>
         <button class="button secondary" data-action="delete-material" data-product-id="${product.id}" data-material-id="${item.id}">移除</button>
       </article>
     `)

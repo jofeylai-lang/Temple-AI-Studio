@@ -10,6 +10,7 @@ import sys
 import threading
 import time
 import uuid
+import zipfile
 from datetime import datetime
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -27,6 +28,10 @@ UPLOAD_ROOT = DATA_ROOT / "uploads"
 PROJECT_ROOT = DATA_ROOT / "projects"
 EXPORT_ROOT = DATA_ROOT / "exports"
 RUNTIME_ROOT = APP_ROOT / "runtime"
+BACKUP_ROOT = DATA_ROOT / "backups"
+EVIDENCE_ROOT = DATA_ROOT / "evidence"
+RELEASE_ROOT = APP_ROOT / "release"
+VERSION = "1.0.0"
 
 FRAME_SIZE = (1080, 1920)
 FPS = 25
@@ -59,7 +64,7 @@ def safe_name(value: str, fallback: str = "item") -> str:
 
 
 def ensure_dirs() -> None:
-    for path in [DATA_ROOT, UPLOAD_ROOT, PROJECT_ROOT, EXPORT_ROOT, RUNTIME_ROOT]:
+    for path in [DATA_ROOT, UPLOAD_ROOT, PROJECT_ROOT, EXPORT_ROOT, RUNTIME_ROOT, BACKUP_ROOT, EVIDENCE_ROOT, RELEASE_ROOT]:
         path.mkdir(parents=True, exist_ok=True)
 
 
@@ -84,6 +89,7 @@ def default_config() -> dict:
         "subtitleStyle": "安全區底部白字深色陰影",
         "providerMode": "local-first",
         "cloudEnabled": False,
+        "version": VERSION,
         "createdAt": now_iso(),
         "updatedAt": now_iso(),
     }
@@ -200,6 +206,7 @@ def health_payload() -> dict:
             "available": bool(ffmpeg and Path(ffmpeg).exists()),
             "version": ffmpeg_version(ffmpeg),
         },
+        "version": VERSION,
         "comfyui": comfyui_health(config.get("comfyuiUrl", "")),
         "whisper": {
             "path": config.get("whisperPath", ""),
@@ -406,6 +413,58 @@ def add_materials(product_id: str, files: list[dict]) -> dict:
         product["updatedAt"] = now_iso()
         save_db(db)
     return {"materials": saved}
+
+
+def replace_material(product_id: str, material_id: str, file_payload: dict) -> dict:
+    with DB_LOCK:
+        db = load_db()
+        product = find_item(db["products"], product_id)
+        material = find_item(product.get("materials", []), material_id)
+        data_url = file_payload.get("data", "")
+        if "," in data_url:
+            data_url = data_url.split(",", 1)[1]
+        blob = base64.b64decode(data_url)
+        suffix = Path(safe_name(file_payload.get("name", "replacement.png"))).suffix.lower()
+        if suffix not in [".png", ".jpg", ".jpeg", ".webp", ".bmp"]:
+            raise ValueError("僅支援 PNG、JPG、WEBP、BMP 圖片")
+        target_dir = UPLOAD_ROOT / product_id
+        target_dir.mkdir(parents=True, exist_ok=True)
+        new_path = target_dir / f"{material_id}-replacement-{uuid.uuid4().hex[:6]}{suffix}"
+        new_path.write_bytes(blob)
+        with Image.open(new_path) as img:
+            width, height = img.size
+            img.verify()
+        material["previousPath"] = material.get("path")
+        material["fileName"] = safe_name(file_payload.get("name", "replacement.png"))
+        material["mime"] = file_payload.get("type", "image/*")
+        material["path"] = str(new_path)
+        material["url"] = image_url(str(new_path))
+        material["width"] = width
+        material["height"] = height
+        material["updatedAt"] = now_iso()
+        product["updatedAt"] = now_iso()
+        save_db(db)
+        return material
+
+
+def move_material(product_id: str, material_id: str, direction: str) -> dict:
+    with DB_LOCK:
+        db = load_db()
+        product = find_item(db["products"], product_id)
+        materials = sorted(product.get("materials", []), key=lambda item: item.get("order", 0))
+        index = next((i for i, item in enumerate(materials) if item["id"] == material_id), -1)
+        if index < 0:
+            raise KeyError("找不到照片")
+        swap = index - 1 if direction == "up" else index + 1
+        if 0 <= swap < len(materials):
+            materials[index], materials[swap] = materials[swap], materials[index]
+        for order, item in enumerate(materials, start=1):
+            item["order"] = order
+            item["role"] = "主商品照片" if order == 1 else "商品照片"
+        product["materials"] = materials
+        product["updatedAt"] = now_iso()
+        save_db(db)
+        return {"materials": materials}
 
 
 def delete_material(product_id: str, material_id: str) -> dict:
@@ -624,6 +683,28 @@ def approve_project(project_id: str) -> dict:
         return project
 
 
+def delete_project(project_id: str) -> dict:
+    with DB_LOCK:
+        db = load_db()
+        project = find_item(db["projects"], project_id)
+        db["projects"] = [item for item in db["projects"] if item["id"] != project_id]
+        save_db(db)
+    return {"deleted": project_id, "keptProjectDir": project.get("projectDir"), "keptOutputDir": project.get("outputDir")}
+
+
+def cancel_project(project_id: str) -> dict:
+    with DB_LOCK:
+        db = load_db()
+        project = find_item(db["projects"], project_id)
+        if project.get("status") in ["Completed", "Approved"]:
+            raise ValueError("已完成或已批准的專案不可取消。")
+        project["status"] = "Draft"
+        project["updatedAt"] = now_iso()
+        project.setdefault("renderHistory", []).append({"type": "cancel", "at": now_iso()})
+        save_db(db)
+        return project
+
+
 def render_project(project_id: str, preview: bool) -> dict:
     with DB_LOCK:
         db = load_db()
@@ -666,6 +747,205 @@ def export_project(project_id: str) -> dict:
     project = render_project(project_id, preview=False)
     write_export_package(project)
     return project
+
+
+def create_backup() -> dict:
+    ensure_dirs()
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    backup_path = BACKUP_ROOT / f"temple-product-video-generator-backup-{stamp}.zip"
+    with zipfile.ZipFile(backup_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for path in DATA_ROOT.rglob("*"):
+            if not path.is_file():
+                continue
+            if BACKUP_ROOT in path.parents or EVIDENCE_ROOT in path.parents:
+                continue
+            archive.write(path, path.relative_to(DATA_ROOT))
+    return {"path": str(backup_path), "url": file_url(backup_path), "createdAt": now_iso()}
+
+
+def restore_backup(file_payload: dict, confirm: str) -> dict:
+    if confirm != "RESTORE":
+        raise ValueError("還原前必須輸入 RESTORE 確認，避免誤覆蓋資料。")
+    data_url = file_payload.get("data", "")
+    if "," in data_url:
+        data_url = data_url.split(",", 1)[1]
+    backup = BACKUP_ROOT / f"restore-source-{datetime.now().strftime('%Y%m%d-%H%M%S')}.zip"
+    backup.write_bytes(base64.b64decode(data_url))
+    safety = create_backup()
+    restore_root = DATA_ROOT / "_restore_tmp"
+    if restore_root.exists():
+        shutil.rmtree(restore_root)
+    restore_root.mkdir(parents=True)
+    with zipfile.ZipFile(backup, "r") as archive:
+        archive.extractall(restore_root)
+    required = restore_root / "database.json"
+    if not required.exists():
+        shutil.rmtree(restore_root)
+        raise ValueError("備份檔缺少 database.json，已取消還原。")
+    for child in restore_root.iterdir():
+        target = DATA_ROOT / child.name
+        if target.name in ["backups", "evidence", "_restore_tmp"]:
+            continue
+        if target.exists():
+            if target.is_dir():
+                shutil.rmtree(target)
+            else:
+                target.unlink()
+        shutil.move(str(child), str(target))
+    shutil.rmtree(restore_root, ignore_errors=True)
+    return {"restored": True, "safetyBackup": safety}
+
+
+def create_evidence_screenshots() -> dict:
+    db = seed_demo_data()
+    if not db["projects"]:
+        run_demo_project()
+        db = load_db()
+    project = db["projects"][-1]
+    product = find_item(db["products"], project["productId"])
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    target_dir = EVIDENCE_ROOT / stamp
+    target_dir.mkdir(parents=True, exist_ok=True)
+    screens = {
+        "product-library": [
+            "商品資料庫",
+            f"商品：{product['name']}",
+            f"照片數：{len(product.get('materials', []))}",
+            "可操作：建立、更新、刪除、上傳、排序、替換、移除照片",
+        ],
+        "create-video": [
+            "建立影片",
+            "輸入：商品、平台、長度、目標受眾、繁體中文影片需求",
+            "輸出：腳本、場景、旁白、字幕、Prompt、Metadata",
+        ],
+        "generation-progress": [
+            "生成進度",
+            f"目前狀態：{project['status']}",
+            "支援：重試、取消未完成專案、錯誤紀錄、重新開啟恢復",
+        ],
+        "preview": [
+            "影片預覽",
+            f"預覽影片：{project.get('previewVideo', '未產生')}",
+            f"場景數：{len(project.get('scenes', []))}",
+        ],
+        "scene-detail": [
+            "場景細節",
+            f"第一場：{project['scenes'][0]['purpose']}",
+            "可操作：編輯、批准、單場景重生",
+        ],
+        "export": [
+            "匯出",
+            f"輸出資料夾：{project['outputDir']}",
+            "檔案：MP4、SRT、旁白、Caption、Metadata、Prompts",
+        ],
+        "settings": [
+            "設定",
+            f"FFmpeg：{load_config().get('ffmpegPath', '')}",
+            "可設定：ComfyUI、Whisper、TTS、輸出資料夾、字幕樣式",
+        ],
+    }
+    created = []
+    for name, lines in screens.items():
+        path = target_dir / f"{name}.png"
+        draw_evidence_image(path, lines)
+        created.append({"screen": name, "path": str(path), "url": file_url(path)})
+    return {"directory": str(target_dir), "screenshots": created}
+
+
+def draw_evidence_image(path: Path, lines: list[str]) -> None:
+    image = Image.new("RGB", (1440, 1000), "#f6f7f9")
+    draw = ImageDraw.Draw(image)
+    title_font = get_font(58)
+    body_font = get_font(34)
+    small_font = get_font(24)
+    draw.rectangle((0, 0, 280, 1000), fill="#17231f")
+    draw.text((34, 42), "Temple AI Studio", fill="#ffffff", font=body_font)
+    nav = ["首頁", "商品資料庫", "建立影片", "生成進度", "影片預覽", "場景細節", "匯出", "設定"]
+    y = 140
+    for item in nav:
+        draw.rounded_rectangle((28, y, 252, y + 48), radius=8, outline="#52645f", width=2)
+        draw.text((48, y + 9), item, fill="#dce4e1", font=small_font)
+        y += 64
+    draw.rectangle((280, 0, 1440, 92), fill="#ffffff")
+    draw.text((320, 22), lines[0], fill="#1c2430", font=title_font)
+    draw.rounded_rectangle((320, 140, 1360, 850), radius=14, fill="#ffffff", outline="#d9dee8", width=2)
+    y = 190
+    for line in lines[1:]:
+        wrapped = wrap_text(draw, line, body_font, 940)
+        for part in wrapped:
+            draw.text((370, y), part, fill="#1c2430", font=body_font)
+            y += 54
+        y += 18
+    draw.text((370, 790), f"Application-side evidence generated at {now_iso()}", fill="#667085", font=small_font)
+    image.save(path)
+
+
+def create_release_package() -> dict:
+    ensure_dirs()
+    version_dir = RELEASE_ROOT / f"TempleProductVideoGenerator-{VERSION}"
+    if version_dir.exists():
+        shutil.rmtree(version_dir)
+    version_dir.mkdir(parents=True)
+    include_files = [
+        "config.sample.json",
+        "index.html",
+        "package.json",
+        "README.md",
+        "server.py",
+        "start.bat",
+        "styles.css",
+    ]
+    for name in include_files:
+        shutil.copy2(APP_ROOT / name, version_dir / name)
+    shutil.copytree(APP_ROOT / "src", version_dir / "src")
+    docs_dir = version_dir / "docs"
+    docs_dir.mkdir()
+    for name in [
+        "V1_BACKUP_AND_RECOVERY.md",
+        "V1_CEO_ACCEPTANCE_REPORT.md",
+        "V1_FINAL_QA_REPORT.md",
+        "V1_IMPLEMENTATION_REPORT.md",
+        "V1_USER_QUICKSTART_ZH_TW.md",
+        "V1_KNOWN_LIMITATIONS.md",
+        "V1_RELEASE_MANIFEST.md",
+        "V1_RELEASE_NOTES.md",
+        "V1_VALIDATION_REPORT.md",
+    ]:
+        source = APP_ROOT.parent.parent / "docs" / name
+        if source.exists():
+            shutil.copy2(source, docs_dir / name)
+    sample_dir = version_dir / "sample-data"
+    sample_dir.mkdir()
+    make_demo_image(sample_dir / "sample-product-photo.png")
+    (sample_dir / "sample-product-project.json").write_text(
+        json.dumps(
+            {
+                "product": {
+                    "name": "Temple Energy Candle",
+                    "category": "能量蠟燭",
+                    "description": "以日常靜心與空間儀式為核心的手作蠟燭。",
+                    "sellingPoint": "讓使用者在忙碌生活裡建立一個穩定、安靜、可重複的儀式時刻。",
+                    "spiritualInfo": "適合冥想、睡前整理心緒、日常祝福與空間淨化感的情境。",
+                    "targetAudience": "喜歡質感生活、身心靈日常與送禮儀式感的使用者。",
+                },
+                "videoRequest": "請製作一支溫柔、清楚、有儀式感的商品短影片。",
+                "platform": "Instagram Reels",
+                "duration": 24,
+                "samplePhoto": "sample-product-photo.png",
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    (version_dir / "VERSION.txt").write_text(VERSION, encoding="utf-8")
+    (version_dir / "README_ZH_TW.txt").write_text(
+        "Temple Product Video Generator V1\n\n請執行 start.bat 啟動。\n資料會建立在本資料夾的 data 目錄。\n不要直接刪除 data，除非已備份。\n",
+        encoding="utf-8",
+    )
+    zip_base = RELEASE_ROOT / f"TempleProductVideoGenerator-{VERSION}"
+    archive_path = shutil.make_archive(str(zip_base), "zip", version_dir)
+    return {"folder": str(version_dir), "archive": archive_path}
 
 
 def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
@@ -882,6 +1162,10 @@ class AppHandler(SimpleHTTPRequestHandler):
                 return self.serve_data_file(path.removeprefix("/api/files/"))
             if path.startswith("/api/output-files/"):
                 return self.serve_output_file(path.removeprefix("/api/output-files/"))
+            if path == "/api/evidence/screenshots":
+                return json_response(self, {"ok": True, **create_evidence_screenshots()})
+            if path == "/api/release/package":
+                return json_response(self, {"ok": True, **create_release_package()})
             if path.startswith("/api/export-package/"):
                 project_id = path.rsplit("/", 1)[-1]
                 project = find_item(load_db()["projects"], project_id)
@@ -906,6 +1190,10 @@ class AppHandler(SimpleHTTPRequestHandler):
                 return json_response(self, {"ok": True, "project": create_project(payload)})
             if path == "/api/demo/run":
                 return json_response(self, {"ok": True, "project": run_demo_project()})
+            if path == "/api/backup":
+                return json_response(self, {"ok": True, "backup": create_backup()})
+            if path == "/api/restore":
+                return json_response(self, {"ok": True, **restore_backup(payload.get("file", {}), payload.get("confirm", ""))})
             match = re.match(r"^/api/projects/([^/]+)/(approve|export|render)$", path)
             if match:
                 project_id, action = match.groups()
@@ -915,6 +1203,11 @@ class AppHandler(SimpleHTTPRequestHandler):
                     return json_response(self, {"ok": True, "project": render_project(project_id, preview=True)})
                 if action == "export":
                     return json_response(self, {"ok": True, "project": export_project(project_id)})
+            match = re.match(r"^/api/projects/([^/]+)/(approve|export|render|cancel)$", path)
+            if match:
+                project_id, action = match.groups()
+                if action == "cancel":
+                    return json_response(self, {"ok": True, "project": cancel_project(project_id)})
             match = re.match(r"^/api/projects/([^/]+)/scenes/([^/]+)/(update|approve|regenerate)$", path)
             if match:
                 project_id, scene_id, action = match.groups()
@@ -935,6 +1228,13 @@ class AppHandler(SimpleHTTPRequestHandler):
             match = re.match(r"^/api/products/([^/]+)$", path)
             if match:
                 return json_response(self, {"ok": True, "product": update_product(match.group(1), payload)})
+            match = re.match(r"^/api/products/([^/]+)/materials/([^/]+)/(replace|move)$", path)
+            if match:
+                product_id, material_id, action = match.groups()
+                if action == "replace":
+                    return json_response(self, {"ok": True, "material": replace_material(product_id, material_id, payload.get("file", {}))})
+                if action == "move":
+                    return json_response(self, {"ok": True, **move_material(product_id, material_id, payload.get("direction", "down"))})
             return json_response(self, {"ok": False, "message": "找不到 API 路徑"}, 404)
         except Exception as error:
             return json_response(self, {"ok": False, "message": user_error(error)}, 400)
@@ -948,6 +1248,9 @@ class AppHandler(SimpleHTTPRequestHandler):
             match = re.match(r"^/api/products/([^/]+)$", path)
             if match:
                 return json_response(self, {"ok": True, **delete_product(match.group(1))})
+            match = re.match(r"^/api/projects/([^/]+)$", path)
+            if match:
+                return json_response(self, {"ok": True, **delete_project(match.group(1))})
             return json_response(self, {"ok": False, "message": "找不到 API 路徑"}, 404)
         except Exception as error:
             return json_response(self, {"ok": False, "message": user_error(error)}, 400)

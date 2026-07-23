@@ -1,0 +1,14 @@
+{
+  "comfyuiUrl": "http://127.0.0.1:8188",
+  "comfyuiWorkflow": "",
+  "ffmpegPath": "C:\\Program Files\\Softdeluxe\\Free Download Manager\\ffmpeg.exe",
+  "whisperPath": "",
+  "ttsProvider": "none",
+  "outputDir": "data\\exports",
+  "defaultDuration": 30,
+  "includeLogo": true,
+  "subtitleStyle": "安全區底部白字深色陰影",
+  "providerMode": "local-first",
+  "cloudEnabled": false,
+  "version": "1.0.0"
+}

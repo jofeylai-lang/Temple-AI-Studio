@@ -32,6 +32,8 @@ Desktop.ini
 !apps/temple-product-video-generator/assets/screenshots/*.png
 apps/temple-product-video-generator/data/
 apps/temple-product-video-generator/runtime/
+apps/temple-product-video-generator/release/
+apps/temple-product-video-generator/__pycache__/
 
 # AI model files and local model artifacts
 *.safetensors

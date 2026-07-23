@@ -72,7 +72,7 @@ This does not affect local product usage or MP4 generation.
 ## Validated Demo
 
 ```text
-D:\AI\Jofey AI Studio\apps\temple-product-video-generator\data\exports\project-20260724-1ca7c1f0\final_video.mp4
+D:\AI\Jofey AI Studio\apps\temple-product-video-generator\data\exports\project-20260724-66ce7705\final_video.mp4
 ```
 
 ## CEO Acceptance Candidate

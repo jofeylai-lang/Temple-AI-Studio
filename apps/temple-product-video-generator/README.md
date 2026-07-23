@@ -1,93 +1,80 @@
 # Temple Product Video Generator V1
 
-Temple Product Video Generator is the first runnable product built on Temple AI Studio.
+Temple Product Video Generator 是 Temple AI Studio 的第一個可實際使用產品。
 
-V1 is local-first. It does not call paid APIs, does not require GitHub CLI, and can still produce a usable 9:16 MP4 when ComfyUI, Whisper, or TTS are not connected.
+V1 採用本機優先，不呼叫付費 API，不需要 GitHub CLI。即使沒有 ComfyUI、Whisper 或 TTS，也可以使用商品照片、繁體中文內容模板與 FFmpeg 產生可播放的 9:16 MP4。
 
-## Launch
+## 啟動方式
 
-Double-click:
+雙擊：
 
 ```text
 start.bat
 ```
 
-Or run:
+或執行：
 
 ```powershell
 cd "D:\AI\Jofey AI Studio\apps\temple-product-video-generator"
 python server.py
 ```
 
-Open:
+啟動後開啟：
 
 ```text
 http://127.0.0.1:4173
 ```
 
-## One Command Validation
+使用期間請保留啟動視窗開啟。
+
+## 一鍵驗證
 
 ```powershell
 cd "D:\AI\Jofey AI Studio\apps\temple-product-video-generator"
 python server.py --smoke-test
 ```
 
-The smoke test creates a demo product, creates a video project, regenerates one scene, approves the project, exports MP4, and verifies the required output package files.
+驗證會建立示範商品、建立影片專案、重生一個場景、批准專案、輸出 MP4，並檢查完整內容包。
 
-## Local Dependencies
+## 本機需求
 
-Required:
+必要：
 
 - Python 3
 - Pillow
 - FFmpeg
 
-Detected FFmpeg during V1 validation:
+本機驗收時偵測到的 FFmpeg：
 
 ```text
 C:\Program Files\Softdeluxe\Free Download Manager\ffmpeg.exe
 ```
 
-If FFmpeg is not found, V1 will still save products, photos, scripts, scenes, subtitles, prompts, and metadata, but it cannot honestly export MP4.
+若 FFmpeg 不存在，系統仍能保存商品、照片、腳本、場景、字幕、Prompt 與 Metadata，但不會假裝輸出 MP4。
 
-Optional:
+選用：
 
 - ComfyUI
 - Whisper
-- Local TTS
+- 本機 TTS
 
-## ComfyUI
+## 使用流程
 
-ComfyUI is optional for V1.
+1. 進入「商品資料庫」。
+2. 建立或選擇商品。
+3. 上傳一張或多張商品照片。
+4. 需要時排序、替換或移除照片。
+5. 進入「建立影片」。
+6. 輸入繁體中文影片需求。
+7. 產生腳本、場景、旁白、字幕、Prompt、Caption、SEO、Metadata 與預覽影片。
+8. 在「影片預覽」檢查整支影片。
+9. 在「場景細節」編輯、批准或重生單一場景。
+10. 批准整支影片。
+11. 匯出完整內容包。
 
-Use Settings to configure:
+## 匯出內容包
 
-- ComfyUI URL
-- Workflow name or path
-
-If ComfyUI is unavailable, V1 uses the reliable fallback path:
-
-```text
-real product photos + scene frames + Ken Burns motion + subtitles + FFmpeg MP4
-```
-
-## Workflow
-
-1. Open Product Library.
-2. Create or select a product.
-3. Upload one or more real product photos.
-4. Open Create Video.
-5. Enter the Traditional Chinese video request.
-6. Generate script, scenes, preview video, subtitles, caption, prompts, and metadata.
-7. Open Preview.
-8. Review the video and scene list.
-9. Open Scene Detail if one scene needs editing or regeneration.
-10. Approve the project.
-11. Export the complete content package.
-
-## Output Package
-
-Each completed project exports:
+每個完成專案會輸出：
 
 - `final_video.mp4`
 - `final_video_subtitled.mp4`
@@ -100,49 +87,56 @@ Each completed project exports:
 - `thumbnail_suggestion.txt`
 - `materials_used.txt`
 
-Default output location:
+預設輸出位置：
 
 ```text
 apps/temple-product-video-generator/data/exports/<project-id>/
 ```
 
-## Data Location
+## 資料位置
 
-Default data location:
+預設資料位置：
 
 ```text
 apps/temple-product-video-generator/data/
 ```
 
-The data folder contains local products, projects, uploaded images, generated preview files, and exports. It is ignored by Git to avoid committing private materials or generated media.
+此資料夾保存商品、照片、專案、備份與輸出檔，已被 Git 忽略，避免把私人素材或生成影片提交到版本庫。
 
-## Common Errors
+## 備份與還原
 
-### FFmpeg Not Found
+在「設定」頁可以：
 
-Set the FFmpeg path in Settings.
+- 建立資料備份
+- 還原備份 zip
+- 產生操作證據圖
+- 建立 release package
 
-V1 validation found an existing FFmpeg at:
+還原備份前必須輸入：
 
 ```text
-C:\Program Files\Softdeluxe\Free Download Manager\ffmpeg.exe
+RESTORE
 ```
 
-### ComfyUI Not Connected
+系統會先建立安全備份，再執行還原。
 
-This is not a V1 blocker. The app will show the connection status and continue using the local fallback generator.
+## ComfyUI
 
-### No Product Photo
+ComfyUI 是 V1 選用項目。
 
-Upload at least one product photo before creating a video.
+可在「設定」頁填寫：
 
-### MP4 Export Failed
+- ComfyUI 位址
+- ComfyUI 工作流
 
-Open Generation Progress to read the user-facing error, then retry preview render or export.
+若 ComfyUI 尚未連線，V1 會使用可靠 fallback：
 
-## Notes
+```text
+真實商品照片 + 場景圖片 + Ken Burns 動態 + 字幕 + FFmpeg MP4
+```
 
-- User-facing copy defaults to Traditional Chinese and Taiwan usage.
-- V1 does not perform voice cloning.
-- V1 does not call paid cloud APIs.
-- V1 burns subtitles into scene frames and also exports `subtitles.srt`.
+## 移除方式
+
+若要移除程式，可刪除應用程式資料夾。
+
+請注意：刪除前請先備份 `data/`，否則商品、照片、專案和輸出影片會一起消失。
