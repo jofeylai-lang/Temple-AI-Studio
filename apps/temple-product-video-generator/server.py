@@ -17,7 +17,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 
 
 APP_ROOT = Path(__file__).resolve().parent
@@ -27,6 +27,7 @@ if str(SCRIPTS_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_ROOT))
 
 from temple_ai_studio.script_engine import generate_video_script_package
+from temple_ai_studio.image_pipeline import run_image_pipeline
 
 DATA_ROOT = Path(os.environ.get("TPVG_DATA_DIR", APP_ROOT / "data")).resolve()
 DB_PATH = DATA_ROOT / "database.json"
@@ -928,7 +929,7 @@ def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
     config = load_config()
     ffmpeg = config.get("ffmpegPath") or detect_ffmpeg()
     if not ffmpeg or not Path(ffmpeg).exists():
-        raise RuntimeError("找不到 FFmpeg，無法輸出真正 MP4")
+        raise RuntimeError("??? FFmpeg????? MP4?")
     output_dir = Path(project["outputDir"])
     frames_dir = Path(project["projectDir"]) / "frames"
     clips_dir = Path(project["projectDir"]) / "clips"
@@ -937,15 +938,24 @@ def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
     clips_dir.mkdir(parents=True, exist_ok=True)
     material_paths = [Path(m["path"]) for m in product.get("materials", []) if Path(m["path"]).exists()]
     if not material_paths:
-        raise RuntimeError("找不到可用的商品照片")
+        raise RuntimeError("???????????")
+
+    visual_report = run_image_pipeline(project, product, Path(project["projectDir"]))
+    if visual_report.get("quality", {}).get("overall") != "PASS":
+        append_log("generation.log", "visual-pipeline-quality-failed", {"projectId": project["id"], "quality": visual_report.get("quality")})
+        raise RuntimeError("???????????????????????")
+
     clip_paths = []
-    for index, scene in enumerate(project["scenes"]):
-        material = material_paths[index % len(material_paths)]
+    for scene in project["scenes"]:
         frame_path = frames_dir / f"{scene['order']:02d}-{scene['id']}-v{scene['version']}.png"
         clip_path = clips_dir / f"{scene['order']:02d}-{scene['id']}-v{scene['version']}.mp4"
-        create_scene_frame(material, frame_path, product, scene, project)
+        generated_image = Path(scene.get("generatedImagePath", ""))
+        if not generated_image.exists():
+            raise RuntimeError(f"????????{scene.get('id')}")
+        shutil.copyfile(generated_image, frame_path)
         make_clip(ffmpeg, frame_path, clip_path, int(scene["duration"]))
         clip_paths.append(clip_path)
+
     concat_path = Path(project["projectDir"]) / ("preview-concat.txt" if preview else "final-concat.txt")
     concat_path.write_text("".join([f"file '{path.as_posix()}'\n" for path in clip_paths]), encoding="utf-8")
     target = output_dir / ("preview.mp4" if preview else "final_video.mp4")
@@ -960,62 +970,14 @@ def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
         "finalVideo": file_url(target) if not preview else project.get("finalVideo"),
         "subtitles": file_url(srt_path),
         "ffmpegPath": ffmpeg,
+        "scenes": project["scenes"],
+        "storyboard": visual_report.get("storyboard"),
+        "providerPrompts": visual_report.get("providerPrompts"),
+        "visualQuality": visual_report.get("quality"),
+        "visualPipelineReport": str(Path(project["projectDir"]) / "visual-pipeline-report.json"),
+        "assetIndex": visual_report.get("assetIndex"),
         "videoSpec": "1080x1920, MP4, H.264 via h264_mf when available, subtitles burned into frames",
     }
-
-
-def create_scene_frame(material_path: Path, frame_path: Path, product: dict, scene: dict, project: dict) -> None:
-    canvas = Image.new("RGB", FRAME_SIZE, "#f7f3ec")
-    with Image.open(material_path) as source:
-        source = source.convert("RGB")
-        background = fit_cover(source, FRAME_SIZE).filter(ImageFilter.GaussianBlur(18))
-        overlay = Image.new("RGB", FRAME_SIZE, "#ffffff")
-        canvas = Image.blend(background, overlay, 0.36)
-        product_img = fit_contain(source, (880, 900))
-    draw = ImageDraw.Draw(canvas)
-    product_x = (FRAME_SIZE[0] - product_img.width) // 2
-    product_y = 430
-    draw.rounded_rectangle(
-        (product_x - 24, product_y - 24, product_x + product_img.width + 24, product_y + product_img.height + 24),
-        radius=34,
-        fill="#ffffff",
-        outline="#d7c7ae",
-        width=4,
-    )
-    canvas.paste(product_img, (product_x, product_y))
-    title_font = get_font(54)
-    purpose_font = get_font(34)
-    subtitle_font = get_font(58)
-    small_font = get_font(28)
-    draw.text((80, 110), product["name"], fill="#17231f", font=title_font)
-    draw.text((82, 178), scene["purpose"], fill="#8d5d3c", font=purpose_font)
-    safe_box = (70, 1450, 1010, 1730)
-    draw.rounded_rectangle(safe_box, radius=26, fill=(23, 35, 31))
-    lines = wrap_text(draw, scene["subtitle"], subtitle_font, 880)
-    y = safe_box[1] + 42
-    for line in lines:
-        bbox = draw.textbbox((0, 0), line, font=subtitle_font)
-        draw.text(((FRAME_SIZE[0] - (bbox[2] - bbox[0])) // 2, y), line, fill="#ffffff", font=subtitle_font)
-        y += 76
-    if load_config().get("includeLogo", True):
-        draw.rounded_rectangle((760, 1780, 1010, 1848), radius=12, fill="#245c4f")
-        draw.text((790, 1796), "Temple AI Studio", fill="#ffffff", font=small_font)
-    frame_path.parent.mkdir(parents=True, exist_ok=True)
-    canvas.save(frame_path)
-
-
-def fit_cover(img: Image.Image, size: tuple[int, int]) -> Image.Image:
-    ratio = max(size[0] / img.width, size[1] / img.height)
-    resized = img.resize((int(img.width * ratio), int(img.height * ratio)), Image.LANCZOS)
-    left = (resized.width - size[0]) // 2
-    top = (resized.height - size[1]) // 2
-    return resized.crop((left, top, left + size[0], top + size[1]))
-
-
-def fit_contain(img: Image.Image, size: tuple[int, int]) -> Image.Image:
-    ratio = min(size[0] / img.width, size[1] / img.height)
-    return img.resize((int(img.width * ratio), int(img.height * ratio)), Image.LANCZOS)
-
 
 def make_clip(ffmpeg: str, frame: Path, output: Path, duration: int) -> None:
     frames = max(FPS * duration, FPS * 2)
@@ -1081,6 +1043,11 @@ def write_export_package(project: dict) -> None:
     (output_dir / "metadata.json").write_text(json.dumps(project["metadata"], ensure_ascii=False, indent=2), encoding="utf-8")
     (output_dir / "scenes.json").write_text(json.dumps(project["scenes"], ensure_ascii=False, indent=2), encoding="utf-8")
     (output_dir / "prompts.json").write_text(json.dumps(project["prompts"], ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "storyboard.json").write_text(json.dumps(project.get("storyboard", {}), ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "provider_prompts.json").write_text(json.dumps(project.get("providerPrompts", {}), ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "visual_quality.json").write_text(json.dumps(project.get("visualQuality", {}), ensure_ascii=False, indent=2), encoding="utf-8")
+    if project.get("assetIndex") and Path(project["assetIndex"]).exists():
+        shutil.copyfile(project["assetIndex"], output_dir / "asset_index.json")
     (output_dir / "thumbnail_suggestion.txt").write_text(project["thumbnailSuggestion"], encoding="utf-8")
     product = find_item(load_db()["products"], project["productId"])
     material_lines = [f"{m['fileName']} | {m['path']}" for m in product.get("materials", [])]

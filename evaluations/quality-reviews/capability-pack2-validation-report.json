@@ -1,0 +1,28 @@
+{
+  "schema": "temple-ai-studio.capability-pack2-validation.v1",
+  "createdAt": "2026-07-24T13:02:58",
+  "overall": "PASS",
+  "capabilities": {
+    "storyboardEngine": "PASS",
+    "promptTranslationEngine": "PASS",
+    "imagePipeline": "PASS",
+    "assetManager": "PASS",
+    "qualityAnalyzerV1": "PASS",
+    "productionIntegration": "PASS"
+  },
+  "tests": {
+    "compile": "PASS",
+    "unitTests": "PASS: 4 tests",
+    "appSmokeTest": "PASS",
+    "exportQualityCheck": "PASS",
+    "placeholderScan": "PASS"
+  },
+  "finalRehearsalProjectId": "project-20260724-7c212f8e",
+  "finalMp4": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-7c212f8e\\final_video.mp4",
+  "exportDir": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-7c212f8e",
+  "visualQualityScore": 0.9176,
+  "assetCount": 21,
+  "generatedSceneImageCount": 18,
+  "requiredExportFilesChecked": 13,
+  "failedChecks": []
+}

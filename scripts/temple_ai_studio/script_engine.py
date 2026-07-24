@@ -224,7 +224,7 @@ def build_scene_templates(product: dict[str, Any], intent: dict[str, Any]) -> li
 def build_prompt(scene: dict[str, str], product: dict[str, Any], intent: dict[str, Any], platform: dict[str, str]) -> str:
     name = product_value(product, "name", "Temple product")
     material_count = len(product.get("materials", []) or [])
-    source_note = "use uploaded product photos as identity and product reference" if material_count else "prepare placeholder visual until product photos are provided"
+    source_note = "use uploaded product photos as identity and product reference" if material_count else "block visual generation until product photos are provided"
     return (
         f"Temple product video scene. Product: {name}. Scene purpose: {scene['purpose']}. "
         f"Visual goal: {scene['visual']} Motion: subtle cinematic movement, stable product framing, vertical 9:16. "
@@ -280,7 +280,7 @@ def generate_video_script_package(product: dict[str, Any], payload: dict[str, An
                 "id": new_id("prompt"),
                 "sceneId": scene_id,
                 "category": "video",
-                "providerMode": "local-template",
+                "providerMode": "local-rule-script",
                 "text": prompt,
                 "createdAt": now_iso(),
             }
