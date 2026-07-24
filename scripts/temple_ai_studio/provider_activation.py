@@ -545,6 +545,8 @@ class ProviderActivationManager:
                 "commercialDeclarationRequired",
                 "secretId",
                 "environmentName",
+                "workerPath",
+                "entryPoint",
             ):
                 if policy_field in default_provider:
                     provider[policy_field] = default_provider[policy_field]

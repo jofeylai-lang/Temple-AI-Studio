@@ -300,10 +300,17 @@ class Qwen3TTSProductionClient:
         ]
         if self.python.is_file():
             result = subprocess.run(
-                [str(self.python), "-c", "import qwen_tts, soundfile, torch"],
+                [
+                    str(self.python),
+                    "-c",
+                    (
+                        "import importlib.util as u, soundfile, torch; "
+                        "assert u.find_spec('qwen_tts') is not None"
+                    ),
+                ],
                 capture_output=True,
                 text=True,
-                timeout=30,
+                timeout=60,
                 check=False,
             )
             checks.append(

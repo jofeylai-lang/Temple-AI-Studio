@@ -176,6 +176,34 @@ class ProductionActivationTests(unittest.TestCase):
         self.assertIn("openai-paid", stopped["disabledProviders"])
         self.assertFalse(manager.provider("openai-paid")["enabled"])
 
+    def test_application_owned_provider_entry_points_follow_current_install(self) -> None:
+        manager = ProviderActivationManager(self.production / "providers")
+        manager.initialize()
+        registry = manager.load()
+        qwen = next(
+            item for item in registry["providers"] if item["id"] == "qwen3-tts-local"
+        )
+        musetalk = next(
+            item for item in registry["providers"] if item["id"] == "musetalk-local"
+        )
+        qwen["workerPath"] = r"D:\obsolete-development-copy\qwen3_tts_worker.py"
+        musetalk["entryPoint"] = r"D:\obsolete-development-copy\musetalk_worker.py"
+        manager.save(registry)
+
+        rebound = manager.load()
+        defaults = {
+            item["id"]: item for item in manager.defaults()["providers"]
+        }
+        rebound_by_id = {item["id"]: item for item in rebound["providers"]}
+        self.assertEqual(
+            rebound_by_id["qwen3-tts-local"]["workerPath"],
+            defaults["qwen3-tts-local"]["workerPath"],
+        )
+        self.assertEqual(
+            rebound_by_id["musetalk-local"]["entryPoint"],
+            defaults["musetalk-local"]["entryPoint"],
+        )
+
     def test_generic_comfy_host_cannot_be_selected_as_generation_provider(self) -> None:
         manager = ProviderActivationManager(self.production / "providers")
         manager.initialize()

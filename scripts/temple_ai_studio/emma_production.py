@@ -218,7 +218,9 @@ class EmmaProductionActivator:
         self.versions = self.root / "versions"
         self.state_path = self.root / "emma-production-state.json"
         self.intake_report_path = self.root / "reports" / "intake-report.json"
-        self.core = EmmaCore(self.project_root)
+        # Production identity data belongs beside other production data, not in
+        # disposable or Git-tracked application files.
+        self.core = EmmaCore(self.root.parent)
 
     def initialize(self) -> dict[str, Any]:
         for path in [
@@ -306,6 +308,62 @@ class EmmaProductionActivator:
             "voiceActivated": False,
             "updatedAt": now_iso(),
         }
+
+    def _sync_core_activation(
+        self,
+        identity_artifact: Path,
+        identity_payload: dict[str, Any],
+        voice_profile: Path,
+        voice_payload: dict[str, Any],
+        production_version: str,
+    ) -> bool:
+        profile = read_json(
+            self.core.profile_path,
+            self.core.default_identity_profile(),
+        )
+        identity_rules = dict(profile.get("identityRules", {}))
+        identity_rules.update(
+            {
+                "trainingRequiresCeoDatasetApproval": False,
+                "voiceCloningDisabledInThisPack": False,
+                "modelFineTuningDisabledInThisPack": False,
+                "realPersonVoiceCloningProhibited": True,
+            }
+        )
+        activation = {
+            "productionVersion": production_version,
+            "identityActivated": True,
+            "voiceActivated": True,
+            "identityVersion": identity_payload.get("identityVersion", ""),
+            "identityAdapter": str(Path(identity_artifact).resolve()),
+            "voiceProfile": str(Path(voice_profile).resolve()),
+            "voiceProfileId": voice_payload.get("profileId", ""),
+        }
+        permanent_identity = dict(profile.get("permanentIdentity", {}))
+        for field in [
+            "faceIdentity",
+            "bodyIdentity",
+            "bodyProportions",
+            "skinTone",
+            "facialGeometry",
+        ]:
+            value = dict(permanent_identity.get(field, {}))
+            value["status"] = "synthetic-production-active"
+            permanent_identity[field] = value
+        desired = {
+            "status": "production-active",
+            "identityAdapter": str(Path(identity_artifact).resolve()),
+            "canonicalVoiceProfile": voice_payload.get("profileId", ""),
+            "identityRules": identity_rules,
+            "permanentIdentity": permanent_identity,
+            "productionActivation": activation,
+        }
+        changed = any(profile.get(key) != value for key, value in desired.items())
+        if changed:
+            profile.update(desired)
+            profile["updatedAt"] = now_iso()
+            atomic_write_json(self.core.profile_path, profile)
+        return changed
 
     def intake_guide(self) -> str:
         return (
@@ -520,6 +578,21 @@ class EmmaProductionActivator:
         validation_evidence: Path,
     ) -> dict[str, Any]:
         preparation = self.prepare_adapters()
+        return self.activate_prepared_version(
+            identity_artifact,
+            voice_profile,
+            validation_evidence,
+            preparation,
+        )
+
+    def activate_prepared_version(
+        self,
+        identity_artifact: Path,
+        voice_profile: Path,
+        validation_evidence: Path,
+        preparation: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Activate a validated Emma package prepared by an approved intake path."""
         evidence = read_json(Path(validation_evidence), {})
         required_checks = {
             "identitySimilarity",
@@ -532,6 +605,11 @@ class EmmaProductionActivator:
         checks = [
             {"name": "identity-artifact", "ok": Path(identity_artifact).is_file()},
             {"name": "voice-profile", "ok": Path(voice_profile).is_file()},
+            {
+                "name": "prepared-dataset",
+                "ok": preparation.get("overall") == "PASS"
+                and str(preparation.get("provenance", "")).lower() == "real-production",
+            },
             {
                 "name": "real-evaluators",
                 "ok": evidence.get("identityEvaluator") == "opencv-sface"
@@ -550,6 +628,47 @@ class EmmaProductionActivator:
         if not all(check["ok"] for check in checks):
             return {"overall": "BLOCKED", "checks": checks}
         current = read_json(self.state_path, self.default_state())
+        identity_payload = read_json(Path(identity_artifact), {})
+        voice_payload = read_json(Path(voice_profile), {})
+        active_record = read_json(
+            self.versions / f"{current.get('activeVersion')}.json",
+            {},
+        )
+        matching_active_version = (
+            current.get("status") == "ACTIVE"
+            and current.get("activeVersion")
+            and active_record.get("identityArtifactSha256")
+            == sha256_file(Path(identity_artifact))
+            and active_record.get("voiceProfileSha256")
+            == sha256_file(Path(voice_profile))
+            and active_record.get("validationEvidenceSha256")
+            == sha256_file(Path(validation_evidence))
+        )
+        if matching_active_version:
+            core_changed = self._sync_core_activation(
+                Path(identity_artifact),
+                identity_payload,
+                Path(voice_profile),
+                voice_payload,
+                current["activeVersion"],
+            )
+            if core_changed:
+                self.core.create_identity_version(
+                    f"Production activation state synchronized {current['activeVersion']}"
+                )
+            if not current.get("activationFinalized"):
+                self.core.create_identity_version(
+                    f"Production activation {current['activeVersion']}"
+                )
+                current["activationFinalized"] = True
+                current["updatedAt"] = now_iso()
+                atomic_write_json(self.state_path, current)
+            return {
+                "overall": "PASS",
+                "version": active_record,
+                "state": current,
+                "idempotent": True,
+            }
         version_number = len(list(self.versions.glob("emma-production-v*.json"))) + 1
         version = f"emma-production-v{version_number}"
         record = {
@@ -566,16 +685,29 @@ class EmmaProductionActivator:
             "previousVersion": current.get("activeVersion"),
         }
         atomic_write_json(self.versions / f"{version}.json", record)
+        self._sync_core_activation(
+            Path(identity_artifact),
+            identity_payload,
+            Path(voice_profile),
+            voice_payload,
+            version,
+        )
+        self.core.create_identity_version(f"Production activation {version}")
         state = {
             **current,
             "status": "ACTIVE",
             "activeVersion": version,
             "identityActivated": True,
             "voiceActivated": True,
+            "activeIdentityVersion": identity_payload.get(
+                "identityVersion",
+                current.get("activeIdentityVersion"),
+            ),
+            "activeVoiceProfile": voice_payload.get("profileId", ""),
+            "activationFinalized": True,
             "updatedAt": now_iso(),
         }
         atomic_write_json(self.state_path, state)
-        self.core.create_identity_version(f"Production activation {version}")
         return {"overall": "PASS", "version": record, "state": state}
 
     def rollback(self, version: str, confirmation: str) -> dict[str, Any]:
@@ -585,6 +717,19 @@ class EmmaProductionActivator:
         record = read_json(record_path, {})
         if not record:
             raise ValueError(f"Emma production version does not exist: {version}")
+        identity_artifact = Path(record.get("identityArtifact", ""))
+        voice_profile = Path(record.get("voiceProfile", ""))
+        if (
+            not identity_artifact.is_file()
+            or not voice_profile.is_file()
+            or sha256_file(identity_artifact) != record.get("identityArtifactSha256")
+            or sha256_file(voice_profile) != record.get("voiceProfileSha256")
+        ):
+            raise RuntimeError(
+                f"Emma production version {version} failed artifact integrity validation."
+            )
+        identity_payload = read_json(identity_artifact, {})
+        voice_payload = read_json(voice_profile, {})
         current = read_json(self.state_path, self.default_state())
         rollback_record = {
             "id": f"rollback-{uuid.uuid4().hex[:10]}",
@@ -592,14 +737,33 @@ class EmmaProductionActivator:
             "toVersion": version,
             "createdAt": now_iso(),
         }
+        core_changed = self._sync_core_activation(
+            identity_artifact,
+            identity_payload,
+            voice_profile,
+            voice_payload,
+            version,
+        )
+        if core_changed:
+            self.core.create_identity_version(f"Production rollback to {version}")
         current["activeVersion"] = version
         current["status"] = "ACTIVE"
         current["identityActivated"] = True
         current["voiceActivated"] = True
+        current["activeIdentityVersion"] = identity_payload.get(
+            "identityVersion",
+            current.get("activeIdentityVersion"),
+        )
+        current["activeVoiceProfile"] = voice_payload.get("profileId", "")
+        current["activationFinalized"] = True
         current["lastRollback"] = rollback_record
         current["updatedAt"] = now_iso()
         atomic_write_json(self.state_path, current)
-        return {"overall": "PASS", "rollback": rollback_record}
+        return {
+            "overall": "PASS",
+            "rollback": rollback_record,
+            "state": current,
+        }
 
     def status(self) -> dict[str, Any]:
         state = read_json(self.state_path, self.default_state())
