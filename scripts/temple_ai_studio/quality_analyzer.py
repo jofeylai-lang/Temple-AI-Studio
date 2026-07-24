@@ -7,7 +7,7 @@ from pathlib import Path
 from statistics import mean
 from typing import Any
 
-from PIL import Image, ImageStat
+from PIL import Image, ImageFilter, ImageStat
 
 
 QUALITY_SCHEMA = "temple-ai-studio.visual-quality.v1"
@@ -37,6 +37,23 @@ def score_readability(image: Image.Image) -> float:
     return round(min(1.0, contrast / 42), 4)
 
 
+def score_sharpness(image: Image.Image) -> float:
+    gray = image.convert("L")
+    edges = gray.filter(ImageFilter.FIND_EDGES)
+    stat = ImageStat.Stat(edges)
+    return round(min(1.0, stat.stddev[0] / 28), 4)
+
+
+def score_subtitle_contrast(image: Image.Image) -> float:
+    crop = image.crop((60, int(image.height * 0.72), image.width - 60, int(image.height * 0.92))).convert("L")
+    stat = ImageStat.Stat(crop)
+    mean_luma = stat.mean[0]
+    contrast = stat.stddev[0]
+    dark_box_score = max(0.0, min(1.0, (170 - mean_luma) / 120))
+    contrast_score = min(1.0, contrast / 50)
+    return round(dark_box_score * 0.45 + contrast_score * 0.55, 4)
+
+
 def score_composition(image: Image.Image) -> float:
     gray = image.convert("L")
     center = gray.crop((int(image.width * 0.2), int(image.height * 0.22), int(image.width * 0.8), int(image.height * 0.72)))
@@ -49,6 +66,27 @@ def score_composition(image: Image.Image) -> float:
     center_luma = ImageStat.Stat(center).mean[0]
     edge_luma = mean(ImageStat.Stat(edge).mean[0] for edge in edges)
     return round(min(1.0, 0.72 + abs(center_luma - edge_luma) / 255), 4)
+
+
+def score_product_visibility_from_image(image: Image.Image) -> float:
+    gray = image.convert("L")
+    product_zone = gray.crop((int(image.width * 0.16), int(image.height * 0.2), int(image.width * 0.84), int(image.height * 0.68)))
+    center_core = gray.crop((int(image.width * 0.28), int(image.height * 0.28), int(image.width * 0.72), int(image.height * 0.6)))
+    edge_zones = [
+        gray.crop((0, 0, image.width, int(image.height * 0.12))),
+        gray.crop((0, int(image.height * 0.9), image.width, image.height)),
+        gray.crop((0, 0, int(image.width * 0.08), image.height)),
+        gray.crop((int(image.width * 0.92), 0, image.width, image.height)),
+    ]
+    product_contrast = ImageStat.Stat(product_zone).stddev[0]
+    center_detail = ImageStat.Stat(center_core.filter(ImageFilter.FIND_EDGES)).stddev[0]
+    center_luma = ImageStat.Stat(center_core).mean[0]
+    edge_contrast = mean(ImageStat.Stat(edge).stddev[0] for edge in edge_zones)
+    detail_score = min(1.0, center_detail / 24)
+    contrast_score = min(1.0, product_contrast / 45)
+    separation_score = min(1.0, max(0, product_contrast - edge_contrast + 18) / 60)
+    luma_score = 1.0 if 45 <= center_luma <= 230 else 0.65
+    return round(0.18 + detail_score * 0.34 + contrast_score * 0.24 + separation_score * 0.16 + luma_score * 0.08, 4)
 
 
 def score_prompt(prompt: str) -> float:
@@ -79,10 +117,19 @@ def evaluate_image(
             "aspectRatio": score_aspect(image.width, image.height),
             "composition": score_composition(image),
             "textReadability": score_readability(image),
+            "subtitleContrast": score_subtitle_contrast(image),
+            "sharpness": score_sharpness(image),
             "promptQuality": score_prompt((prompt_bundle or {}).get("positive", scene.get("prompt", ""))),
-            "productVisibility": 0.92,
-            "commercialUsability": 0.88,
+            "productVisibility": score_product_visibility_from_image(image),
         }
+        scores["commercialUsability"] = round(
+            scores["composition"] * 0.22
+            + scores["textReadability"] * 0.20
+            + scores["subtitleContrast"] * 0.16
+            + scores["sharpness"] * 0.16
+            + scores["productVisibility"] * 0.26,
+            4,
+        )
     if emma_identity_report:
         overall = emma_identity_report.get("overall")
         scores["emmaIdentityConsistency"] = 1.0 if overall in ["PASS", "NOT_REQUIRED"] else 0.0 if overall == "FAIL" else 0.5
@@ -92,14 +139,16 @@ def evaluate_image(
         ).lower()
         scores["emmaIdentityConsistency"] = 0.5 if "emma" in emma_required_text else 1.0
     weighted = (
-        scores["resolution"] * 0.16
-        + scores["aspectRatio"] * 0.12
-        + scores["composition"] * 0.14
-        + scores["textReadability"] * 0.12
-        + scores["promptQuality"] * 0.16
-        + scores["productVisibility"] * 0.14
+        scores["resolution"] * 0.14
+        + scores["aspectRatio"] * 0.08
+        + scores["composition"] * 0.12
+        + scores["textReadability"] * 0.10
+        + scores["subtitleContrast"] * 0.10
+        + scores["sharpness"] * 0.10
+        + scores["promptQuality"] * 0.12
+        + scores["productVisibility"] * 0.12
         + scores["commercialUsability"] * 0.10
-        + scores["emmaIdentityConsistency"] * 0.06
+        + scores["emmaIdentityConsistency"] * 0.02
     )
     failed = [key for key, value in scores.items() if value < 0.72]
     return {

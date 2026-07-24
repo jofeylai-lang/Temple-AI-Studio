@@ -88,6 +88,10 @@ class CapabilityPack2Tests(unittest.TestCase):
         quality = evaluate_image(Path(scene["generatedImagePath"]), scene, scene["providerPrompts"]["openai"])
         self.assertEqual(quality["overall"], "PASS")
         self.assertGreaterEqual(quality["score"], 0.78)
+        self.assertLessEqual(quality["score"], 1.0)
+        self.assertIn("sharpness", quality["scores"])
+        self.assertIn("subtitleContrast", quality["scores"])
+        self.assertGreaterEqual(quality["scores"]["productVisibility"], 0.72)
         self.assertEqual(report["history"][0]["attempt"], 0)
 
 

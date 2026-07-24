@@ -177,7 +177,7 @@ class RenderingPipeline:
     def __init__(self, ffmpeg: Path, provider: str = LOCAL_PROVIDER, codecs: list[str] | None = None):
         self.ffmpeg = Path(ffmpeg)
         self.provider = provider
-        self.codecs = codecs or ["h264_mf", "mpeg4"]
+        self.codecs = codecs or ["libx264", "h264_mf", "mpeg4"]
 
     def render_clip(self, frame: Path, output: Path, duration: int, camera: dict[str, Any]) -> dict[str, Any]:
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -189,6 +189,7 @@ class RenderingPipeline:
         attempts = []
         last_error = ""
         for codec in self.codecs:
+            video_args = self._video_args(codec)
             cmd = [
                 str(self.ffmpeg),
                 "-y",
@@ -209,20 +210,28 @@ class RenderingPipeline:
                 "-r",
                 str(FPS),
                 "-shortest",
-                "-c:v",
-                codec,
-                "-b:v",
-                "5000k",
+                *video_args,
                 "-c:a",
                 "aac",
+                "-b:a",
+                "96k",
+                "-movflags",
+                "+faststart",
                 str(output),
             ]
             result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
-            attempts.append({"codec": codec, "returnCode": result.returncode})
+            attempts.append({"codec": codec, "returnCode": result.returncode, "videoArgs": video_args})
             if result.returncode == 0:
-                return {"engine": "rendering", "overall": "PASS", "output": str(output), "codec": codec, "attempts": attempts}
+                return {"engine": "rendering", "overall": "PASS", "output": str(output), "codec": codec, "videoArgs": video_args, "attempts": attempts}
             last_error = result.stderr[-2000:]
         return {"engine": "rendering", "overall": "FAIL", "output": str(output), "attempts": attempts, "error": last_error}
+
+    def _video_args(self, codec: str) -> list[str]:
+        if codec == "libx264":
+            return ["-c:v", "libx264", "-preset", "medium", "-crf", "18", "-profile:v", "high", "-pix_fmt", "yuv420p"]
+        if codec == "h264_mf":
+            return ["-c:v", "h264_mf", "-b:v", "8000k", "-pix_fmt", "yuv420p"]
+        return ["-c:v", codec, "-b:v", "6500k", "-pix_fmt", "yuv420p"]
 
     def concat(self, clips: list[Path], output: Path, work_dir: Path) -> dict[str, Any]:
         concat_path = work_dir / f"{output.stem}-concat.txt"
@@ -230,7 +239,7 @@ class RenderingPipeline:
         cmd = [str(self.ffmpeg), "-y", "-f", "concat", "-safe", "0", "-i", str(concat_path), "-c", "copy", str(output)]
         result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
         if result.returncode != 0:
-            reencode = [str(self.ffmpeg), "-y", "-f", "concat", "-safe", "0", "-i", str(concat_path), "-c:v", "mpeg4", "-c:a", "aac", str(output)]
+            reencode = [str(self.ffmpeg), "-y", "-f", "concat", "-safe", "0", "-i", str(concat_path), "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-c:a", "aac", "-movflags", "+faststart", str(output)]
             second = subprocess.run(reencode, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
             return {"engine": "concat", "overall": "PASS" if second.returncode == 0 else "FAIL", "output": str(output), "fallback": True, "returnCode": second.returncode, "error": second.stderr[-2000:]}
         return {"engine": "concat", "overall": "PASS", "output": str(output), "fallback": False, "returnCode": result.returncode}

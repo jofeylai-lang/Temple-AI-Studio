@@ -1,0 +1,30 @@
+{
+  "baseline": {
+    "exportDir": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-c6c5bcd5",
+    "visualScoreCurrentMetric": 0.9247,
+    "commercialUsability": 0.9185,
+    "productVisibility": 0.8967,
+    "composition": 0.8055,
+    "failedScenes": [],
+    "videoBytes": 6905046,
+    "videoQuality": "Stream #0:0(und): Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p, 1080x1920, 2294 kb/s, 25 fps, 25 tbr, 12800 tbn, 50 tbc (default)"
+  },
+  "optimized": {
+    "exportDir": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-f5c139d9",
+    "visualScoreCurrentMetric": 0.931,
+    "commercialUsability": 0.929,
+    "productVisibility": 0.9352,
+    "composition": 0.7867,
+    "failedScenes": [],
+    "videoBytes": 9054004,
+    "videoQuality": "Stream #0:0(und): Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p, 1080x1920, 3011 kb/s, 25 fps, 25 tbr, 12800 tbn, 50 tbc (default)"
+  },
+  "improvement": {
+    "visualScoreDelta": 0.0063,
+    "visualScorePercent": 0.68,
+    "commercialUsabilityDelta": 0.0105,
+    "productVisibilityDelta": 0.0385,
+    "videoBytesDelta": 2148958,
+    "videoBytesPercent": 31.12
+  }
+}

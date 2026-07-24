@@ -85,6 +85,7 @@ class VideoIntelligenceTests(unittest.TestCase):
         self.assertTrue(output.exists())
         self.assertEqual(report["attempts"][0]["returnCode"] != 0, True)
         self.assertEqual(report["codec"], "mpeg4")
+        self.assertIn("-b:v", report["videoArgs"])
 
     def test_full_video_pipeline_outputs_playable_video_with_quality(self) -> None:
         output_dir = self.root / "exports"
@@ -97,6 +98,7 @@ class VideoIntelligenceTests(unittest.TestCase):
         for scene_report in report["sceneReports"]:
             self.assertEqual(scene_report["subtitle"]["overall"], "PASS")
             self.assertEqual(scene_report["render"]["overall"], "PASS")
+            self.assertIn("videoArgs", scene_report["render"])
             self.assertIn(scene_report["lipSync"]["overall"], ["NOT_REQUIRED", "READY", "WAITING_FOR_AUDIO"])
 
 

@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
 from temple_ai_studio.asset_manager import AssetManager
 from temple_ai_studio.emma_core import EmmaCore
@@ -81,14 +81,17 @@ class LocalCommercialCompositeProvider:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with Image.open(source_image) as raw:
             source = raw.convert("RGB")
-            background = fit_cover(source, FRAME_SIZE).filter(ImageFilter.GaussianBlur(20 - min(attempt, 1) * 4))
+            source = self._enhance_product(source, attempt)
+            background = fit_cover(source, FRAME_SIZE).filter(ImageFilter.GaussianBlur(16 - min(attempt, 1) * 3))
             warm = Image.new("RGB", FRAME_SIZE, self._background_tint(scene.get("purpose", "")))
-            canvas = Image.blend(background, warm, 0.42 if attempt == 0 else 0.34)
+            canvas = Image.blend(background, warm, 0.36 if attempt == 0 else 0.30)
+            canvas = self._add_depth(canvas, scene.get("purpose", ""))
             product_box = self._product_box(scene.get("purpose", ""), attempt)
             product_img = fit_contain(source, (product_box[2] - product_box[0], product_box[3] - product_box[1]))
+            product_img = self._enhance_product(product_img, attempt)
         draw = ImageDraw.Draw(canvas)
         self._draw_commercial_layout(draw, canvas, product_img, product_box, scene, storyboard_scene, product, attempt)
-        canvas.save(output_path, quality=95)
+        canvas.save(output_path, optimize=True, quality=96)
         return {
             "provider": self.name,
             "seed": seed,
@@ -112,18 +115,37 @@ class LocalCommercialCompositeProvider:
             return "#eef3ef"
         return "#f7f3ec"
 
+    def _enhance_product(self, image: Image.Image, attempt: int) -> Image.Image:
+        enhanced = ImageEnhance.Color(image).enhance(1.06)
+        enhanced = ImageEnhance.Contrast(enhanced).enhance(1.08 + min(attempt, 1) * 0.04)
+        enhanced = ImageEnhance.Sharpness(enhanced).enhance(1.28 + min(attempt, 1) * 0.12)
+        return enhanced
+
+    def _add_depth(self, canvas: Image.Image, purpose: str) -> Image.Image:
+        overlay = Image.new("RGBA", FRAME_SIZE, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+        for y in range(FRAME_SIZE[1]):
+            top_bias = int(30 * (1 - y / FRAME_SIZE[1]))
+            bottom_bias = int(34 * max(0, (y - FRAME_SIZE[1] * 0.68) / (FRAME_SIZE[1] * 0.32)))
+            alpha = max(top_bias, bottom_bias)
+            if alpha:
+                draw.line((0, y, FRAME_SIZE[0], y), fill=(23, 35, 31, alpha))
+        if purpose in {"Hook", "Spiritual Value"}:
+            draw.ellipse((-180, 180, 1260, 1220), fill=(255, 255, 255, 26))
+        return Image.alpha_composite(canvas.convert("RGBA"), overlay).convert("RGB")
+
     def _product_box(self, purpose: str, attempt: int) -> tuple[int, int, int, int]:
         if purpose == "Hook":
-            return (170, 410, 910, 1080)
+            return (150, 360, 930, 1080)
         if purpose == "Product Features":
-            return (115, 360, 965, 1130)
+            return (95, 310, 985, 1130)
         if purpose == "Spiritual Value":
-            return (155, 390, 925, 1110)
+            return (135, 350, 945, 1110)
         if purpose == "Call To Action":
-            return (130, 330, 950, 1110)
+            return (105, 300, 975, 1110)
         if purpose == "Ending":
-            return (185, 360, 895, 1050)
-        return (140, 360, 940, 1100)
+            return (160, 325, 920, 1050)
+        return (120, 330, 960, 1100)
 
     def _draw_commercial_layout(
         self,
@@ -138,36 +160,37 @@ class LocalCommercialCompositeProvider:
     ) -> None:
         title_font = get_font(54)
         scene_font = get_font(30)
-        subtitle_font = get_font(62 if len(scene.get("subtitle", "")) <= 12 else 52)
+        subtitle_font = get_font(60 if len(scene.get("subtitle", "")) <= 12 else 50)
         small_font = get_font(28)
         product_x = product_box[0] + ((product_box[2] - product_box[0]) - product_img.width) // 2
         product_y = product_box[1] + ((product_box[3] - product_box[1]) - product_img.height) // 2
         shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
         shadow_draw = ImageDraw.Draw(shadow)
-        shadow_draw.rounded_rectangle((product_x - 34, product_y - 34, product_x + product_img.width + 34, product_y + product_img.height + 34), radius=42, fill=(0, 0, 0, 46))
-        shadow = shadow.filter(ImageFilter.GaussianBlur(16))
+        shadow_draw.rounded_rectangle((product_x - 42, product_y - 42, product_x + product_img.width + 42, product_y + product_img.height + 42), radius=48, fill=(0, 0, 0, 58))
+        shadow = shadow.filter(ImageFilter.GaussianBlur(18))
         canvas.paste(Image.alpha_composite(canvas.convert("RGBA"), shadow).convert("RGB"))
         draw.rounded_rectangle(
-            (product_x - 26, product_y - 26, product_x + product_img.width + 26, product_y + product_img.height + 26),
-            radius=36,
+            (product_x - 28, product_y - 28, product_x + product_img.width + 28, product_y + product_img.height + 28),
+            radius=34,
             fill="#ffffff",
             outline="#d6c4a8",
-            width=4,
+            width=3,
         )
         canvas.paste(product_img, (product_x, product_y))
-        draw.text((76, 100), product.get("name", "Temple Product"), fill="#17231f", font=title_font)
-        draw.text((80, 168), storyboard_scene.get("shotType", scene.get("purpose", "")), fill="#7a6245", font=scene_font)
-        safe_box = (64, 1410, 1016, 1736)
-        draw.rounded_rectangle(safe_box, radius=30, fill="#17231f")
-        draw.rounded_rectangle((safe_box[0] + 10, safe_box[1] + 10, safe_box[2] - 10, safe_box[3] - 10), radius=24, outline="#d9b36c", width=2)
+        draw.rounded_rectangle((64, 76, 1016, 230), radius=24, fill="#fffaf2", outline="#dcc7a6", width=2)
+        draw.text((92, 100), product.get("name", "Temple Product"), fill="#17231f", font=title_font)
+        draw.text((96, 168), storyboard_scene.get("shotType", scene.get("purpose", "")), fill="#6f5a3f", font=scene_font)
+        safe_box = (72, 1402, 1008, 1736)
+        draw.rounded_rectangle(safe_box, radius=28, fill="#111f1b")
+        draw.rounded_rectangle((safe_box[0] + 10, safe_box[1] + 10, safe_box[2] - 10, safe_box[3] - 10), radius=22, outline="#e0bd76", width=2)
         lines = wrap_text(draw, scene.get("subtitle", ""), subtitle_font, 860)
-        y = safe_box[1] + 48
+        y = safe_box[1] + 50
         for line in lines:
             bbox = draw.textbbox((0, 0), line, font=subtitle_font)
             draw.text(((FRAME_SIZE[0] - (bbox[2] - bbox[0])) // 2, y), line, fill="#ffffff", font=subtitle_font)
-            y += 78
-        draw.rounded_rectangle((740, 1780, 1022, 1848), radius=14, fill="#245c4f")
-        draw.text((770, 1797), "Temple AI Studio", fill="#ffffff", font=small_font)
+            y += 76
+        draw.rounded_rectangle((720, 1780, 1022, 1848), radius=14, fill="#1f5c4d")
+        draw.text((750, 1797), "Temple AI Studio", fill="#ffffff", font=small_font)
 
 
 class ImagePipeline:
