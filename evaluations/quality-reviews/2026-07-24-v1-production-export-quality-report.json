@@ -1,0 +1,133 @@
+{
+  "schema": "temple-ai-studio.quality-report.v1",
+  "createdAt": "2026-07-24T10:24:24",
+  "exportDir": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e",
+  "overall": "PASS",
+  "checks": [
+    {
+      "name": "required-file:final_video.mp4",
+      "ok": true,
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\final_video.mp4",
+      "size": 7472647
+    },
+    {
+      "name": "required-file:subtitles.srt",
+      "ok": true,
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\subtitles.srt",
+      "size": 368
+    },
+    {
+      "name": "required-file:narration.txt",
+      "ok": true,
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\narration.txt",
+      "size": 418
+    },
+    {
+      "name": "required-file:caption.txt",
+      "ok": true,
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\caption.txt",
+      "size": 78
+    },
+    {
+      "name": "required-file:metadata.json",
+      "ok": true,
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\metadata.json",
+      "size": 440
+    },
+    {
+      "name": "required-file:scenes.json",
+      "ok": true,
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\scenes.json",
+      "size": 4815
+    },
+    {
+      "name": "required-file:prompts.json",
+      "ok": true,
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\prompts.json",
+      "size": 2185
+    },
+    {
+      "name": "required-file:thumbnail_suggestion.txt",
+      "ok": true,
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\thumbnail_suggestion.txt",
+      "size": 99
+    },
+    {
+      "name": "required-file:materials_used.txt",
+      "ok": true,
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\materials_used.txt",
+      "size": 275
+    },
+    {
+      "name": "json-valid:metadata.json",
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\metadata.json",
+      "ok": true
+    },
+    {
+      "name": "json-valid:scenes.json",
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\scenes.json",
+      "ok": true
+    },
+    {
+      "name": "json-valid:prompts.json",
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\prompts.json",
+      "ok": true
+    },
+    {
+      "name": "text-quality:subtitles.srt",
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\subtitles.srt",
+      "ok": true,
+      "characters": 271,
+      "mojibakeHints": []
+    },
+    {
+      "name": "text-quality:narration.txt",
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\narration.txt",
+      "ok": true,
+      "characters": 193,
+      "mojibakeHints": []
+    },
+    {
+      "name": "text-quality:caption.txt",
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\caption.txt",
+      "ok": true,
+      "characters": 42,
+      "mojibakeHints": []
+    },
+    {
+      "name": "text-quality:thumbnail_suggestion.txt",
+      "path": "D:\\AI\\Temple Product Video Generator\\data\\exports\\project-20260724-11969a6e\\thumbnail_suggestion.txt",
+      "ok": true,
+      "characters": 51,
+      "mojibakeHints": []
+    },
+    {
+      "name": "ffmpeg-decode",
+      "ok": true,
+      "ffmpeg": "C:\\Program Files\\Softdeluxe\\Free Download Manager\\ffmpeg.exe",
+      "elapsedSeconds": 0.229,
+      "returnCode": 0,
+      "metadata": {
+        "duration": "00:00:24.00",
+        "codec": "h264 (Constrained Baseline) (avc1 / 0x31637661)",
+        "size": {
+          "width": 1080,
+          "height": 1920
+        },
+        "fps": 25.0,
+        "videoLine": "Stream #0:0(und): Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p, 1080x1920, 2489 kb/s, 25 fps, 25 tbr, 12800 tbn, 50 tbc (default)"
+      },
+      "errorTail": ""
+    },
+    {
+      "name": "platform-format:vertical-9x16",
+      "ok": true,
+      "size": {
+        "width": 1080,
+        "height": 1920
+      },
+      "expected": "vertical 9:16 video"
+    }
+  ],
+  "failedChecks": []
+}
