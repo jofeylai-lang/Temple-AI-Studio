@@ -1,0 +1,77 @@
+{
+  "schema": "temple-ai-studio.capability-benchmark-index.v1",
+  "generatedAt": "2026-07-24T10:34:09",
+  "registry": "D:\\AI\\Jofey AI Studio\\evaluations\\capability-registry.json",
+  "capabilities": [
+    {
+      "id": "llm",
+      "name": "LLM",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/llm/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "image-generation",
+      "name": "Image Generation",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/image-generation/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "identity-preservation",
+      "name": "Identity Preservation",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/identity-preservation/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "character-training",
+      "name": "Character Training",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/character-training/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "video-generation",
+      "name": "Video Generation",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/video-generation/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "talking-head",
+      "name": "Talking Head",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/talking-head/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "full-body-animation",
+      "name": "Full Body Animation",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/full-body-animation/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "lip-sync",
+      "name": "Lip Sync",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/lip-sync/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "voice-cloning",
+      "name": "Voice Cloning",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/voice-cloning/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "tts",
+      "name": "TTS",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/tts/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "subtitle",
+      "name": "Subtitle",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/subtitle/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "editing",
+      "name": "Editing",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/editing/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "music",
+      "name": "Music",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/music/BENCHMARK_WORK_PACKAGE.md"
+    },
+    {
+      "id": "automation",
+      "name": "Automation",
+      "workPackage": "D:/AI/Jofey AI Studio/evaluations/capabilities/automation/BENCHMARK_WORK_PACKAGE.md"
+    }
+  ]
+}

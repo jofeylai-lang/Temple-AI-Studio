@@ -1,0 +1,189 @@
+{
+  "schema": "temple-ai-studio.capability-registry.v1",
+  "createdAt": "2026-07-24",
+  "authority": [
+    "docs/TEMPLE_AI_CONSTITUTION.md",
+    "docs/BENCHMARK_PROTOCOL_V1.md"
+  ],
+  "scoringDimensions": [
+    "quality",
+    "stability",
+    "maintainability",
+    "cost",
+    "privacy",
+    "localCapability",
+    "automationPotential",
+    "emmaConsistency"
+  ],
+  "replacementRule": "Replacement requires proof that the current solution has reached its practical limit after research, benchmark, optimisation, latest workflow testing, and practical-limit documentation.",
+  "capabilities": [
+    {
+      "id": "llm",
+      "name": "LLM",
+      "purpose": "Understand Traditional Chinese requests, plan content, create scripts, reason over quality reports, and orchestrate generation steps.",
+      "currentImplementation": "Codex/OpenAI-assisted engineering and local app rule-based generation.",
+      "currentStatus": "partial",
+      "currentBenchmarkTarget": "Measure Traditional Chinese intent parsing, structured JSON output, script quality, reproducibility, privacy, and cost.",
+      "localCandidates": ["llama.cpp", "Ollama", "Transformers"],
+      "freeServiceCandidates": ["free/open model endpoints where reputable and privacy-safe"],
+      "paidServiceCandidates": ["OpenAI API", "Anthropic API", "Google Gemini API"],
+      "emmaCritical": false
+    },
+    {
+      "id": "image-generation",
+      "name": "Image Generation",
+      "purpose": "Generate and edit product, brand, scene, thumbnail, and reference visuals.",
+      "currentImplementation": "No production generator connected; V1 uses uploaded photos and generated placeholder frames.",
+      "currentStatus": "missing-production-provider",
+      "currentBenchmarkTarget": "Measure prompt adherence, product consistency, typography, editability, cost, local viability, and automation.",
+      "localCandidates": ["ComfyUI", "FLUX local/dev workflows", "Stable Diffusion WebUI Forge"],
+      "freeServiceCandidates": ["free tiers from reputable image providers if privacy-safe"],
+      "paidServiceCandidates": ["OpenAI Images", "Black Forest Labs FLUX API", "Google Imagen"],
+      "emmaCritical": true
+    },
+    {
+      "id": "identity-preservation",
+      "name": "Identity Preservation",
+      "purpose": "Preserve Emma or product identity across scenes, poses, outfits and environments.",
+      "currentImplementation": "Governance defined; no automated identity scorer implemented.",
+      "currentStatus": "governance-only",
+      "currentBenchmarkTarget": "Measure face/body/product consistency, style variance tolerance, and false accept/reject rate.",
+      "localCandidates": ["face embedding checks", "CLIP-style similarity", "ComfyUI reference workflows", "IP-Adapter/InstantID-style workflows"],
+      "freeServiceCandidates": ["open-source embedding models"],
+      "paidServiceCandidates": ["paid vision evaluation APIs if materially better"],
+      "emmaCritical": true
+    },
+    {
+      "id": "character-training",
+      "name": "Character Training",
+      "purpose": "Create durable Emma visual and voice identity assets.",
+      "currentImplementation": "Not started; requires approved Emma source material.",
+      "currentStatus": "blocked-by-source-material",
+      "currentBenchmarkTarget": "Measure training data requirement, identity fidelity, update cost, privacy, and reproducibility.",
+      "localCandidates": ["LoRA training", "DreamBooth-style workflows", "GPT-SoVITS voice training"],
+      "freeServiceCandidates": ["free training notebooks where license/privacy permit"],
+      "paidServiceCandidates": ["paid custom character/voice training services"],
+      "emmaCritical": true
+    },
+    {
+      "id": "video-generation",
+      "name": "Video Generation",
+      "purpose": "Generate product clips, scene clips, motion backgrounds, and image-to-video outputs.",
+      "currentImplementation": "V1 uses FFmpeg Ken Burns-style local assembly from images.",
+      "currentStatus": "basic-local-baseline",
+      "currentBenchmarkTarget": "Measure motion naturalness, temporal stability, prompt adherence, speed, VRAM, and playback quality.",
+      "localCandidates": ["ComfyUI LTXVideo", "Wan2.1", "HunyuanVideo", "LTX Desktop"],
+      "freeServiceCandidates": ["reputable free video generation tiers if privacy-safe"],
+      "paidServiceCandidates": ["Runway", "Kling", "Luma", "Pika", "Comfy Cloud API nodes"],
+      "emmaCritical": true
+    },
+    {
+      "id": "talking-head",
+      "name": "Talking Head",
+      "purpose": "Animate Emma or presenter head/face for spoken content.",
+      "currentImplementation": "Not in production; prior experiments are not active V1 inputs.",
+      "currentStatus": "candidate-needed",
+      "currentBenchmarkTarget": "Measure identity preservation, expression naturalness, head motion, artifacts, and runtime.",
+      "localCandidates": ["LivePortrait", "SadTalker", "MuseTalk"],
+      "freeServiceCandidates": ["open-source demos only when privacy-safe"],
+      "paidServiceCandidates": ["paid avatar/talking-head APIs if clearly superior"],
+      "emmaCritical": true
+    },
+    {
+      "id": "full-body-animation",
+      "name": "Full Body Animation",
+      "purpose": "Animate Emma full-body movement while preserving identity and proportions.",
+      "currentImplementation": "Not production-ready.",
+      "currentStatus": "research-needed",
+      "currentBenchmarkTarget": "Measure body consistency, pose control, motion naturalness, clothing stability, and identity drift.",
+      "localCandidates": ["AnimateDiff/ComfyUI workflows", "pose-guided video workflows", "Wan/VACE-style video editing"],
+      "freeServiceCandidates": ["open-source pose/motion tools"],
+      "paidServiceCandidates": ["paid human motion video platforms"],
+      "emmaCritical": true
+    },
+    {
+      "id": "lip-sync",
+      "name": "Lip Sync",
+      "purpose": "Align mouth motion to generated or recorded voice.",
+      "currentImplementation": "Not production-connected.",
+      "currentStatus": "candidate-needed",
+      "currentBenchmarkTarget": "Measure lip-sync accuracy, face quality, identity retention, language support, and speed.",
+      "localCandidates": ["MuseTalk", "Wav2Lip", "SadTalker"],
+      "freeServiceCandidates": ["open-source demos only when privacy-safe"],
+      "paidServiceCandidates": ["paid dubbing/lip-sync APIs if clearly superior"],
+      "emmaCritical": true
+    },
+    {
+      "id": "voice-cloning",
+      "name": "Voice Cloning",
+      "purpose": "Preserve Emma voice identity or generate brand-consistent narration voices.",
+      "currentImplementation": "Not production-connected.",
+      "currentStatus": "candidate-needed",
+      "currentBenchmarkTarget": "Measure speaker similarity, intelligibility, emotion, Traditional Chinese quality, training burden, and privacy.",
+      "localCandidates": ["GPT-SoVITS", "OpenVoice", "Coqui XTTS"],
+      "freeServiceCandidates": ["open-source hosted demos only when privacy-safe"],
+      "paidServiceCandidates": ["ElevenLabs", "OpenAI audio/TTS where approved", "commercial voice APIs"],
+      "emmaCritical": true
+    },
+    {
+      "id": "tts",
+      "name": "TTS",
+      "purpose": "Generate narration from approved scripts.",
+      "currentImplementation": "V1 uses text narration files; no audio synthesis connected.",
+      "currentStatus": "missing-audio-provider",
+      "currentBenchmarkTarget": "Measure naturalness, Traditional Chinese pronunciation, speed, cost, and automation.",
+      "localCandidates": ["Piper", "Coqui TTS", "GPT-SoVITS inference"],
+      "freeServiceCandidates": ["free TTS services where terms/privacy permit"],
+      "paidServiceCandidates": ["OpenAI TTS", "ElevenLabs", "Google Cloud TTS"],
+      "emmaCritical": true
+    },
+    {
+      "id": "subtitle",
+      "name": "Subtitle",
+      "purpose": "Generate, align, style and validate Traditional Chinese subtitles.",
+      "currentImplementation": "V1 generates timeline-based SRT from scene durations.",
+      "currentStatus": "basic-local-baseline",
+      "currentBenchmarkTarget": "Measure timing accuracy, readability, line length, safe area, and Traditional Chinese quality.",
+      "localCandidates": ["Whisper", "WhisperX", "faster-whisper", "rule-based timeline generation"],
+      "freeServiceCandidates": ["free transcription tiers where privacy-safe"],
+      "paidServiceCandidates": ["OpenAI transcription", "Google Speech-to-Text", "commercial subtitle APIs"],
+      "emmaCritical": false
+    },
+    {
+      "id": "editing",
+      "name": "Editing",
+      "purpose": "Assemble clips, subtitles, audio, pacing, transitions, CTA, and platform exports.",
+      "currentImplementation": "V1 uses FFmpeg local rendering.",
+      "currentStatus": "working-baseline",
+      "currentBenchmarkTarget": "Measure render speed, format correctness, subtitle style, automation, maintainability, and playback reliability.",
+      "localCandidates": ["FFmpeg", "MoviePy", "Remotion", "Manim for programmatic segments"],
+      "freeServiceCandidates": ["none preferred until local limit is proven"],
+      "paidServiceCandidates": ["cloud render services if local rendering becomes bottleneck"],
+      "emmaCritical": false
+    },
+    {
+      "id": "music",
+      "name": "Music",
+      "purpose": "Add safe background music or generated audio mood where business-appropriate.",
+      "currentImplementation": "Not production-connected.",
+      "currentStatus": "research-needed",
+      "currentBenchmarkTarget": "Measure licensing safety, mood fit, loop quality, mix quality, cost, and privacy.",
+      "localCandidates": ["royalty-free local library", "open music generation models"],
+      "freeServiceCandidates": ["royalty-free/free music libraries with clear licenses"],
+      "paidServiceCandidates": ["licensed music providers", "paid music generation APIs"],
+      "emmaCritical": false
+    },
+    {
+      "id": "automation",
+      "name": "Automation",
+      "purpose": "Orchestrate one-click workflows, retries, logs, recovery, and support packages.",
+      "currentImplementation": "V1 app has local workflow, backup, restore, support package and quality checker entry point.",
+      "currentStatus": "partial",
+      "currentBenchmarkTarget": "Measure end-to-end reliability, recoverability, retry behavior, operator burden, and maintainability.",
+      "localCandidates": ["Python orchestrator", "ComfyUI API", "n8n self-hosted", "Prefect-style workflow orchestration"],
+      "freeServiceCandidates": ["self-hostable open-source automation"],
+      "paidServiceCandidates": ["managed workflow tools only if operationally justified"],
+      "emmaCritical": false
+    }
+  ]
+}

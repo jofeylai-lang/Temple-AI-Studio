@@ -1,0 +1,8 @@
+{
+  "schema": "temple-ai-studio.capability-registry-validation.v1",
+  "registry": "D:\\AI\\Jofey AI Studio\\evaluations\\capability-registry.json",
+  "overall": "PASS",
+  "capabilityCount": 14,
+  "dimensionCount": 8,
+  "errors": []
+}
