@@ -29,6 +29,7 @@ if str(SCRIPTS_ROOT) not in sys.path:
 from temple_ai_studio.script_engine import generate_video_script_package
 from temple_ai_studio.image_pipeline import run_image_pipeline
 from temple_ai_studio.emma_core import EmmaCore
+from temple_ai_studio.video_intelligence import run_video_generation_pipeline
 
 DATA_ROOT = Path(os.environ.get("TPVG_DATA_DIR", APP_ROOT / "data")).resolve()
 DB_PATH = DATA_ROOT / "database.json"
@@ -45,8 +46,6 @@ RELEASE_ROOT = APP_ROOT / "release"
 VERSION = "1.0.0"
 CURRENT_SCHEMA_VERSION = 1
 
-FRAME_SIZE = (1080, 1920)
-FPS = 25
 VIDEO_STATES = [
     "Draft",
     "Planning",
@@ -933,11 +932,7 @@ def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
     if not ffmpeg or not Path(ffmpeg).exists():
         raise RuntimeError("??? FFmpeg????? MP4?")
     output_dir = Path(project["outputDir"])
-    frames_dir = Path(project["projectDir"]) / "frames"
-    clips_dir = Path(project["projectDir"]) / "clips"
     output_dir.mkdir(parents=True, exist_ok=True)
-    frames_dir.mkdir(parents=True, exist_ok=True)
-    clips_dir.mkdir(parents=True, exist_ok=True)
     material_paths = [Path(m["path"]) for m in product.get("materials", []) if Path(m["path"]).exists()]
     if not material_paths:
         raise RuntimeError("???????????")
@@ -947,26 +942,9 @@ def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
         append_log("generation.log", "visual-pipeline-quality-failed", {"projectId": project["id"], "quality": visual_report.get("quality")})
         raise RuntimeError("???????????????????????")
 
-    clip_paths = []
-    for scene in project["scenes"]:
-        frame_path = frames_dir / f"{scene['order']:02d}-{scene['id']}-v{scene['version']}.png"
-        clip_path = clips_dir / f"{scene['order']:02d}-{scene['id']}-v{scene['version']}.mp4"
-        generated_image = Path(scene.get("generatedImagePath", ""))
-        if not generated_image.exists():
-            raise RuntimeError(f"????????{scene.get('id')}")
-        shutil.copyfile(generated_image, frame_path)
-        make_clip(ffmpeg, frame_path, clip_path, int(scene["duration"]))
-        clip_paths.append(clip_path)
-
-    concat_path = Path(project["projectDir"]) / ("preview-concat.txt" if preview else "final-concat.txt")
-    concat_path.write_text("".join([f"file '{path.as_posix()}'\n" for path in clip_paths]), encoding="utf-8")
-    target = output_dir / ("preview.mp4" if preview else "final_video.mp4")
-    run_ffmpeg([ffmpeg, "-y", "-f", "concat", "-safe", "0", "-i", str(concat_path), "-c", "copy", str(target)])
-    srt_path = output_dir / "subtitles.srt"
-    srt_path.write_text(build_srt(project["scenes"]), encoding="utf-8-sig")
-    if not preview:
-        subtitled = output_dir / "final_video_subtitled.mp4"
-        shutil.copyfile(target, subtitled)
+    video_report = run_video_generation_pipeline(project, product, output_dir, Path(project["projectDir"]), Path(ffmpeg), preview=preview)
+    target = Path(video_report["outputVideo"])
+    srt_path = Path(video_report["subtitles"])
     return {
         "previewVideo": file_url(target) if preview else project.get("previewVideo"),
         "finalVideo": file_url(target) if not preview else project.get("finalVideo"),
@@ -978,64 +956,11 @@ def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
         "visualQuality": visual_report.get("quality"),
         "visualPipelineReport": str(Path(project["projectDir"]) / "visual-pipeline-report.json"),
         "assetIndex": visual_report.get("assetIndex"),
-        "videoSpec": "1080x1920, MP4, H.264 via h264_mf when available, subtitles burned into frames",
+        "videoIntelligence": video_report,
+        "videoIntelligenceReport": str(Path(project["projectDir"]) / ("video-intelligence-preview-report.json" if preview else "video-intelligence-final-report.json")),
+        "videoQuality": video_report.get("quality"),
+        "videoSpec": "1080x1920, MP4, local FFmpeg motion pipeline, silent sync audio track, subtitles burned into frames",
     }
-
-def make_clip(ffmpeg: str, frame: Path, output: Path, duration: int) -> None:
-    frames = max(FPS * duration, FPS * 2)
-    vf = f"zoompan=z='min(zoom+0.0008,1.06)':d={frames}:s=1080x1920:fps={FPS},format=yuv420p"
-    cmd = [
-        ffmpeg,
-        "-y",
-        "-loop",
-        "1",
-        "-i",
-        str(frame),
-        "-vf",
-        vf,
-        "-frames:v",
-        str(frames),
-        "-r",
-        str(FPS),
-        "-an",
-        "-c:v",
-        "h264_mf",
-        "-b:v",
-        "5000k",
-        str(output),
-    ]
-    try:
-        run_ffmpeg(cmd)
-    except RuntimeError:
-        fallback = cmd.copy()
-        fallback[fallback.index("h264_mf")] = "mpeg4"
-        run_ffmpeg(fallback)
-
-
-def run_ffmpeg(cmd: list[str]) -> None:
-    result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
-    if result.returncode != 0:
-        error = result.stderr.strip() or "FFmpeg 執行失敗"
-        append_log("ffmpeg-error.log", "ffmpeg-failed", {"command": cmd[:3] + ["..."], "error": error[-2000:]})
-        raise RuntimeError(error)
-
-
-def build_srt(scenes: list[dict]) -> str:
-    blocks = []
-    for index, scene in enumerate(scenes, start=1):
-        blocks.append(
-            f"{index}\n{fmt_time(scene['start'])} --> {fmt_time(scene['end'])}\n{scene['subtitle']}\n"
-        )
-    return "\n".join(blocks)
-
-
-def fmt_time(seconds: float) -> str:
-    ms = int(round((seconds - int(seconds)) * 1000))
-    total = int(seconds)
-    h, rem = divmod(total, 3600)
-    m, s = divmod(rem, 60)
-    return f"{h:02d}:{m:02d}:{s:02d},{ms:03d}"
-
 
 def write_export_package(project: dict) -> None:
     output_dir = Path(project["outputDir"])
@@ -1048,6 +973,8 @@ def write_export_package(project: dict) -> None:
     (output_dir / "storyboard.json").write_text(json.dumps(project.get("storyboard", {}), ensure_ascii=False, indent=2), encoding="utf-8")
     (output_dir / "provider_prompts.json").write_text(json.dumps(project.get("providerPrompts", {}), ensure_ascii=False, indent=2), encoding="utf-8")
     (output_dir / "visual_quality.json").write_text(json.dumps(project.get("visualQuality", {}), ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "video_intelligence.json").write_text(json.dumps(project.get("videoIntelligence", {}), ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "video_quality.json").write_text(json.dumps(project.get("videoQuality", {}), ensure_ascii=False, indent=2), encoding="utf-8")
     (output_dir / "emma_core.json").write_text(
         json.dumps(
             {
@@ -1300,6 +1227,8 @@ def smoke_test() -> int:
         output_dir / "storyboard.json",
         output_dir / "provider_prompts.json",
         output_dir / "visual_quality.json",
+        output_dir / "video_intelligence.json",
+        output_dir / "video_quality.json",
         output_dir / "emma_core.json",
         output_dir / "asset_index.json",
         output_dir / "thumbnail_suggestion.txt",

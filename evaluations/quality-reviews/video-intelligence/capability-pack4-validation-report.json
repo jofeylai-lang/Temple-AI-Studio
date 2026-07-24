@@ -1,0 +1,37 @@
+{
+  "schema": "temple-ai-studio.capability-pack4-validation.v1",
+  "createdAt": "2026-07-24T13:33:24",
+  "overall": "PASS",
+  "capabilities": {
+    "talkingHeadEngine": "PASS",
+    "lipSyncEngine": "PASS",
+    "motionEngine": "PASS",
+    "cameraMotionEngine": "PASS",
+    "videoGenerationPipeline": "PASS",
+    "sceneAnimationEngine": "PASS",
+    "audioSynchronization": "PASS",
+    "subtitleBurnInEngine": "PASS",
+    "renderingPipeline": "PASS",
+    "videoQualityAnalyzer": "PASS",
+    "automaticRetry": "PASS",
+    "productionIntegration": "PASS"
+  },
+  "tests": {
+    "compile": "PASS",
+    "unitTests": "PASS: 13 tests",
+    "appSmokeTest": "PASS",
+    "exportQualityCheck": "PASS",
+    "videoPlayback": "PASS",
+    "subtitleTests": "PASS",
+    "synchronizationTests": "PASS",
+    "renderingTests": "PASS",
+    "regressionTests": "PASS"
+  },
+  "finalRehearsalProjectId": "project-20260724-cb787185",
+  "finalMp4": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-cb787185\\final_video.mp4",
+  "videoQualityScore": 0.9176,
+  "audioTrack": "Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 1 kb/s (default)",
+  "sceneCount": 6,
+  "provider": "local_ffmpeg_motion",
+  "failedChecks": []
+}

@@ -186,8 +186,9 @@ class EmmaCore:
             (self.provider_adapter_path, adapters),
             (self.version_history_path, versions),
         ]:
-            payload["updatedAt"] = now_iso()
-            write_json(path, payload)
+            if not path.exists():
+                payload["updatedAt"] = now_iso()
+                write_json(path, payload)
         return self.status()
 
     def default_identity_profile(self) -> dict[str, Any]:

@@ -21,6 +21,8 @@ REQUIRED_EXPORT_FILES = [
     "storyboard.json",
     "provider_prompts.json",
     "visual_quality.json",
+    "video_intelligence.json",
+    "video_quality.json",
     "emma_core.json",
     "asset_index.json",
     "thumbnail_suggestion.txt",
@@ -105,8 +107,13 @@ def read_text(path: Path) -> str:
 
 def check_json(path: Path) -> dict:
     try:
-        json.loads(read_text(path))
-        return {"ok": True}
+        payload = json.loads(read_text(path))
+        result = {"ok": True}
+        if path.name in ["video_quality.json", "video_intelligence.json", "visual_quality.json"] and isinstance(payload, dict):
+            overall = payload.get("overall") or payload.get("quality", {}).get("overall")
+            result["overall"] = overall
+            result["ok"] = overall in [None, "PASS"]
+        return result
     except Exception as exc:
         return {"ok": False, "error": str(exc)}
 
@@ -134,7 +141,7 @@ def evaluate_export(export_dir: Path, ffmpeg_path: str | None) -> dict:
             "size": path.stat().st_size if path.exists() else 0,
         })
 
-    for name in ["metadata.json", "scenes.json", "prompts.json", "storyboard.json", "provider_prompts.json", "visual_quality.json", "emma_core.json", "asset_index.json"]:
+    for name in ["metadata.json", "scenes.json", "prompts.json", "storyboard.json", "provider_prompts.json", "visual_quality.json", "video_intelligence.json", "video_quality.json", "emma_core.json", "asset_index.json"]:
         path = export_dir / name
         if path.exists():
             result = check_json(path)
