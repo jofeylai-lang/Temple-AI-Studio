@@ -1,0 +1,10 @@
+{
+  "schema": "temple-ai-studio.emma-identity-fingerprint.v1",
+  "identityId": "emma",
+  "displayName": "Emma",
+  "createdAt": "2026-07-24T10:52:55",
+  "referenceCount": 0,
+  "status": "blocked-missing-reference-material",
+  "threshold": 0.9,
+  "references": []
+}

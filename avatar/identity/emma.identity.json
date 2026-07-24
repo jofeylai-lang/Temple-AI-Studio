@@ -1,0 +1,31 @@
+{
+  "schema": "temple-ai-studio.emma-identity-profile.v1",
+  "identityId": "emma",
+  "displayName": "Emma",
+  "createdAt": "2026-07-24T10:49:20",
+  "updatedAt": "2026-07-24T10:49:20",
+  "status": "needs-approved-reference-material",
+  "permanent": {
+    "face": "same face",
+    "body": "same body",
+    "voice": "same voice",
+    "identity": "same identity",
+    "continuity": "same core character continuity"
+  },
+  "mutable": [
+    "clothing",
+    "hairstyle",
+    "accessories",
+    "scene",
+    "pose",
+    "expression",
+    "lighting",
+    "camera language"
+  ],
+  "referencePolicy": {
+    "requiresCeoApprovedMaterial": true,
+    "doNotInventPermanentIdentity": true,
+    "privateReferenceMediaIsNotCommittedToGit": true
+  },
+  "references": []
+}

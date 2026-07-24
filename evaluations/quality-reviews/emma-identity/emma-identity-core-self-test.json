@@ -1,0 +1,9 @@
+{
+  "schema": "temple-ai-studio.emma-identity-self-test.v1",
+  "createdAt": "2026-07-24T10:52:55",
+  "overall": "PASS",
+  "similarCandidate": "PASS",
+  "differentCandidate": "FAIL",
+  "similarScore": 0.999,
+  "differentScore": 0.604
+}

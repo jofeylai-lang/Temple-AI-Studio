@@ -1,0 +1,25 @@
+{
+  "schema": "temple-ai-studio.emma-identity-evaluation.v1",
+  "createdAt": "2026-07-24T10:53:34",
+  "identityId": "emma",
+  "overall": "BLOCKED",
+  "reason": "No approved Emma reference material exists.",
+  "candidate": {
+    "path": "D:\\AI\\Jofey AI Studio\\work\\emma-identity-candidate-test.png",
+    "sha256": "e77cd21ae5d66fb81798be9c2ce358b3ff591485a2bab9b071445f615a892a83",
+    "fileName": "emma-identity-candidate-test.png",
+    "format": "PNG",
+    "width": 320,
+    "height": 480,
+    "aspectRatio": 0.6667,
+    "averageRgb": [
+      230,
+      224,
+      217
+    ],
+    "averageLuma": 0.8815,
+    "averageHash": "ffc3c3e7ffffffe7",
+    "differenceHash": "0c3071304c4c4c20"
+  },
+  "matches": []
+}
