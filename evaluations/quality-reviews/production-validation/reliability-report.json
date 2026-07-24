@@ -1,0 +1,15 @@
+{
+  "projectCount": 100,
+  "acceptedCount": 100,
+  "acceptedRate": 1.0,
+  "validProductionProjectCount": 87,
+  "validProductionSuccessCount": 87,
+  "validProductionSuccessRate": 1.0,
+  "expectedFailureCount": 13,
+  "expectedFailureHandledCount": 13,
+  "expectedFailureHandledRate": 1.0,
+  "crashCount": 0,
+  "crashRate": 0.0,
+  "retrySignalCount": 0,
+  "exportSuccessCount": 87
+}

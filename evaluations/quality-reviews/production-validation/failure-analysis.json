@@ -1,0 +1,42 @@
+{
+  "totalFailures": 13,
+  "unexpectedFailures": 0,
+  "byCategory": [
+    {
+      "category": "input-validation",
+      "count": 13,
+      "severity": "major",
+      "rootCauses": {
+        "Product image assets are missing or invalid.": 13
+      },
+      "suggestedFix": "Show a clear operator message and require valid product photos before generation.",
+      "examples": [
+        {
+          "caseId": "PV-088-crystal-set-missing_assets",
+          "status": "HANDLED_EXPECTED_FAILURE",
+          "message": "No product reference images are available for visual generation."
+        },
+        {
+          "caseId": "PV-089-temple-candle-missing_assets",
+          "status": "HANDLED_EXPECTED_FAILURE",
+          "message": "No product reference images are available for visual generation."
+        },
+        {
+          "caseId": "PV-090-blessing-bracelet-missing_assets",
+          "status": "HANDLED_EXPECTED_FAILURE",
+          "message": "No product reference images are available for visual generation."
+        },
+        {
+          "caseId": "PV-091-fortune-card-missing_assets",
+          "status": "HANDLED_EXPECTED_FAILURE",
+          "message": "No product reference images are available for visual generation."
+        },
+        {
+          "caseId": "PV-092-ritual-oil-missing_assets",
+          "status": "HANDLED_EXPECTED_FAILURE",
+          "message": "No product reference images are available for visual generation."
+        }
+      ]
+    }
+  ]
+}

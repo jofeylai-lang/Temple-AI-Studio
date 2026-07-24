@@ -1,0 +1,35 @@
+{
+  "overall": "PASS",
+  "checks": [
+    {
+      "capability": "script-engine",
+      "pass": true,
+      "criterion": "All cases create or attempt a script package."
+    },
+    {
+      "capability": "image-pipeline",
+      "pass": true,
+      "criterion": "Visual generation passes or fails with classification."
+    },
+    {
+      "capability": "video-pipeline",
+      "pass": true,
+      "criterion": "All valid cases export playable MP4 files."
+    },
+    {
+      "capability": "quality-analyzer",
+      "pass": true,
+      "criterion": "Each case produces a quality result or classified failure."
+    },
+    {
+      "capability": "input-recovery",
+      "pass": true,
+      "criterion": "Missing, empty, and invalid assets are handled without crash."
+    },
+    {
+      "capability": "concurrent-projects",
+      "pass": true,
+      "criterion": "Three valid projects complete concurrently."
+    }
+  ]
+}

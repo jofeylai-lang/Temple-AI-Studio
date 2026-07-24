@@ -1,0 +1,22 @@
+{
+  "batchElapsedSeconds": 986.8434,
+  "coldStartProjectSeconds": 8.3338,
+  "warmStartAverageSeconds": 9.7491,
+  "singleProjectAverageSeconds": 11.1783,
+  "singleProjectP95Seconds": 13.8505,
+  "allCasesAverageSeconds": 9.735,
+  "averageExportBytes": 16214876.59,
+  "maxExportBytes": 21897410,
+  "peakTracemallocBytes": 2241469,
+  "concurrentProbe": {
+    "overall": "PASS",
+    "elapsedSeconds": 12.8568,
+    "projectCount": 3,
+    "accepted": 3,
+    "caseIds": [
+      "PV-001-temple-candle-valid",
+      "PV-002-blessing-bracelet-valid",
+      "PV-003-fortune-card-valid"
+    ]
+  }
+}

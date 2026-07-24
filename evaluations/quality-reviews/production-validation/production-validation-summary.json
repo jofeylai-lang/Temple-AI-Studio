@@ -1,0 +1,5185 @@
+{
+  "schema": "temple-ai-studio.product-validation.v1",
+  "version": "1.0.0",
+  "createdAt": "2026-07-24T17:36:45",
+  "artifactRoot": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019",
+  "caseCount": 100,
+  "cases": [
+    {
+      "case_id": "PV-001-temple-candle-valid",
+      "name": "淨心能量蠟燭 溫柔療癒 Instagram Reels",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "請用溫柔療癒風格，為淨心能量蠟燭製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 1 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-002-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 溫柔療癒 TikTok",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "請用溫柔療癒風格，為靜願黑曜石手鍊製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 2 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-003-fortune-card-valid",
+      "name": "每日祝福小卡 溫柔療癒 YouTube Shorts",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "請用溫柔療癒風格，為每日祝福小卡製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 3 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-004-ritual-oil-valid",
+      "name": "平安儀式精油 溫柔療癒 Instagram Reels",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "請用溫柔療癒風格，為平安儀式精油製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 4 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-005-desk-altar-valid",
+      "name": "迷你靜心供台 溫柔療癒 TikTok",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "請用溫柔療癒風格，為迷你靜心供台製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 5 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-006-singing-bowl-valid",
+      "name": "銅製靜心音缽 溫柔療癒 YouTube Shorts",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "請用溫柔療癒風格，為銅製靜心音缽製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 6 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-007-incense-set-valid",
+      "name": "晨光線香組 溫柔療癒 Instagram Reels",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "請用溫柔療癒風格，為晨光線香組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 7 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-008-crystal-set-valid",
+      "name": "七日水晶組 溫柔療癒 TikTok",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "請用溫柔療癒風格，為七日水晶組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 8 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-009-temple-candle-valid",
+      "name": "淨心能量蠟燭 高級商業 YouTube Shorts",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "請用高級商業風格，為淨心能量蠟燭製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 9 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-010-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 高級商業 Instagram Reels",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "請用高級商業風格，為靜願黑曜石手鍊製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 10 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-011-fortune-card-valid",
+      "name": "每日祝福小卡 高級商業 TikTok",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "請用高級商業風格，為每日祝福小卡製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 11 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-012-ritual-oil-valid",
+      "name": "平安儀式精油 高級商業 YouTube Shorts",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "請用高級商業風格，為平安儀式精油製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 12 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-013-desk-altar-valid",
+      "name": "迷你靜心供台 高級商業 Instagram Reels",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "請用高級商業風格，為迷你靜心供台製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 13 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-014-singing-bowl-valid",
+      "name": "銅製靜心音缽 高級商業 TikTok",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "請用高級商業風格，為銅製靜心音缽製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 14 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-015-incense-set-valid",
+      "name": "晨光線香組 高級商業 YouTube Shorts",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "請用高級商業風格，為晨光線香組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 15 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-016-crystal-set-valid",
+      "name": "七日水晶組 高級商業 Instagram Reels",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "請用高級商業風格，為七日水晶組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 16 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-017-temple-candle-valid",
+      "name": "淨心能量蠟燭 節奏快速 TikTok",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "請用節奏快速風格，為淨心能量蠟燭製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 17 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-018-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 節奏快速 YouTube Shorts",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "請用節奏快速風格，為靜願黑曜石手鍊製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 18 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-019-fortune-card-valid",
+      "name": "每日祝福小卡 節奏快速 Instagram Reels",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "請用節奏快速風格，為每日祝福小卡製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 19 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-020-ritual-oil-valid",
+      "name": "平安儀式精油 節奏快速 TikTok",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "請用節奏快速風格，為平安儀式精油製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 20 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-021-desk-altar-valid",
+      "name": "迷你靜心供台 節奏快速 YouTube Shorts",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "請用節奏快速風格，為迷你靜心供台製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 21 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-022-singing-bowl-valid",
+      "name": "銅製靜心音缽 節奏快速 Instagram Reels",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "請用節奏快速風格，為銅製靜心音缽製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 22 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-023-incense-set-valid",
+      "name": "晨光線香組 節奏快速 TikTok",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "請用節奏快速風格，為晨光線香組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 23 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-024-crystal-set-valid",
+      "name": "七日水晶組 節奏快速 YouTube Shorts",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "請用節奏快速風格，為七日水晶組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 24 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-025-temple-candle-valid",
+      "name": "淨心能量蠟燭 故事敘事 Instagram Reels",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "請用故事敘事風格，為淨心能量蠟燭製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 25 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "故事敘事",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-026-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 故事敘事 TikTok",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "請用故事敘事風格，為靜願黑曜石手鍊製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 26 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "故事敘事",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-027-fortune-card-valid",
+      "name": "每日祝福小卡 故事敘事 YouTube Shorts",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "請用故事敘事風格，為每日祝福小卡製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 27 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "故事敘事",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-028-ritual-oil-valid",
+      "name": "平安儀式精油 故事敘事 Instagram Reels",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "請用故事敘事風格，為平安儀式精油製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 28 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "故事敘事",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-029-desk-altar-valid",
+      "name": "迷你靜心供台 故事敘事 TikTok",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "請用故事敘事風格，為迷你靜心供台製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 29 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "故事敘事",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-030-singing-bowl-valid",
+      "name": "銅製靜心音缽 故事敘事 YouTube Shorts",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "請用故事敘事風格，為銅製靜心音缽製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 30 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "故事敘事",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-031-incense-set-valid",
+      "name": "晨光線香組 故事敘事 Instagram Reels",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "請用故事敘事風格，為晨光線香組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 31 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "故事敘事",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-032-crystal-set-valid",
+      "name": "七日水晶組 故事敘事 TikTok",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "請用故事敘事風格，為七日水晶組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 32 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "故事敘事",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-033-temple-candle-valid",
+      "name": "淨心能量蠟燭 節慶促銷 YouTube Shorts",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "請用節慶促銷風格，為淨心能量蠟燭製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 33 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "節慶促銷",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-034-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 節慶促銷 Instagram Reels",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "請用節慶促銷風格，為靜願黑曜石手鍊製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 34 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "節慶促銷",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-035-fortune-card-valid",
+      "name": "每日祝福小卡 節慶促銷 TikTok",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "請用節慶促銷風格，為每日祝福小卡製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 35 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "節慶促銷",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-036-ritual-oil-valid",
+      "name": "平安儀式精油 節慶促銷 YouTube Shorts",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "請用節慶促銷風格，為平安儀式精油製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 36 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "節慶促銷",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-037-desk-altar-valid",
+      "name": "迷你靜心供台 節慶促銷 Instagram Reels",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "請用節慶促銷風格，為迷你靜心供台製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 37 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "節慶促銷",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-038-singing-bowl-valid",
+      "name": "銅製靜心音缽 節慶促銷 TikTok",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "請用節慶促銷風格，為銅製靜心音缽製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 38 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "節慶促銷",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-039-incense-set-valid",
+      "name": "晨光線香組 節慶促銷 YouTube Shorts",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "請用節慶促銷風格，為晨光線香組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 39 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "節慶促銷",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-040-crystal-set-valid",
+      "name": "七日水晶組 節慶促銷 Instagram Reels",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "請用節慶促銷風格，為七日水晶組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 40 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "節慶促銷",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-041-temple-candle-valid",
+      "name": "淨心能量蠟燭 新手友善 TikTok",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "請用新手友善風格，為淨心能量蠟燭製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 41 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "新手友善",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-042-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 新手友善 YouTube Shorts",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "請用新手友善風格，為靜願黑曜石手鍊製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 42 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "新手友善",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-043-fortune-card-valid",
+      "name": "每日祝福小卡 新手友善 Instagram Reels",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "請用新手友善風格，為每日祝福小卡製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 43 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "新手友善",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-044-ritual-oil-valid",
+      "name": "平安儀式精油 新手友善 TikTok",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "請用新手友善風格，為平安儀式精油製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 44 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "新手友善",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-045-desk-altar-valid",
+      "name": "迷你靜心供台 新手友善 YouTube Shorts",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "請用新手友善風格，為迷你靜心供台製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 45 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "新手友善",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-046-singing-bowl-valid",
+      "name": "銅製靜心音缽 新手友善 Instagram Reels",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "請用新手友善風格，為銅製靜心音缽製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 46 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "新手友善",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-047-incense-set-valid",
+      "name": "晨光線香組 新手友善 TikTok",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "請用新手友善風格，為晨光線香組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 47 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "新手友善",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-048-crystal-set-valid",
+      "name": "七日水晶組 新手友善 YouTube Shorts",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "請用新手友善風格，為七日水晶組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 48 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "新手友善",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-049-temple-candle-valid",
+      "name": "淨心能量蠟燭 品牌形象 Instagram Reels",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "請用品牌形象風格，為淨心能量蠟燭製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 49 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "品牌形象",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-050-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 品牌形象 TikTok",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "請用品牌形象風格，為靜願黑曜石手鍊製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 50 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "品牌形象",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-051-fortune-card-valid",
+      "name": "每日祝福小卡 品牌形象 YouTube Shorts",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "請用品牌形象風格，為每日祝福小卡製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 51 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "品牌形象",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-052-ritual-oil-valid",
+      "name": "平安儀式精油 品牌形象 Instagram Reels",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "請用品牌形象風格，為平安儀式精油製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 52 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "品牌形象",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-053-desk-altar-valid",
+      "name": "迷你靜心供台 品牌形象 TikTok",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "請用品牌形象風格，為迷你靜心供台製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 53 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "品牌形象",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-054-singing-bowl-valid",
+      "name": "銅製靜心音缽 品牌形象 YouTube Shorts",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "請用品牌形象風格，為銅製靜心音缽製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 54 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "品牌形象",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-055-incense-set-valid",
+      "name": "晨光線香組 品牌形象 Instagram Reels",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "請用品牌形象風格，為晨光線香組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 55 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "品牌形象",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-056-crystal-set-valid",
+      "name": "七日水晶組 品牌形象 TikTok",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "請用品牌形象風格，為七日水晶組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 56 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "品牌形象",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-057-temple-candle-valid",
+      "name": "淨心能量蠟燭 短影音爆款 YouTube Shorts",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "請用短影音爆款風格，為淨心能量蠟燭製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 57 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "短影音爆款",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-058-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 短影音爆款 Instagram Reels",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "請用短影音爆款風格，為靜願黑曜石手鍊製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 58 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "短影音爆款",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-059-fortune-card-valid",
+      "name": "每日祝福小卡 短影音爆款 TikTok",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "請用短影音爆款風格，為每日祝福小卡製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 59 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "短影音爆款",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-060-ritual-oil-valid",
+      "name": "平安儀式精油 短影音爆款 YouTube Shorts",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "請用短影音爆款風格，為平安儀式精油製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 60 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "短影音爆款",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-061-desk-altar-valid",
+      "name": "迷你靜心供台 短影音爆款 Instagram Reels",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "請用短影音爆款風格，為迷你靜心供台製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 61 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "短影音爆款",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-062-singing-bowl-valid",
+      "name": "銅製靜心音缽 短影音爆款 TikTok",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "請用短影音爆款風格，為銅製靜心音缽製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 62 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "短影音爆款",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-063-incense-set-valid",
+      "name": "晨光線香組 短影音爆款 YouTube Shorts",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "請用短影音爆款風格，為晨光線香組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 63 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "短影音爆款",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-064-crystal-set-valid",
+      "name": "七日水晶組 短影音爆款 Instagram Reels",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "請用短影音爆款風格，為七日水晶組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 64 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "短影音爆款",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-065-temple-candle-valid",
+      "name": "淨心能量蠟燭 溫柔療癒 TikTok",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "請用溫柔療癒風格，為淨心能量蠟燭製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 65 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-066-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 溫柔療癒 YouTube Shorts",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "請用溫柔療癒風格，為靜願黑曜石手鍊製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 66 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-067-fortune-card-valid",
+      "name": "每日祝福小卡 溫柔療癒 Instagram Reels",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "請用溫柔療癒風格，為每日祝福小卡製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 67 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-068-ritual-oil-valid",
+      "name": "平安儀式精油 溫柔療癒 TikTok",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "請用溫柔療癒風格，為平安儀式精油製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 68 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-069-desk-altar-valid",
+      "name": "迷你靜心供台 溫柔療癒 YouTube Shorts",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "請用溫柔療癒風格，為迷你靜心供台製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 69 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-070-singing-bowl-valid",
+      "name": "銅製靜心音缽 溫柔療癒 Instagram Reels",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "請用溫柔療癒風格，為銅製靜心音缽製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 70 個生產驗證案例。",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-071-incense-set-valid",
+      "name": "晨光線香組 溫柔療癒 TikTok",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "請用溫柔療癒風格，為晨光線香組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 71 個生產驗證案例。",
+      "platform": "TikTok",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-072-crystal-set-valid",
+      "name": "七日水晶組 溫柔療癒 YouTube Shorts",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "請用溫柔療癒風格，為七日水晶組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。這是第 72 個生產驗證案例。",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "valid",
+      "writing_style": "溫柔療癒",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-073-temple-candle-long_subtitle",
+      "name": "淨心能量蠟燭 高級商業 Instagram Reels",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "請用高級商業風格，為淨心能量蠟燭製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。字幕可以稍長，但仍要清楚好讀，請避免誇大療效，並把重點放在商品能陪伴使用者整理心情。",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "long_subtitle",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-074-blessing-bracelet-long_subtitle",
+      "name": "靜願黑曜石手鍊 高級商業 TikTok",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "請用高級商業風格，為靜願黑曜石手鍊製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。字幕可以稍長，但仍要清楚好讀，請避免誇大療效，並把重點放在商品能陪伴使用者整理心情。",
+      "platform": "TikTok",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "long_subtitle",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-075-fortune-card-long_subtitle",
+      "name": "每日祝福小卡 高級商業 YouTube Shorts",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "請用高級商業風格，為每日祝福小卡製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。字幕可以稍長，但仍要清楚好讀，請避免誇大療效，並把重點放在商品能陪伴使用者整理心情。",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "long_subtitle",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-076-ritual-oil-long_subtitle",
+      "name": "平安儀式精油 高級商業 Instagram Reels",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "請用高級商業風格，為平安儀式精油製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。字幕可以稍長，但仍要清楚好讀，請避免誇大療效，並把重點放在商品能陪伴使用者整理心情。",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "long_subtitle",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-077-desk-altar-long_subtitle",
+      "name": "迷你靜心供台 高級商業 TikTok",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "請用高級商業風格，為迷你靜心供台製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。字幕可以稍長，但仍要清楚好讀，請避免誇大療效，並把重點放在商品能陪伴使用者整理心情。",
+      "platform": "TikTok",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "long_subtitle",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-078-singing-bowl-long_subtitle",
+      "name": "銅製靜心音缽 高級商業 YouTube Shorts",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "請用高級商業風格，為銅製靜心音缽製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。字幕可以稍長，但仍要清楚好讀，請避免誇大療效，並把重點放在商品能陪伴使用者整理心情。",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "long_subtitle",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-079-incense-set-long_subtitle",
+      "name": "晨光線香組 高級商業 Instagram Reels",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "請用高級商業風格，為晨光線香組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。字幕可以稍長，但仍要清楚好讀，請避免誇大療效，並把重點放在商品能陪伴使用者整理心情。",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "long_subtitle",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-080-crystal-set-long_subtitle",
+      "name": "七日水晶組 高級商業 TikTok",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "請用高級商業風格，為七日水晶組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。字幕可以稍長，但仍要清楚好讀，請避免誇大療效，並把重點放在商品能陪伴使用者整理心情。",
+      "platform": "TikTok",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "long_subtitle",
+      "writing_style": "高級商業",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-081-temple-candle-multilingual",
+      "name": "淨心能量蠟燭 節奏快速 YouTube Shorts",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "請用節奏快速風格，為淨心能量蠟燭製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。內容以繁體中文為主，可以自然加入少量英文關鍵字，例如 calm、ritual、daily blessing。",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "multilingual",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-082-blessing-bracelet-multilingual",
+      "name": "靜願黑曜石手鍊 節奏快速 Instagram Reels",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "請用節奏快速風格，為靜願黑曜石手鍊製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。內容以繁體中文為主，可以自然加入少量英文關鍵字，例如 calm、ritual、daily blessing。",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "multilingual",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-083-fortune-card-multilingual",
+      "name": "每日祝福小卡 節奏快速 TikTok",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "請用節奏快速風格，為每日祝福小卡製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。內容以繁體中文為主，可以自然加入少量英文關鍵字，例如 calm、ritual、daily blessing。",
+      "platform": "TikTok",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "multilingual",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-084-ritual-oil-multilingual",
+      "name": "平安儀式精油 節奏快速 YouTube Shorts",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "請用節奏快速風格，為平安儀式精油製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。內容以繁體中文為主，可以自然加入少量英文關鍵字，例如 calm、ritual、daily blessing。",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "multilingual",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-085-desk-altar-multilingual",
+      "name": "迷你靜心供台 節奏快速 Instagram Reels",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "請用節奏快速風格，為迷你靜心供台製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。內容以繁體中文為主，可以自然加入少量英文關鍵字，例如 calm、ritual、daily blessing。",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "multilingual",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-086-singing-bowl-multilingual",
+      "name": "銅製靜心音缽 節奏快速 TikTok",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "請用節奏快速風格，為銅製靜心音缽製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。內容以繁體中文為主，可以自然加入少量英文關鍵字，例如 calm、ritual、daily blessing。",
+      "platform": "TikTok",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "multilingual",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-087-incense-set-multilingual",
+      "name": "晨光線香組 節奏快速 YouTube Shorts",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "請用節奏快速風格，為晨光線香組製作一支適合社群短影音的商品影片，強調質感、日常使用情境與安心感。內容以繁體中文為主，可以自然加入少量英文關鍵字，例如 calm、ritual、daily blessing。",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "multilingual",
+      "writing_style": "節奏快速",
+      "expected": "production_export",
+      "severity_if_fail": "critical"
+    },
+    {
+      "case_id": "PV-088-crystal-set-missing_assets",
+      "name": "七日水晶組 節奏快速 Instagram Reels",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "測試缺少素材時的恢復流程：為水晶七日水晶組建立影片，但素材檔案不存在。",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "missing_assets",
+      "writing_style": "節奏快速",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-089-temple-candle-missing_assets",
+      "name": "淨心能量蠟燭 故事敘事 TikTok",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "測試缺少素材時的恢復流程：為香氛蠟燭淨心能量蠟燭建立影片，但素材檔案不存在。",
+      "platform": "TikTok",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "missing_assets",
+      "writing_style": "故事敘事",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-090-blessing-bracelet-missing_assets",
+      "name": "靜願黑曜石手鍊 故事敘事 YouTube Shorts",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "測試缺少素材時的恢復流程：為能量手鍊靜願黑曜石手鍊建立影片，但素材檔案不存在。",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "missing_assets",
+      "writing_style": "故事敘事",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-091-fortune-card-missing_assets",
+      "name": "每日祝福小卡 故事敘事 Instagram Reels",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "測試缺少素材時的恢復流程：為療癒卡牌每日祝福小卡建立影片，但素材檔案不存在。",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "missing_assets",
+      "writing_style": "故事敘事",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-092-ritual-oil-missing_assets",
+      "name": "平安儀式精油 故事敘事 TikTok",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "測試缺少素材時的恢復流程：為芳香精油平安儀式精油建立影片，但素材檔案不存在。",
+      "platform": "TikTok",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "missing_assets",
+      "writing_style": "故事敘事",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-093-desk-altar-invalid_assets",
+      "name": "迷你靜心供台 故事敘事 YouTube Shorts",
+      "product_name": "迷你靜心供台",
+      "category": "居家擺飾",
+      "requirement": "測試無效圖片時的恢復流程：為迷你靜心供台建立影片，但上傳檔案不是有效圖片。",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "invalid_assets",
+      "writing_style": "故事敘事",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-094-singing-bowl-invalid_assets",
+      "name": "銅製靜心音缽 故事敘事 Instagram Reels",
+      "product_name": "銅製靜心音缽",
+      "category": "聲音療癒",
+      "requirement": "測試無效圖片時的恢復流程：為銅製靜心音缽建立影片，但上傳檔案不是有效圖片。",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "invalid_assets",
+      "writing_style": "故事敘事",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-095-incense-set-invalid_assets",
+      "name": "晨光線香組 故事敘事 TikTok",
+      "product_name": "晨光線香組",
+      "category": "線香",
+      "requirement": "測試無效圖片時的恢復流程：為晨光線香組建立影片，但上傳檔案不是有效圖片。",
+      "platform": "TikTok",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "invalid_assets",
+      "writing_style": "故事敘事",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-096-crystal-set-invalid_assets",
+      "name": "七日水晶組 故事敘事 YouTube Shorts",
+      "product_name": "七日水晶組",
+      "category": "水晶",
+      "requirement": "測試無效圖片時的恢復流程：為七日水晶組建立影片，但上傳檔案不是有效圖片。",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "invalid_assets",
+      "writing_style": "故事敘事",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-097-temple-candle-invalid_assets",
+      "name": "淨心能量蠟燭 節慶促銷 Instagram Reels",
+      "product_name": "淨心能量蠟燭",
+      "category": "香氛蠟燭",
+      "requirement": "測試無效圖片時的恢復流程：為淨心能量蠟燭建立影片，但上傳檔案不是有效圖片。",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "image_count": 1,
+      "asset_mode": "invalid_assets",
+      "writing_style": "節慶促銷",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-098-blessing-bracelet-empty_assets",
+      "name": "靜願黑曜石手鍊 節慶促銷 TikTok",
+      "product_name": "靜願黑曜石手鍊",
+      "category": "能量手鍊",
+      "requirement": "測試未上傳圖片時的提醒流程：為靜願黑曜石手鍊建立影片。",
+      "platform": "TikTok",
+      "duration": 24,
+      "image_count": 2,
+      "asset_mode": "empty_assets",
+      "writing_style": "節慶促銷",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-099-fortune-card-empty_assets",
+      "name": "每日祝福小卡 節慶促銷 YouTube Shorts",
+      "product_name": "每日祝福小卡",
+      "category": "療癒卡牌",
+      "requirement": "測試未上傳圖片時的提醒流程：為每日祝福小卡建立影片。",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "image_count": 3,
+      "asset_mode": "empty_assets",
+      "writing_style": "節慶促銷",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    },
+    {
+      "case_id": "PV-100-ritual-oil-empty_assets",
+      "name": "平安儀式精油 節慶促銷 Instagram Reels",
+      "product_name": "平安儀式精油",
+      "category": "芳香精油",
+      "requirement": "測試未上傳圖片時的提醒流程：為平安儀式精油建立影片。",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "image_count": 4,
+      "asset_mode": "empty_assets",
+      "writing_style": "節慶促銷",
+      "expected": "handled_input_failure",
+      "severity_if_fail": "major"
+    }
+  ],
+  "results": [
+    {
+      "caseId": "PV-001-temple-candle-valid",
+      "name": "淨心能量蠟燭 溫柔療癒 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:20:19",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:20:27",
+      "timings": {
+        "scriptSeconds": 0.0205,
+        "imageSeconds": 2.0509,
+        "videoSeconds": 6.0177,
+        "qualitySeconds": 0.2226,
+        "totalSeconds": 8.3338
+      },
+      "memory": {
+        "tracemallocPeakBytes": 2178546,
+        "tracemallocCurrentBytes": 1038070
+      },
+      "disk": {
+        "projectBytes": 9488634,
+        "exportBytes": 15781130
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-001-temple-candle-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-001-temple-candle-valid"
+      },
+      "ordinal": 1
+    },
+    {
+      "caseId": "PV-002-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 溫柔療癒 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:20:27",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:20:38",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2668,
+        "videoSeconds": 8.2671,
+        "qualitySeconds": 0.2615,
+        "totalSeconds": 10.8338
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1374336,
+        "tracemallocCurrentBytes": 268303
+      },
+      "disk": {
+        "projectBytes": 10876440,
+        "exportBytes": 18618601
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-002-blessing-bracelet-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-002-blessing-bracelet-valid"
+      },
+      "ordinal": 2
+    },
+    {
+      "caseId": "PV-003-fortune-card-valid",
+      "name": "每日祝福小卡 溫柔療癒 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:20:38",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:20:50",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.26,
+        "videoSeconds": 9.7782,
+        "qualitySeconds": 0.2955,
+        "totalSeconds": 12.3871
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1376335,
+        "tracemallocCurrentBytes": 235583
+      },
+      "disk": {
+        "projectBytes": 11423240,
+        "exportBytes": 19697459
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-003-fortune-card-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-003-fortune-card-valid"
+      },
+      "ordinal": 3
+    },
+    {
+      "caseId": "PV-004-ritual-oil-valid",
+      "name": "平安儀式精油 溫柔療癒 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:20:50",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:21:03",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2756,
+        "videoSeconds": 10.3516,
+        "qualitySeconds": 0.3352,
+        "totalSeconds": 13.0353
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1382055,
+        "tracemallocCurrentBytes": 273258
+      },
+      "disk": {
+        "projectBytes": 12593762,
+        "exportBytes": 21815774
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-004-ritual-oil-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-004-ritual-oil-valid"
+      },
+      "ordinal": 4
+    },
+    {
+      "caseId": "PV-005-desk-altar-valid",
+      "name": "迷你靜心供台 溫柔療癒 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:21:03",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:21:12",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2086,
+        "videoSeconds": 6.9029,
+        "qualitySeconds": 0.2252,
+        "totalSeconds": 9.3555
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1370674,
+        "tracemallocCurrentBytes": 230187
+      },
+      "disk": {
+        "projectBytes": 9160365,
+        "exportBytes": 15261850
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-005-desk-altar-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-005-desk-altar-valid"
+      },
+      "ordinal": 5
+    },
+    {
+      "caseId": "PV-006-singing-bowl-valid",
+      "name": "銅製靜心音缽 溫柔療癒 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:21:13",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:21:23",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2984,
+        "videoSeconds": 7.4878,
+        "qualitySeconds": 0.2733,
+        "totalSeconds": 10.0977
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1377628,
+        "tracemallocCurrentBytes": 265297
+      },
+      "disk": {
+        "projectBytes": 10835903,
+        "exportBytes": 18417149
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-006-singing-bowl-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-006-singing-bowl-valid"
+      },
+      "ordinal": 6
+    },
+    {
+      "caseId": "PV-007-incense-set-valid",
+      "name": "晨光線香組 溫柔療癒 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:21:23",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:21:35",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2673,
+        "videoSeconds": 9.7864,
+        "qualitySeconds": 0.2931,
+        "totalSeconds": 12.4006
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1373369,
+        "tracemallocCurrentBytes": 229769
+      },
+      "disk": {
+        "projectBytes": 11411319,
+        "exportBytes": 19653125
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-007-incense-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-007-incense-set-valid"
+      },
+      "ordinal": 7
+    },
+    {
+      "caseId": "PV-008-crystal-set-valid",
+      "name": "七日水晶組 溫柔療癒 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:21:35",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:21:49",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2249,
+        "videoSeconds": 11.1489,
+        "qualitySeconds": 0.3388,
+        "totalSeconds": 13.7856
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1363801,
+        "tracemallocCurrentBytes": 271683
+      },
+      "disk": {
+        "projectBytes": 11429714,
+        "exportBytes": 20007847
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-008-crystal-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-008-crystal-set-valid"
+      },
+      "ordinal": 8
+    },
+    {
+      "caseId": "PV-009-temple-candle-valid",
+      "name": "淨心能量蠟燭 高級商業 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:21:49",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:21:57",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.0643,
+        "videoSeconds": 5.9305,
+        "qualitySeconds": 0.2131,
+        "totalSeconds": 8.2269
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1373430,
+        "tracemallocCurrentBytes": 228952
+      },
+      "disk": {
+        "projectBytes": 9470455,
+        "exportBytes": 15759589
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-009-temple-candle-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-009-temple-candle-valid"
+      },
+      "ordinal": 9
+    },
+    {
+      "caseId": "PV-010-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 高級商業 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:21:57",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:22:08",
+      "timings": {
+        "scriptSeconds": 0.0008,
+        "imageSeconds": 2.0784,
+        "videoSeconds": 8.3339,
+        "qualitySeconds": 0.2673,
+        "totalSeconds": 10.7094
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1380448,
+        "tracemallocCurrentBytes": 266843
+      },
+      "disk": {
+        "projectBytes": 11047134,
+        "exportBytes": 18802270
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-010-blessing-bracelet-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-010-blessing-bracelet-valid"
+      },
+      "ordinal": 10
+    },
+    {
+      "caseId": "PV-011-fortune-card-valid",
+      "name": "每日祝福小卡 高級商業 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:22:08",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:22:19",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2502,
+        "videoSeconds": 8.9038,
+        "qualitySeconds": 0.3063,
+        "totalSeconds": 11.5142
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1366469,
+        "tracemallocCurrentBytes": 228256
+      },
+      "disk": {
+        "projectBytes": 11217663,
+        "exportBytes": 19462954
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-011-fortune-card-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-011-fortune-card-valid"
+      },
+      "ordinal": 11
+    },
+    {
+      "caseId": "PV-012-ritual-oil-valid",
+      "name": "平安儀式精油 高級商業 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:22:19",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:22:33",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2868,
+        "videoSeconds": 11.18,
+        "qualitySeconds": 0.3352,
+        "totalSeconds": 13.8736
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1380834,
+        "tracemallocCurrentBytes": 270837
+      },
+      "disk": {
+        "projectBytes": 12556244,
+        "exportBytes": 21771794
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-012-ritual-oil-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-012-ritual-oil-valid"
+      },
+      "ordinal": 12
+    },
+    {
+      "caseId": "PV-013-desk-altar-valid",
+      "name": "迷你靜心供台 高級商業 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:22:33",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:22:42",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.247,
+        "videoSeconds": 6.8509,
+        "qualitySeconds": 0.2253,
+        "totalSeconds": 9.3435
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1374218,
+        "tracemallocCurrentBytes": 228359
+      },
+      "disk": {
+        "projectBytes": 9333112,
+        "exportBytes": 15469754
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-013-desk-altar-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-013-desk-altar-valid"
+      },
+      "ordinal": 13
+    },
+    {
+      "caseId": "PV-014-singing-bowl-valid",
+      "name": "銅製靜心音缽 高級商業 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:22:42",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:22:53",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2755,
+        "videoSeconds": 7.5208,
+        "qualitySeconds": 0.2624,
+        "totalSeconds": 10.0969
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1369843,
+        "tracemallocCurrentBytes": 263129
+      },
+      "disk": {
+        "projectBytes": 10618349,
+        "exportBytes": 18148840
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-014-singing-bowl-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-014-singing-bowl-valid"
+      },
+      "ordinal": 14
+    },
+    {
+      "caseId": "PV-015-incense-set-valid",
+      "name": "晨光線香組 高級商業 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:22:53",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:23:05",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2486,
+        "videoSeconds": 9.7697,
+        "qualitySeconds": 0.2895,
+        "totalSeconds": 12.3609
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1370954,
+        "tracemallocCurrentBytes": 228515
+      },
+      "disk": {
+        "projectBytes": 11393090,
+        "exportBytes": 19642214
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-015-incense-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-015-incense-set-valid"
+      },
+      "ordinal": 15
+    },
+    {
+      "caseId": "PV-016-crystal-set-valid",
+      "name": "七日水晶組 高級商業 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:23:05",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:23:18",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2813,
+        "videoSeconds": 10.3814,
+        "qualitySeconds": 0.3235,
+        "totalSeconds": 13.0593
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1370403,
+        "tracemallocCurrentBytes": 270452
+      },
+      "disk": {
+        "projectBytes": 11711679,
+        "exportBytes": 20403301
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-016-crystal-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-016-crystal-set-valid"
+      },
+      "ordinal": 16
+    },
+    {
+      "caseId": "PV-017-temple-candle-valid",
+      "name": "淨心能量蠟燭 節奏快速 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:23:18",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:23:27",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2293,
+        "videoSeconds": 6.9056,
+        "qualitySeconds": 0.2225,
+        "totalSeconds": 9.3774
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1366787,
+        "tracemallocCurrentBytes": 228454
+      },
+      "disk": {
+        "projectBytes": 9284533,
+        "exportBytes": 15527928
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-017-temple-candle-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-017-temple-candle-valid"
+      },
+      "ordinal": 17
+    },
+    {
+      "caseId": "PV-018-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 節奏快速 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:23:27",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:23:38",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.3106,
+        "videoSeconds": 8.2667,
+        "qualitySeconds": 0.262,
+        "totalSeconds": 10.8779
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1379197,
+        "tracemallocCurrentBytes": 265550
+      },
+      "disk": {
+        "projectBytes": 11034637,
+        "exportBytes": 18791220
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-018-blessing-bracelet-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-018-blessing-bracelet-valid"
+      },
+      "ordinal": 18
+    },
+    {
+      "caseId": "PV-019-fortune-card-valid",
+      "name": "每日祝福小卡 節奏快速 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:23:38",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:23:50",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2763,
+        "videoSeconds": 8.9104,
+        "qualitySeconds": 0.2892,
+        "totalSeconds": 11.5297
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1373117,
+        "tracemallocCurrentBytes": 231135
+      },
+      "disk": {
+        "projectBytes": 11405655,
+        "exportBytes": 19662125
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-019-fortune-card-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-019-fortune-card-valid"
+      },
+      "ordinal": 19
+    },
+    {
+      "caseId": "PV-020-ritual-oil-valid",
+      "name": "平安儀式精油 節奏快速 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:23:50",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:24:04",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2632,
+        "videoSeconds": 11.1777,
+        "qualitySeconds": 0.3272,
+        "totalSeconds": 13.8381
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1375360,
+        "tracemallocCurrentBytes": 270674
+      },
+      "disk": {
+        "projectBytes": 12300292,
+        "exportBytes": 21421183
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-020-ritual-oil-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-020-ritual-oil-valid"
+      },
+      "ordinal": 20
+    },
+    {
+      "caseId": "PV-021-desk-altar-valid",
+      "name": "迷你靜心供台 節奏快速 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:24:04",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:24:12",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2432,
+        "videoSeconds": 5.9786,
+        "qualitySeconds": 0.2238,
+        "totalSeconds": 8.4645
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1372484,
+        "tracemallocCurrentBytes": 226422
+      },
+      "disk": {
+        "projectBytes": 9324160,
+        "exportBytes": 15457192
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-021-desk-altar-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-021-desk-altar-valid"
+      },
+      "ordinal": 21
+    },
+    {
+      "caseId": "PV-022-singing-bowl-valid",
+      "name": "銅製靜心音缽 節奏快速 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:24:12",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:24:23",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2968,
+        "videoSeconds": 8.2417,
+        "qualitySeconds": 0.2588,
+        "totalSeconds": 10.8341
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1377119,
+        "tracemallocCurrentBytes": 262343
+      },
+      "disk": {
+        "projectBytes": 10833145,
+        "exportBytes": 18406772
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-022-singing-bowl-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-022-singing-bowl-valid"
+      },
+      "ordinal": 22
+    },
+    {
+      "caseId": "PV-023-incense-set-valid",
+      "name": "晨光線香組 節奏快速 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:24:23",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:24:34",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2503,
+        "videoSeconds": 8.8818,
+        "qualitySeconds": 0.2868,
+        "totalSeconds": 11.4727
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1366169,
+        "tracemallocCurrentBytes": 228737
+      },
+      "disk": {
+        "projectBytes": 11119660,
+        "exportBytes": 19254265
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-023-incense-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-023-incense-set-valid"
+      },
+      "ordinal": 23
+    },
+    {
+      "caseId": "PV-024-crystal-set-valid",
+      "name": "七日水晶組 節奏快速 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:24:34",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:24:48",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2523,
+        "videoSeconds": 11.1458,
+        "qualitySeconds": 0.3257,
+        "totalSeconds": 13.7962
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1370449,
+        "tracemallocCurrentBytes": 270764
+      },
+      "disk": {
+        "projectBytes": 11694849,
+        "exportBytes": 20381482
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-024-crystal-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-024-crystal-set-valid"
+      },
+      "ordinal": 24
+    },
+    {
+      "caseId": "PV-025-temple-candle-valid",
+      "name": "淨心能量蠟燭 故事敘事 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:24:48",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:24:58",
+      "timings": {
+        "scriptSeconds": 0.0008,
+        "imageSeconds": 2.2403,
+        "videoSeconds": 6.8263,
+        "qualitySeconds": 0.2249,
+        "totalSeconds": 9.3115
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1373795,
+        "tracemallocCurrentBytes": 229031
+      },
+      "disk": {
+        "projectBytes": 9492006,
+        "exportBytes": 15788794
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-025-temple-candle-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-025-temple-candle-valid"
+      },
+      "ordinal": 25
+    },
+    {
+      "caseId": "PV-026-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 故事敘事 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:24:58",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:25:08",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2506,
+        "videoSeconds": 7.4346,
+        "qualitySeconds": 0.2598,
+        "totalSeconds": 9.9828
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1372992,
+        "tracemallocCurrentBytes": 265668
+      },
+      "disk": {
+        "projectBytes": 10868623,
+        "exportBytes": 18611252
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-026-blessing-bracelet-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-026-blessing-bracelet-valid"
+      },
+      "ordinal": 26
+    },
+    {
+      "caseId": "PV-027-fortune-card-valid",
+      "name": "每日祝福小卡 故事敘事 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:25:08",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:25:20",
+      "timings": {
+        "scriptSeconds": 0.001,
+        "imageSeconds": 2.2621,
+        "videoSeconds": 9.7021,
+        "qualitySeconds": 0.2902,
+        "totalSeconds": 12.3069
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1373102,
+        "tracemallocCurrentBytes": 229055
+      },
+      "disk": {
+        "projectBytes": 11413606,
+        "exportBytes": 19688749
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-027-fortune-card-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-027-fortune-card-valid"
+      },
+      "ordinal": 27
+    },
+    {
+      "caseId": "PV-028-ritual-oil-valid",
+      "name": "平安儀式精油 故事敘事 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:25:20",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:25:33",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2923,
+        "videoSeconds": 10.3326,
+        "qualitySeconds": 0.3274,
+        "totalSeconds": 13.0224
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1382319,
+        "tracemallocCurrentBytes": 270448
+      },
+      "disk": {
+        "projectBytes": 12587704,
+        "exportBytes": 21817514
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-028-ritual-oil-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-028-ritual-oil-valid"
+      },
+      "ordinal": 28
+    },
+    {
+      "caseId": "PV-029-desk-altar-valid",
+      "name": "迷你靜心供台 故事敘事 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:25:33",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:25:42",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2186,
+        "videoSeconds": 6.8257,
+        "qualitySeconds": 0.2299,
+        "totalSeconds": 9.2937
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1367908,
+        "tracemallocCurrentBytes": 225843
+      },
+      "disk": {
+        "projectBytes": 9148151,
+        "exportBytes": 15237442
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-029-desk-altar-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-029-desk-altar-valid"
+      },
+      "ordinal": 29
+    },
+    {
+      "caseId": "PV-030-singing-bowl-valid",
+      "name": "銅製靜心音缽 故事敘事 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:25:42",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:25:52",
+      "timings": {
+        "scriptSeconds": 0.001,
+        "imageSeconds": 2.281,
+        "videoSeconds": 7.4529,
+        "qualitySeconds": 0.2641,
+        "totalSeconds": 10.0338
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1372771,
+        "tracemallocCurrentBytes": 256364
+      },
+      "disk": {
+        "projectBytes": 10830996,
+        "exportBytes": 18414755
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-030-singing-bowl-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-030-singing-bowl-valid"
+      },
+      "ordinal": 30
+    },
+    {
+      "caseId": "PV-031-incense-set-valid",
+      "name": "晨光線香組 故事敘事 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:25:52",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:26:05",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2537,
+        "videoSeconds": 9.7513,
+        "qualitySeconds": 0.2903,
+        "totalSeconds": 12.3501
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1369360,
+        "tracemallocCurrentBytes": 225872
+      },
+      "disk": {
+        "projectBytes": 11392943,
+        "exportBytes": 19627238
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-031-incense-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-031-incense-set-valid"
+      },
+      "ordinal": 31
+    },
+    {
+      "caseId": "PV-032-crystal-set-valid",
+      "name": "七日水晶組 故事敘事 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:26:05",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:26:18",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2269,
+        "videoSeconds": 10.3468,
+        "qualitySeconds": 0.3195,
+        "totalSeconds": 12.9627
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1360432,
+        "tracemallocCurrentBytes": 264751
+      },
+      "disk": {
+        "projectBytes": 11417977,
+        "exportBytes": 19999752
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-032-crystal-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-032-crystal-set-valid"
+      },
+      "ordinal": 32
+    },
+    {
+      "caseId": "PV-033-temple-candle-valid",
+      "name": "淨心能量蠟燭 節慶促銷 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:26:18",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:26:27",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2455,
+        "videoSeconds": 6.8533,
+        "qualitySeconds": 0.2245,
+        "totalSeconds": 9.3436
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1367546,
+        "tracemallocCurrentBytes": 222590
+      },
+      "disk": {
+        "projectBytes": 9471430,
+        "exportBytes": 15763379
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-033-temple-candle-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-033-temple-candle-valid"
+      },
+      "ordinal": 33
+    },
+    {
+      "caseId": "PV-034-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 節慶促銷 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:26:27",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:26:38",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.3137,
+        "videoSeconds": 8.3305,
+        "qualitySeconds": 0.2603,
+        "totalSeconds": 10.9413
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1386894,
+        "tracemallocCurrentBytes": 259681
+      },
+      "disk": {
+        "projectBytes": 11047146,
+        "exportBytes": 18800400
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-034-blessing-bracelet-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-034-blessing-bracelet-valid"
+      },
+      "ordinal": 34
+    },
+    {
+      "caseId": "PV-035-fortune-card-valid",
+      "name": "每日祝福小卡 節慶促銷 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:26:38",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:26:49",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2392,
+        "videoSeconds": 8.8962,
+        "qualitySeconds": 0.293,
+        "totalSeconds": 11.4809
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1360174,
+        "tracemallocCurrentBytes": 223389
+      },
+      "disk": {
+        "projectBytes": 11216913,
+        "exportBytes": 19458229
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-035-fortune-card-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-035-fortune-card-valid"
+      },
+      "ordinal": 35
+    },
+    {
+      "caseId": "PV-036-ritual-oil-valid",
+      "name": "平安儀式精油 節慶促銷 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:26:49",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:27:03",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2839,
+        "videoSeconds": 11.221,
+        "qualitySeconds": 0.333,
+        "totalSeconds": 13.9107
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1379891,
+        "tracemallocCurrentBytes": 264510
+      },
+      "disk": {
+        "projectBytes": 12559844,
+        "exportBytes": 21773042
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-036-ritual-oil-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-036-ritual-oil-valid"
+      },
+      "ordinal": 36
+    },
+    {
+      "caseId": "PV-037-desk-altar-valid",
+      "name": "迷你靜心供台 節慶促銷 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:27:03",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:27:12",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2428,
+        "videoSeconds": 6.008,
+        "qualitySeconds": 0.2218,
+        "totalSeconds": 8.4929
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1368205,
+        "tracemallocCurrentBytes": 221813
+      },
+      "disk": {
+        "projectBytes": 9327640,
+        "exportBytes": 15458870
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-037-desk-altar-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-037-desk-altar-valid"
+      },
+      "ordinal": 37
+    },
+    {
+      "caseId": "PV-038-singing-bowl-valid",
+      "name": "銅製靜心音缽 節慶促銷 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:27:12",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:27:23",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2589,
+        "videoSeconds": 8.29,
+        "qualitySeconds": 0.2576,
+        "totalSeconds": 10.843
+      },
+      "memory": {
+        "tracemallocPeakBytes": 2241469,
+        "tracemallocCurrentBytes": 1220414
+      },
+      "disk": {
+        "projectBytes": 10616172,
+        "exportBytes": 18141287
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-038-singing-bowl-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-038-singing-bowl-valid"
+      },
+      "ordinal": 38
+    },
+    {
+      "caseId": "PV-039-incense-set-valid",
+      "name": "晨光線香組 節慶促銷 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:27:23",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:27:34",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2418,
+        "videoSeconds": 8.9353,
+        "qualitySeconds": 0.2969,
+        "totalSeconds": 11.5287
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1366135,
+        "tracemallocCurrentBytes": 225950
+      },
+      "disk": {
+        "projectBytes": 11385902,
+        "exportBytes": 19624725
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-039-incense-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-039-incense-set-valid"
+      },
+      "ordinal": 39
+    },
+    {
+      "caseId": "PV-040-crystal-set-valid",
+      "name": "七日水晶組 節慶促銷 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:27:34",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:27:48",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2589,
+        "videoSeconds": 11.227,
+        "qualitySeconds": 0.3216,
+        "totalSeconds": 13.8793
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1366526,
+        "tracemallocCurrentBytes": 264724
+      },
+      "disk": {
+        "projectBytes": 11715010,
+        "exportBytes": 20404655
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-040-crystal-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-040-crystal-set-valid"
+      },
+      "ordinal": 40
+    },
+    {
+      "caseId": "PV-041-temple-candle-valid",
+      "name": "淨心能量蠟燭 新手友善 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:27:48",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:27:57",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2206,
+        "videoSeconds": 6.907,
+        "qualitySeconds": 0.219,
+        "totalSeconds": 9.3665
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1362962,
+        "tracemallocCurrentBytes": 222861
+      },
+      "disk": {
+        "projectBytes": 9298191,
+        "exportBytes": 15551474
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-041-temple-candle-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-041-temple-candle-valid"
+      },
+      "ordinal": 41
+    },
+    {
+      "caseId": "PV-042-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 新手友善 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:27:57",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:28:07",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2887,
+        "videoSeconds": 7.47,
+        "qualitySeconds": 0.2649,
+        "totalSeconds": 10.0614
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1387702,
+        "tracemallocCurrentBytes": 259681
+      },
+      "disk": {
+        "projectBytes": 11024175,
+        "exportBytes": 18771831
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-042-blessing-bracelet-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-042-blessing-bracelet-valid"
+      },
+      "ordinal": 42
+    },
+    {
+      "caseId": "PV-043-fortune-card-valid",
+      "name": "每日祝福小卡 新手友善 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:28:07",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:28:20",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.1694,
+        "videoSeconds": 9.7534,
+        "qualitySeconds": 0.2917,
+        "totalSeconds": 12.2676
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1367761,
+        "tracemallocCurrentBytes": 224836
+      },
+      "disk": {
+        "projectBytes": 11410938,
+        "exportBytes": 19674150
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-043-fortune-card-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-043-fortune-card-valid"
+      },
+      "ordinal": 43
+    },
+    {
+      "caseId": "PV-044-ritual-oil-valid",
+      "name": "平安儀式精油 新手友善 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:28:20",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:28:33",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.1041,
+        "videoSeconds": 11.1421,
+        "qualitySeconds": 0.3327,
+        "totalSeconds": 13.6495
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1374333,
+        "tracemallocCurrentBytes": 264653
+      },
+      "disk": {
+        "projectBytes": 12286156,
+        "exportBytes": 21400277
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-044-ritual-oil-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-044-ritual-oil-valid"
+      },
+      "ordinal": 44
+    },
+    {
+      "caseId": "PV-045-desk-altar-valid",
+      "name": "迷你靜心供台 新手友善 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:28:33",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:28:43",
+      "timings": {
+        "scriptSeconds": 0.0007,
+        "imageSeconds": 2.0891,
+        "videoSeconds": 6.8449,
+        "qualitySeconds": 0.2262,
+        "totalSeconds": 9.1783
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1367202,
+        "tracemallocCurrentBytes": 220635
+      },
+      "disk": {
+        "projectBytes": 9329947,
+        "exportBytes": 15463099
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-045-desk-altar-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-045-desk-altar-valid"
+      },
+      "ordinal": 45
+    },
+    {
+      "caseId": "PV-046-singing-bowl-valid",
+      "name": "銅製靜心音缽 新手友善 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:28:43",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:28:53",
+      "timings": {
+        "scriptSeconds": 0.0007,
+        "imageSeconds": 2.2221,
+        "videoSeconds": 7.415,
+        "qualitySeconds": 0.258,
+        "totalSeconds": 9.9308
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1386647,
+        "tracemallocCurrentBytes": 260286
+      },
+      "disk": {
+        "projectBytes": 10834378,
+        "exportBytes": 18410736
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-046-singing-bowl-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-046-singing-bowl-valid"
+      },
+      "ordinal": 46
+    },
+    {
+      "caseId": "PV-047-incense-set-valid",
+      "name": "晨光線香組 新手友善 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:28:53",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:29:05",
+      "timings": {
+        "scriptSeconds": 0.0007,
+        "imageSeconds": 2.1469,
+        "videoSeconds": 9.759,
+        "qualitySeconds": 0.2877,
+        "totalSeconds": 12.2444
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1361488,
+        "tracemallocCurrentBytes": 225544
+      },
+      "disk": {
+        "projectBytes": 11121286,
+        "exportBytes": 19260768
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-047-incense-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-047-incense-set-valid"
+      },
+      "ordinal": 47
+    },
+    {
+      "caseId": "PV-048-crystal-set-valid",
+      "name": "七日水晶組 新手友善 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:29:05",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:29:18",
+      "timings": {
+        "scriptSeconds": 0.0011,
+        "imageSeconds": 2.0713,
+        "videoSeconds": 11.115,
+        "qualitySeconds": 0.3183,
+        "totalSeconds": 13.573
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1366540,
+        "tracemallocCurrentBytes": 263274
+      },
+      "disk": {
+        "projectBytes": 11686352,
+        "exportBytes": 20370802
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-048-crystal-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-048-crystal-set-valid"
+      },
+      "ordinal": 48
+    },
+    {
+      "caseId": "PV-049-temple-candle-valid",
+      "name": "淨心能量蠟燭 品牌形象 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:29:18",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:29:27",
+      "timings": {
+        "scriptSeconds": 0.0007,
+        "imageSeconds": 2.0121,
+        "videoSeconds": 6.8051,
+        "qualitySeconds": 0.2287,
+        "totalSeconds": 9.0612
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1367926,
+        "tracemallocCurrentBytes": 223451
+      },
+      "disk": {
+        "projectBytes": 9454312,
+        "exportBytes": 15739984
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-049-temple-candle-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-049-temple-candle-valid"
+      },
+      "ordinal": 49
+    },
+    {
+      "caseId": "PV-050-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 品牌形象 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:29:27",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:29:38",
+      "timings": {
+        "scriptSeconds": 0.0008,
+        "imageSeconds": 2.1197,
+        "videoSeconds": 8.1951,
+        "qualitySeconds": 0.2597,
+        "totalSeconds": 10.611
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1381531,
+        "tracemallocCurrentBytes": 260609
+      },
+      "disk": {
+        "projectBytes": 10852021,
+        "exportBytes": 18592307
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-050-blessing-bracelet-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-050-blessing-bracelet-valid"
+      },
+      "ordinal": 50
+    },
+    {
+      "caseId": "PV-051-fortune-card-valid",
+      "name": "每日祝福小卡 品牌形象 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:29:38",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:29:49",
+      "timings": {
+        "scriptSeconds": 0.0008,
+        "imageSeconds": 2.0951,
+        "videoSeconds": 8.9349,
+        "qualitySeconds": 0.2933,
+        "totalSeconds": 11.3712
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1367508,
+        "tracemallocCurrentBytes": 226272
+      },
+      "disk": {
+        "projectBytes": 11386815,
+        "exportBytes": 19652387
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-051-fortune-card-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-051-fortune-card-valid"
+      },
+      "ordinal": 51
+    },
+    {
+      "caseId": "PV-052-ritual-oil-valid",
+      "name": "平安儀式精油 品牌形象 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:29:49",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:30:03",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.284,
+        "videoSeconds": 11.1632,
+        "qualitySeconds": 0.3336,
+        "totalSeconds": 13.8505
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1379490,
+        "tracemallocCurrentBytes": 264051
+      },
+      "disk": {
+        "projectBytes": 12550147,
+        "exportBytes": 21757128
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-052-ritual-oil-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-052-ritual-oil-valid"
+      },
+      "ordinal": 52
+    },
+    {
+      "caseId": "PV-053-desk-altar-valid",
+      "name": "迷你靜心供台 品牌形象 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:30:03",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:30:13",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2073,
+        "videoSeconds": 6.7962,
+        "qualitySeconds": 0.2231,
+        "totalSeconds": 9.2447
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1362377,
+        "tracemallocCurrentBytes": 222255
+      },
+      "disk": {
+        "projectBytes": 9128497,
+        "exportBytes": 15222928
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-053-desk-altar-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-053-desk-altar-valid"
+      },
+      "ordinal": 53
+    },
+    {
+      "caseId": "PV-054-singing-bowl-valid",
+      "name": "銅製靜心音缽 品牌形象 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:30:13",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:30:23",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2751,
+        "videoSeconds": 7.4501,
+        "qualitySeconds": 0.2617,
+        "totalSeconds": 10.025
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1385598,
+        "tracemallocCurrentBytes": 260563
+      },
+      "disk": {
+        "projectBytes": 10811440,
+        "exportBytes": 18388743
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-054-singing-bowl-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-054-singing-bowl-valid"
+      },
+      "ordinal": 54
+    },
+    {
+      "caseId": "PV-055-incense-set-valid",
+      "name": "晨光線香組 品牌形象 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:30:23",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:30:35",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2458,
+        "videoSeconds": 9.7605,
+        "qualitySeconds": 0.2878,
+        "totalSeconds": 12.3465
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1366203,
+        "tracemallocCurrentBytes": 224691
+      },
+      "disk": {
+        "projectBytes": 11381051,
+        "exportBytes": 19619277
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-055-incense-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-055-incense-set-valid"
+      },
+      "ordinal": 55
+    },
+    {
+      "caseId": "PV-056-crystal-set-valid",
+      "name": "七日水晶組 品牌形象 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:30:35",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:30:48",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2291,
+        "videoSeconds": 10.4553,
+        "qualitySeconds": 0.3306,
+        "totalSeconds": 13.085
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1359760,
+        "tracemallocCurrentBytes": 263352
+      },
+      "disk": {
+        "projectBytes": 11395978,
+        "exportBytes": 19967866
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-056-crystal-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-056-crystal-set-valid"
+      },
+      "ordinal": 56
+    },
+    {
+      "caseId": "PV-057-temple-candle-valid",
+      "name": "淨心能量蠟燭 短影音爆款 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:30:48",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:30:57",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2538,
+        "videoSeconds": 6.8829,
+        "qualitySeconds": 0.2269,
+        "totalSeconds": 9.3834
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1368924,
+        "tracemallocCurrentBytes": 223392
+      },
+      "disk": {
+        "projectBytes": 9526789,
+        "exportBytes": 15845720
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-057-temple-candle-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-057-temple-candle-valid"
+      },
+      "ordinal": 57
+    },
+    {
+      "caseId": "PV-058-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 短影音爆款 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:30:57",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:31:08",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.3082,
+        "videoSeconds": 8.2774,
+        "qualitySeconds": 0.2618,
+        "totalSeconds": 10.8857
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1388047,
+        "tracemallocCurrentBytes": 259716
+      },
+      "disk": {
+        "projectBytes": 11097729,
+        "exportBytes": 18869433
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-058-blessing-bracelet-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-058-blessing-bracelet-valid"
+      },
+      "ordinal": 58
+    },
+    {
+      "caseId": "PV-059-fortune-card-valid",
+      "name": "每日祝福小卡 短影音爆款 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:31:08",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:31:20",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2315,
+        "videoSeconds": 8.9079,
+        "qualitySeconds": 0.2901,
+        "totalSeconds": 11.4843
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1362771,
+        "tracemallocCurrentBytes": 226367
+      },
+      "disk": {
+        "projectBytes": 11240058,
+        "exportBytes": 19460180
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-059-fortune-card-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-059-fortune-card-valid"
+      },
+      "ordinal": 59
+    },
+    {
+      "caseId": "PV-060-ritual-oil-valid",
+      "name": "平安儀式精油 短影音爆款 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:31:20",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:31:34",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.295,
+        "videoSeconds": 11.2899,
+        "qualitySeconds": 0.3255,
+        "totalSeconds": 13.9802
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1381275,
+        "tracemallocCurrentBytes": 265036
+      },
+      "disk": {
+        "projectBytes": 12646817,
+        "exportBytes": 21897410
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-060-ritual-oil-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-060-ritual-oil-valid"
+      },
+      "ordinal": 60
+    },
+    {
+      "caseId": "PV-061-desk-altar-valid",
+      "name": "迷你靜心供台 短影音爆款 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:31:34",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:31:43",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.262,
+        "videoSeconds": 6.7722,
+        "qualitySeconds": 0.2196,
+        "totalSeconds": 9.2726
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1369692,
+        "tracemallocCurrentBytes": 222238
+      },
+      "disk": {
+        "projectBytes": 9375027,
+        "exportBytes": 15526510
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-061-desk-altar-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-061-desk-altar-valid"
+      },
+      "ordinal": 61
+    },
+    {
+      "caseId": "PV-062-singing-bowl-valid",
+      "name": "銅製靜心音缽 短影音爆款 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:31:43",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:31:53",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2286,
+        "videoSeconds": 7.4236,
+        "qualitySeconds": 0.2545,
+        "totalSeconds": 9.9437
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1380901,
+        "tracemallocCurrentBytes": 259540
+      },
+      "disk": {
+        "projectBytes": 10665169,
+        "exportBytes": 18194595
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-062-singing-bowl-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-062-singing-bowl-valid"
+      },
+      "ordinal": 62
+    },
+    {
+      "caseId": "PV-063-incense-set-valid",
+      "name": "晨光線香組 短影音爆款 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:31:53",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:32:04",
+      "timings": {
+        "scriptSeconds": 0.0007,
+        "imageSeconds": 2.2623,
+        "videoSeconds": 8.9002,
+        "qualitySeconds": 0.2833,
+        "totalSeconds": 11.5005
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1376734,
+        "tracemallocCurrentBytes": 248273
+      },
+      "disk": {
+        "projectBytes": 11458818,
+        "exportBytes": 19727920
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-063-incense-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-063-incense-set-valid"
+      },
+      "ordinal": 63
+    },
+    {
+      "caseId": "PV-064-crystal-set-valid",
+      "name": "七日水晶組 短影音爆款 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:32:04",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:32:18",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2362,
+        "videoSeconds": 11.0747,
+        "qualitySeconds": 0.329,
+        "totalSeconds": 13.7105
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1371986,
+        "tracemallocCurrentBytes": 270198
+      },
+      "disk": {
+        "projectBytes": 11791235,
+        "exportBytes": 20520842
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-064-crystal-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-064-crystal-set-valid"
+      },
+      "ordinal": 64
+    },
+    {
+      "caseId": "PV-065-temple-candle-valid",
+      "name": "淨心能量蠟燭 溫柔療癒 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:32:18",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:32:27",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.1826,
+        "videoSeconds": 5.9346,
+        "qualitySeconds": 0.2178,
+        "totalSeconds": 8.3583
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1370199,
+        "tracemallocCurrentBytes": 228607
+      },
+      "disk": {
+        "projectBytes": 9300573,
+        "exportBytes": 15551812
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-065-temple-candle-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-065-temple-candle-valid"
+      },
+      "ordinal": 65
+    },
+    {
+      "caseId": "PV-066-blessing-bracelet-valid",
+      "name": "靜願黑曜石手鍊 溫柔療癒 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:32:27",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:32:37",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.267,
+        "videoSeconds": 8.301,
+        "qualitySeconds": 0.2578,
+        "totalSeconds": 10.8622
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1375370,
+        "tracemallocCurrentBytes": 261837
+      },
+      "disk": {
+        "projectBytes": 11041566,
+        "exportBytes": 18796097
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-066-blessing-bracelet-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-066-blessing-bracelet-valid"
+      },
+      "ordinal": 66
+    },
+    {
+      "caseId": "PV-067-fortune-card-valid",
+      "name": "每日祝福小卡 溫柔療癒 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:32:37",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:32:50",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2355,
+        "videoSeconds": 9.5631,
+        "qualitySeconds": 0.2725,
+        "totalSeconds": 12.1242
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1373447,
+        "tracemallocCurrentBytes": 229356
+      },
+      "disk": {
+        "projectBytes": 11434285,
+        "exportBytes": 19707717
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-067-fortune-card-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-067-fortune-card-valid"
+      },
+      "ordinal": 67
+    },
+    {
+      "caseId": "PV-068-ritual-oil-valid",
+      "name": "平安儀式精油 溫柔療癒 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:32:50",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:33:03",
+      "timings": {
+        "scriptSeconds": 0.0007,
+        "imageSeconds": 2.0195,
+        "videoSeconds": 11.0344,
+        "qualitySeconds": 0.3216,
+        "totalSeconds": 13.431
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1375520,
+        "tracemallocCurrentBytes": 271245
+      },
+      "disk": {
+        "projectBytes": 12317340,
+        "exportBytes": 21444510
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-068-ritual-oil-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-068-ritual-oil-valid"
+      },
+      "ordinal": 68
+    },
+    {
+      "caseId": "PV-069-desk-altar-valid",
+      "name": "迷你靜心供台 溫柔療癒 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:33:03",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:33:11",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2097,
+        "videoSeconds": 5.954,
+        "qualitySeconds": 0.2144,
+        "totalSeconds": 8.3967
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1374201,
+        "tracemallocCurrentBytes": 229075
+      },
+      "disk": {
+        "projectBytes": 9331862,
+        "exportBytes": 15464017
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-069-desk-altar-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-069-desk-altar-valid"
+      },
+      "ordinal": 69
+    },
+    {
+      "caseId": "PV-070-singing-bowl-valid",
+      "name": "銅製靜心音缽 溫柔療癒 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:33:11",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:33:22",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2602,
+        "videoSeconds": 8.2176,
+        "qualitySeconds": 0.2683,
+        "totalSeconds": 10.7819
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1377108,
+        "tracemallocCurrentBytes": 263612
+      },
+      "disk": {
+        "projectBytes": 10851574,
+        "exportBytes": 18433688
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-070-singing-bowl-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-070-singing-bowl-valid"
+      },
+      "ordinal": 70
+    },
+    {
+      "caseId": "PV-071-incense-set-valid",
+      "name": "晨光線香組 溫柔療癒 TikTok",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "TikTok",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:33:22",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:33:34",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2109,
+        "videoSeconds": 8.8055,
+        "qualitySeconds": 1.0733,
+        "totalSeconds": 12.1417
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1366511,
+        "tracemallocCurrentBytes": 228552
+      },
+      "disk": {
+        "projectBytes": 11151756,
+        "exportBytes": 19307415
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-071-incense-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-071-incense-set-valid"
+      },
+      "ordinal": 71
+    },
+    {
+      "caseId": "PV-072-crystal-set-valid",
+      "name": "七日水晶組 溫柔療癒 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "valid",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:33:34",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:33:47",
+      "timings": {
+        "scriptSeconds": 0.0008,
+        "imageSeconds": 2.2376,
+        "videoSeconds": 10.1915,
+        "qualitySeconds": 0.3135,
+        "totalSeconds": 12.8102
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1369991,
+        "tracemallocCurrentBytes": 268679
+      },
+      "disk": {
+        "projectBytes": 11718673,
+        "exportBytes": 20417460
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-072-crystal-set-valid",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-072-crystal-set-valid"
+      },
+      "ordinal": 72
+    },
+    {
+      "caseId": "PV-073-temple-candle-long_subtitle",
+      "name": "淨心能量蠟燭 高級商業 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "long_subtitle",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:33:47",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:33:56",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.1103,
+        "videoSeconds": 6.7131,
+        "qualitySeconds": 0.2142,
+        "totalSeconds": 9.0566
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1373386,
+        "tracemallocCurrentBytes": 229397
+      },
+      "disk": {
+        "projectBytes": 9479722,
+        "exportBytes": 15772902
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-073-temple-candle-long_subtitle",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-073-temple-candle-long_subtitle"
+      },
+      "ordinal": 73
+    },
+    {
+      "caseId": "PV-074-blessing-bracelet-long_subtitle",
+      "name": "靜願黑曜石手鍊 高級商業 TikTok",
+      "expected": "production_export",
+      "assetMode": "long_subtitle",
+      "platform": "TikTok",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:33:56",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:34:06",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.1224,
+        "videoSeconds": 7.2608,
+        "qualitySeconds": 0.2656,
+        "totalSeconds": 9.6862
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1372894,
+        "tracemallocCurrentBytes": 264209
+      },
+      "disk": {
+        "projectBytes": 10865638,
+        "exportBytes": 18606798
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-074-blessing-bracelet-long_subtitle",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-074-blessing-bracelet-long_subtitle"
+      },
+      "ordinal": 74
+    },
+    {
+      "caseId": "PV-075-fortune-card-long_subtitle",
+      "name": "每日祝福小卡 高級商業 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "long_subtitle",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:34:06",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:34:18",
+      "timings": {
+        "scriptSeconds": 0.0007,
+        "imageSeconds": 2.0935,
+        "videoSeconds": 9.4814,
+        "qualitySeconds": 0.2848,
+        "totalSeconds": 11.9089
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1372812,
+        "tracemallocCurrentBytes": 229697
+      },
+      "disk": {
+        "projectBytes": 11425796,
+        "exportBytes": 19715262
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-075-fortune-card-long_subtitle",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-075-fortune-card-long_subtitle"
+      },
+      "ordinal": 75
+    },
+    {
+      "caseId": "PV-076-ritual-oil-long_subtitle",
+      "name": "平安儀式精油 高級商業 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "long_subtitle",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:34:18",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:34:31",
+      "timings": {
+        "scriptSeconds": 0.0008,
+        "imageSeconds": 2.203,
+        "videoSeconds": 10.9886,
+        "qualitySeconds": 0.3287,
+        "totalSeconds": 13.5929
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1381411,
+        "tracemallocCurrentBytes": 272025
+      },
+      "disk": {
+        "projectBytes": 12581759,
+        "exportBytes": 21804316
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-076-ritual-oil-long_subtitle",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-076-ritual-oil-long_subtitle"
+      },
+      "ordinal": 76
+    },
+    {
+      "caseId": "PV-077-desk-altar-long_subtitle",
+      "name": "迷你靜心供台 高級商業 TikTok",
+      "expected": "production_export",
+      "assetMode": "long_subtitle",
+      "platform": "TikTok",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:34:31",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:34:41",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.0812,
+        "videoSeconds": 5.9082,
+        "qualitySeconds": 1.1749,
+        "totalSeconds": 9.1841
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1367833,
+        "tracemallocCurrentBytes": 227884
+      },
+      "disk": {
+        "projectBytes": 9153974,
+        "exportBytes": 15257494
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-077-desk-altar-long_subtitle",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-077-desk-altar-long_subtitle"
+      },
+      "ordinal": 77
+    },
+    {
+      "caseId": "PV-078-singing-bowl-long_subtitle",
+      "name": "銅製靜心音缽 高級商業 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "long_subtitle",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:34:41",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:34:50",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.1553,
+        "videoSeconds": 7.3101,
+        "qualitySeconds": 0.2501,
+        "totalSeconds": 9.7526
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1376582,
+        "tracemallocCurrentBytes": 264386
+      },
+      "disk": {
+        "projectBytes": 10831132,
+        "exportBytes": 18416591
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-078-singing-bowl-long_subtitle",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-078-singing-bowl-long_subtitle"
+      },
+      "ordinal": 78
+    },
+    {
+      "caseId": "PV-079-incense-set-long_subtitle",
+      "name": "晨光線香組 高級商業 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "long_subtitle",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:34:50",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:35:02",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.0906,
+        "videoSeconds": 9.6629,
+        "qualitySeconds": 0.2896,
+        "totalSeconds": 12.0977
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1370137,
+        "tracemallocCurrentBytes": 226374
+      },
+      "disk": {
+        "projectBytes": 11399527,
+        "exportBytes": 19642058
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-079-incense-set-long_subtitle",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-079-incense-set-long_subtitle"
+      },
+      "ordinal": 79
+    },
+    {
+      "caseId": "PV-080-crystal-set-long_subtitle",
+      "name": "七日水晶組 高級商業 TikTok",
+      "expected": "production_export",
+      "assetMode": "long_subtitle",
+      "platform": "TikTok",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:35:02",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:35:16",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.1367,
+        "videoSeconds": 11.0342,
+        "qualitySeconds": 0.3188,
+        "totalSeconds": 13.5585
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1359464,
+        "tracemallocCurrentBytes": 264759
+      },
+      "disk": {
+        "projectBytes": 11425507,
+        "exportBytes": 20013094
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-080-crystal-set-long_subtitle",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-080-crystal-set-long_subtitle"
+      },
+      "ordinal": 80
+    },
+    {
+      "caseId": "PV-081-temple-candle-multilingual",
+      "name": "淨心能量蠟燭 節奏快速 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "multilingual",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:35:16",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:35:24",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.1062,
+        "videoSeconds": 5.902,
+        "qualitySeconds": 0.2211,
+        "totalSeconds": 8.2479
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1374277,
+        "tracemallocCurrentBytes": 229409
+      },
+      "disk": {
+        "projectBytes": 9487490,
+        "exportBytes": 15793742
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-081-temple-candle-multilingual",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-081-temple-candle-multilingual"
+      },
+      "ordinal": 81
+    },
+    {
+      "caseId": "PV-082-blessing-bracelet-multilingual",
+      "name": "靜願黑曜石手鍊 節奏快速 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "multilingual",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:35:24",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:35:35",
+      "timings": {
+        "scriptSeconds": 0.0007,
+        "imageSeconds": 2.2112,
+        "videoSeconds": 8.1818,
+        "qualitySeconds": 0.2519,
+        "totalSeconds": 10.6787
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1380109,
+        "tracemallocCurrentBytes": 265393
+      },
+      "disk": {
+        "projectBytes": 11042712,
+        "exportBytes": 18792547
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-082-blessing-bracelet-multilingual",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-082-blessing-bracelet-multilingual"
+      },
+      "ordinal": 82
+    },
+    {
+      "caseId": "PV-083-fortune-card-multilingual",
+      "name": "每日祝福小卡 節奏快速 TikTok",
+      "expected": "production_export",
+      "assetMode": "multilingual",
+      "platform": "TikTok",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:35:35",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:35:47",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.1262,
+        "videoSeconds": 9.6461,
+        "qualitySeconds": 0.2868,
+        "totalSeconds": 12.1118
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1366604,
+        "tracemallocCurrentBytes": 229715
+      },
+      "disk": {
+        "projectBytes": 11207966,
+        "exportBytes": 19439774
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-083-fortune-card-multilingual",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-083-fortune-card-multilingual"
+      },
+      "ordinal": 83
+    },
+    {
+      "caseId": "PV-084-ritual-oil-multilingual",
+      "name": "平安儀式精油 節奏快速 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "multilingual",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:35:47",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:36:00",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2511,
+        "videoSeconds": 10.3206,
+        "qualitySeconds": 0.3243,
+        "totalSeconds": 12.967
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1382481,
+        "tracemallocCurrentBytes": 273150
+      },
+      "disk": {
+        "projectBytes": 12556590,
+        "exportBytes": 21768077
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-084-ritual-oil-multilingual",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-084-ritual-oil-multilingual"
+      },
+      "ordinal": 84
+    },
+    {
+      "caseId": "PV-085-desk-altar-multilingual",
+      "name": "迷你靜心供台 節奏快速 Instagram Reels",
+      "expected": "production_export",
+      "assetMode": "multilingual",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:36:00",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:36:09",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2297,
+        "videoSeconds": 6.8089,
+        "qualitySeconds": 0.2179,
+        "totalSeconds": 9.2751
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1374197,
+        "tracemallocCurrentBytes": 228934
+      },
+      "disk": {
+        "projectBytes": 9332437,
+        "exportBytes": 15466913
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-085-desk-altar-multilingual",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-085-desk-altar-multilingual"
+      },
+      "ordinal": 85
+    },
+    {
+      "caseId": "PV-086-singing-bowl-multilingual",
+      "name": "銅製靜心音缽 節奏快速 TikTok",
+      "expected": "production_export",
+      "assetMode": "multilingual",
+      "platform": "TikTok",
+      "duration": 24,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:36:09",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:36:20",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2258,
+        "videoSeconds": 7.406,
+        "qualitySeconds": 1.1014,
+        "totalSeconds": 10.771
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1370725,
+        "tracemallocCurrentBytes": 264992
+      },
+      "disk": {
+        "projectBytes": 10615247,
+        "exportBytes": 18139654
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-086-singing-bowl-multilingual",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-086-singing-bowl-multilingual"
+      },
+      "ordinal": 86
+    },
+    {
+      "caseId": "PV-087-incense-set-multilingual",
+      "name": "晨光線香組 節奏快速 YouTube Shorts",
+      "expected": "production_export",
+      "assetMode": "multilingual",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "status": "PASS",
+      "accepted": true,
+      "failure": null,
+      "startedAt": "2026-07-24T17:36:20",
+      "quality": {
+        "overall": "PASS",
+        "failedCount": 0,
+        "failedChecks": []
+      },
+      "finishedAt": "2026-07-24T17:36:31",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "imageSeconds": 2.2335,
+        "videoSeconds": 8.8323,
+        "qualitySeconds": 0.2808,
+        "totalSeconds": 11.3998
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1372474,
+        "tracemallocCurrentBytes": 228416
+      },
+      "disk": {
+        "projectBytes": 11385384,
+        "exportBytes": 19623453
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-087-incense-set-multilingual",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-087-incense-set-multilingual"
+      },
+      "ordinal": 87
+    },
+    {
+      "caseId": "PV-088-crystal-set-missing_assets",
+      "name": "七日水晶組 節奏快速 Instagram Reels",
+      "expected": "handled_input_failure",
+      "assetMode": "missing_assets",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "No product reference images are available for visual generation.",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0007,
+        "totalSeconds": 0.0067
+      },
+      "memory": {
+        "tracemallocPeakBytes": 64838,
+        "tracemallocCurrentBytes": 34720
+      },
+      "disk": {
+        "projectBytes": 7613,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-088-crystal-set-missing_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-088-crystal-set-missing_assets"
+      },
+      "ordinal": 88
+    },
+    {
+      "caseId": "PV-089-temple-candle-missing_assets",
+      "name": "淨心能量蠟燭 故事敘事 TikTok",
+      "expected": "handled_input_failure",
+      "assetMode": "missing_assets",
+      "platform": "TikTok",
+      "duration": 18,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "No product reference images are available for visual generation.",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0006,
+        "totalSeconds": 0.0067
+      },
+      "memory": {
+        "tracemallocPeakBytes": 64853,
+        "tracemallocCurrentBytes": 34687
+      },
+      "disk": {
+        "projectBytes": 7613,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-089-temple-candle-missing_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-089-temple-candle-missing_assets"
+      },
+      "ordinal": 89
+    },
+    {
+      "caseId": "PV-090-blessing-bracelet-missing_assets",
+      "name": "靜願黑曜石手鍊 故事敘事 YouTube Shorts",
+      "expected": "handled_input_failure",
+      "assetMode": "missing_assets",
+      "platform": "YouTube Shorts",
+      "duration": 24,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "No product reference images are available for visual generation.",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0006,
+        "totalSeconds": 0.0065
+      },
+      "memory": {
+        "tracemallocPeakBytes": 65125,
+        "tracemallocCurrentBytes": 34863
+      },
+      "disk": {
+        "projectBytes": 7613,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-090-blessing-bracelet-missing_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-090-blessing-bracelet-missing_assets"
+      },
+      "ordinal": 90
+    },
+    {
+      "caseId": "PV-091-fortune-card-missing_assets",
+      "name": "每日祝福小卡 故事敘事 Instagram Reels",
+      "expected": "handled_input_failure",
+      "assetMode": "missing_assets",
+      "platform": "Instagram Reels",
+      "duration": 30,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "No product reference images are available for visual generation.",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0006,
+        "totalSeconds": 0.0123
+      },
+      "memory": {
+        "tracemallocPeakBytes": 57156,
+        "tracemallocCurrentBytes": 27422
+      },
+      "disk": {
+        "projectBytes": 7613,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-091-fortune-card-missing_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-091-fortune-card-missing_assets"
+      },
+      "ordinal": 91
+    },
+    {
+      "caseId": "PV-092-ritual-oil-missing_assets",
+      "name": "平安儀式精油 故事敘事 TikTok",
+      "expected": "handled_input_failure",
+      "assetMode": "missing_assets",
+      "platform": "TikTok",
+      "duration": 36,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "No product reference images are available for visual generation.",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0006,
+        "totalSeconds": 0.0062
+      },
+      "memory": {
+        "tracemallocPeakBytes": 64656,
+        "tracemallocCurrentBytes": 35162
+      },
+      "disk": {
+        "projectBytes": 7613,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-092-ritual-oil-missing_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-092-ritual-oil-missing_assets"
+      },
+      "ordinal": 92
+    },
+    {
+      "caseId": "PV-093-desk-altar-invalid_assets",
+      "name": "迷你靜心供台 故事敘事 YouTube Shorts",
+      "expected": "handled_input_failure",
+      "assetMode": "invalid_assets",
+      "platform": "YouTube Shorts",
+      "duration": 18,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "cannot identify image file 'D:\\\\AI\\\\Temple AI Studio Validation Work\\\\20260724-172019\\\\projects\\\\PV-093-desk-altar-invalid_assets\\\\source-assets\\\\PV-093-desk-altar-invalid_assets-invalid.png'",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0006,
+        "totalSeconds": 0.88
+      },
+      "memory": {
+        "tracemallocPeakBytes": 2045906,
+        "tracemallocCurrentBytes": 1903130
+      },
+      "disk": {
+        "projectBytes": 8713,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-093-desk-altar-invalid_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-093-desk-altar-invalid_assets"
+      },
+      "ordinal": 93
+    },
+    {
+      "caseId": "PV-094-singing-bowl-invalid_assets",
+      "name": "銅製靜心音缽 故事敘事 Instagram Reels",
+      "expected": "handled_input_failure",
+      "assetMode": "invalid_assets",
+      "platform": "Instagram Reels",
+      "duration": 24,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "cannot identify image file 'D:\\\\AI\\\\Temple AI Studio Validation Work\\\\20260724-172019\\\\projects\\\\PV-094-singing-bowl-invalid_assets\\\\source-assets\\\\PV-094-singing-bowl-invalid_assets-invalid.png'",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0006,
+        "totalSeconds": 0.0138
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1105450,
+        "tracemallocCurrentBytes": 47411
+      },
+      "disk": {
+        "projectBytes": 8725,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-094-singing-bowl-invalid_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-094-singing-bowl-invalid_assets"
+      },
+      "ordinal": 94
+    },
+    {
+      "caseId": "PV-095-incense-set-invalid_assets",
+      "name": "晨光線香組 故事敘事 TikTok",
+      "expected": "handled_input_failure",
+      "assetMode": "invalid_assets",
+      "platform": "TikTok",
+      "duration": 30,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "cannot identify image file 'D:\\\\AI\\\\Temple AI Studio Validation Work\\\\20260724-172019\\\\projects\\\\PV-095-incense-set-invalid_assets\\\\source-assets\\\\PV-095-incense-set-invalid_assets-invalid.png'",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0006,
+        "totalSeconds": 0.0107
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1106280,
+        "tracemallocCurrentBytes": 48552
+      },
+      "disk": {
+        "projectBytes": 8719,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-095-incense-set-invalid_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-095-incense-set-invalid_assets"
+      },
+      "ordinal": 95
+    },
+    {
+      "caseId": "PV-096-crystal-set-invalid_assets",
+      "name": "七日水晶組 故事敘事 YouTube Shorts",
+      "expected": "handled_input_failure",
+      "assetMode": "invalid_assets",
+      "platform": "YouTube Shorts",
+      "duration": 36,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "cannot identify image file 'D:\\\\AI\\\\Temple AI Studio Validation Work\\\\20260724-172019\\\\projects\\\\PV-096-crystal-set-invalid_assets\\\\source-assets\\\\PV-096-crystal-set-invalid_assets-invalid.png'",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0006,
+        "totalSeconds": 0.0113
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1093380,
+        "tracemallocCurrentBytes": 35422
+      },
+      "disk": {
+        "projectBytes": 8719,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-096-crystal-set-invalid_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-096-crystal-set-invalid_assets"
+      },
+      "ordinal": 96
+    },
+    {
+      "caseId": "PV-097-temple-candle-invalid_assets",
+      "name": "淨心能量蠟燭 節慶促銷 Instagram Reels",
+      "expected": "handled_input_failure",
+      "assetMode": "invalid_assets",
+      "platform": "Instagram Reels",
+      "duration": 18,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "cannot identify image file 'D:\\\\AI\\\\Temple AI Studio Validation Work\\\\20260724-172019\\\\projects\\\\PV-097-temple-candle-invalid_assets\\\\source-assets\\\\PV-097-temple-candle-invalid_assets-invalid.png'",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0006,
+        "totalSeconds": 0.0111
+      },
+      "memory": {
+        "tracemallocPeakBytes": 1105434,
+        "tracemallocCurrentBytes": 47282
+      },
+      "disk": {
+        "projectBytes": 8731,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-097-temple-candle-invalid_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-097-temple-candle-invalid_assets"
+      },
+      "ordinal": 97
+    },
+    {
+      "caseId": "PV-098-blessing-bracelet-empty_assets",
+      "name": "靜願黑曜石手鍊 節慶促銷 TikTok",
+      "expected": "handled_input_failure",
+      "assetMode": "empty_assets",
+      "platform": "TikTok",
+      "duration": 24,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "No product reference images are available for visual generation.",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0006,
+        "totalSeconds": 0.0059
+      },
+      "memory": {
+        "tracemallocPeakBytes": 64244,
+        "tracemallocCurrentBytes": 34030
+      },
+      "disk": {
+        "projectBytes": 7613,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-098-blessing-bracelet-empty_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-098-blessing-bracelet-empty_assets"
+      },
+      "ordinal": 98
+    },
+    {
+      "caseId": "PV-099-fortune-card-empty_assets",
+      "name": "每日祝福小卡 節慶促銷 YouTube Shorts",
+      "expected": "handled_input_failure",
+      "assetMode": "empty_assets",
+      "platform": "YouTube Shorts",
+      "duration": 30,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "No product reference images are available for visual generation.",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:32",
+      "timings": {
+        "scriptSeconds": 0.0006,
+        "totalSeconds": 0.0065
+      },
+      "memory": {
+        "tracemallocPeakBytes": 64293,
+        "tracemallocCurrentBytes": 34199
+      },
+      "disk": {
+        "projectBytes": 7613,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-099-fortune-card-empty_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-099-fortune-card-empty_assets"
+      },
+      "ordinal": 99
+    },
+    {
+      "caseId": "PV-100-ritual-oil-empty_assets",
+      "name": "平安儀式精油 節慶促銷 Instagram Reels",
+      "expected": "handled_input_failure",
+      "assetMode": "empty_assets",
+      "platform": "Instagram Reels",
+      "duration": 36,
+      "status": "HANDLED_EXPECTED_FAILURE",
+      "accepted": true,
+      "failure": {
+        "category": "input-validation",
+        "rootCause": "Product image assets are missing or invalid.",
+        "severity": "major",
+        "message": "No product reference images are available for visual generation.",
+        "suggestedFix": "Show a clear operator message and require valid product photos before generation."
+      },
+      "startedAt": "2026-07-24T17:36:32",
+      "finishedAt": "2026-07-24T17:36:33",
+      "timings": {
+        "scriptSeconds": 0.0009,
+        "totalSeconds": 0.0086
+      },
+      "memory": {
+        "tracemallocPeakBytes": 58732,
+        "tracemallocCurrentBytes": 28494
+      },
+      "disk": {
+        "projectBytes": 7613,
+        "exportBytes": 0
+      },
+      "paths": {
+        "projectDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\projects\\PV-100-ritual-oil-empty_assets",
+        "exportDir": "D:\\AI\\Temple AI Studio Validation Work\\20260724-172019\\exports\\PV-100-ritual-oil-empty_assets"
+      },
+      "ordinal": 100
+    }
+  ]
+}

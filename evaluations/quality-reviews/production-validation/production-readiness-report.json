@@ -1,0 +1,11 @@
+{
+  "level": "PRODUCTION READY",
+  "criteria": {
+    "acceptancePass": true,
+    "validProductionSuccessRate": 1.0,
+    "expectedFailureHandledRate": 1.0,
+    "crashRate": 0.0,
+    "criticalFailureCount": 0,
+    "averageProductionSeconds": 11.1783
+  }
+}
