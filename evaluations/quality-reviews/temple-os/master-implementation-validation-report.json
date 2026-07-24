@@ -8,9 +8,14 @@
     "project-manager",
     "provider-manager",
     "model-manager",
+    "model-download-manager",
     "plugin-manager",
     "prompt-library",
     "knowledge-base",
+    "user-profile-manager",
+    "application-registry",
+    "ai-agent-system",
+    "multi-agent-collaboration",
     "business-rule-engine",
     "queue-manager",
     "task-scheduler",
@@ -23,17 +28,22 @@
     "logging",
     "backup-manager",
     "restore-manager",
+    "update-manager",
     "support-package",
     "rest-api",
     "cli",
     "desktop-launcher",
+    "future-mobile-api-contract",
+    "future-cloud-sync-contract",
+    "future-multi-user-contract",
+    "future-temple-application-registry",
     "product-video-generator-integration"
   ],
   "validation": {
     "unitTests": {
       "command": "python -B -m unittest tests\\test_emma_core.py tests\\test_capability_pack2.py tests\\test_video_intelligence.py tests\\test_temple_os.py",
       "result": "PASS",
-      "testsRun": 23
+      "testsRun": 26
     },
     "templeOSSelfTest": {
       "command": "python -B scripts\\temple_os_cli.py --root \"D:\\AI\\Jofey AI Studio\" self-test",
@@ -46,11 +56,11 @@
     "appSmokeTest": {
       "command": "scripts\\run_temple_product_video_generator_v1_smoke_test.bat",
       "result": "PASS",
-      "projectId": "project-20260724-f538e2fe",
-      "finalVideo": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-f538e2fe\\final_video.mp4"
+      "projectId": "project-20260724-ecf00fbe",
+      "finalVideo": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-ecf00fbe\\final_video.mp4"
     },
     "appExportQuality": {
-      "report": "evaluations\\quality-reviews\\temple-os\\temple-os-app-export-quality-report.json",
+      "report": "evaluations\\quality-reviews\\temple-os\\temple-os-platform-expansion-export-quality-report.json",
       "result": "PASS"
     }
   },

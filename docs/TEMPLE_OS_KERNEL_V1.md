@@ -8,10 +8,15 @@ It is not a standalone product. It provides the reusable runtime services that f
 ## Implemented Services
 
 - Configuration Center
+- User Profile Manager
 - Workspace Manager
 - Project Manager
+- Application Registry
+- AI Agent System
+- Multi-Agent Collaboration
 - Provider Manager
 - Model Manager
+- Model Download Manager
 - Plugin Manager and local Plugin SDK manifest validation
 - Prompt Library
 - Knowledge Base
@@ -26,9 +31,13 @@ It is not a standalone product. It provides the reusable runtime services that f
 - Local JSONL logging
 - Backup Manager
 - Restore Manager with explicit confirmation
+- Update Manager
 - Support package generator with secret redaction
 - Local REST API
 - Local CLI
+- Future Mobile API local contract
+- Future Cloud Sync governance contract
+- Future Multi-user governance contract
 
 ## Local CLI
 
@@ -64,10 +73,20 @@ Local-only endpoints:
 - `GET /api/workflows`
 - `GET /api/projects`
 - `GET /api/config`
+- `GET /api/user-profile`
+- `GET /api/agents`
+- `GET /api/applications`
+- `GET /api/mobile/v1/status`
+- `GET /mobile/v1/status`
+- `GET /api/cloud-sync`
+- `GET /api/multi-user`
 - `POST /api/queue`
 - `POST /api/worker/run-once`
 - `POST /api/workflows/run`
 - `POST /api/projects`
+- `POST /api/agents/plan`
+- `POST /api/agents/queue`
+- `POST /api/collaboration`
 - `POST /api/support-package`
 
 ## Safety Rules

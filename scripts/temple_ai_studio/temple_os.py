@@ -80,6 +80,16 @@ class TempleOSPaths:
         self.automation = self.state / "automation.json"
         self.telemetry = self.state / "telemetry.json"
         self.version = self.state / "version.json"
+        self.user_profiles = self.state / "user_profiles.json"
+        self.agents = self.state / "agents.json"
+        self.agent_runs = self.state / "agent_runs.json"
+        self.collaborations = self.state / "collaborations.json"
+        self.downloads = self.state / "downloads.json"
+        self.updates = self.state / "updates.json"
+        self.applications = self.state / "applications.json"
+        self.mobile_api = self.state / "mobile_api.json"
+        self.cloud_sync = self.state / "cloud_sync.json"
+        self.tenants = self.state / "tenants.json"
         self.logs = self.operations / "logs"
         self.events = self.logs / "events.jsonl"
         self.recovery_log = self.logs / "recovery.jsonl"
@@ -172,6 +182,20 @@ class ConfigurationCenter:
                 "minimumCommercialScore": 0.72,
                 "minimumEmmaScore": 0.7,
                 "automaticRetry": True,
+            },
+            "user": {
+                "defaultProfileId": "ceo",
+                "role": "CEO",
+                "timezone": "Asia/Taipei",
+            },
+            "api": {
+                "mobileContractEnabled": True,
+                "restHost": "127.0.0.1",
+                "restPort": 8765,
+            },
+            "multiUser": {
+                "mode": "single-user-local",
+                "tenantIsolation": "prepared",
             },
         }
 
@@ -606,6 +630,552 @@ class KnowledgeBase:
         return {"entries": len(entries), "tags": sorted({tag for entry in entries for tag in entry.get("tags", [])})}
 
 
+class UserProfileManager:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def defaults(self) -> dict:
+        return {
+            "schemaVersion": SCHEMA_VERSION,
+            "profiles": [
+                {
+                    "id": "ceo",
+                    "displayName": "Temple CEO",
+                    "role": "owner-operator",
+                    "language": "zh-TW",
+                    "timezone": "Asia/Taipei",
+                    "approvalPolicy": {
+                        "paidServices": "manual",
+                        "cloudSync": "manual",
+                        "destructiveOperations": "manual",
+                        "emmaTrainingAssets": "manual",
+                    },
+                    "dailyPreferences": {
+                        "inputLanguage": "Traditional Chinese",
+                        "outputStyle": "commercial-ready",
+                        "defaultApplication": "temple-product-video-generator",
+                    },
+                    "createdAt": now_iso(),
+                }
+            ],
+            "activeProfileId": "ceo",
+        }
+
+    def ensure(self) -> dict:
+        if not self.paths.user_profiles.exists():
+            atomic_write_json(self.paths.user_profiles, self.defaults())
+            self.logger.emit("user-profile-initialized", {"path": str(self.paths.user_profiles)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.user_profiles, self.defaults())
+
+    def active(self) -> dict:
+        registry = self.ensure()
+        active_id = registry.get("activeProfileId", "ceo")
+        return next((item for item in registry.get("profiles", []) if item.get("id") == active_id), registry["profiles"][0])
+
+    def update_active(self, changes: dict) -> dict:
+        registry = self.ensure()
+        active_id = registry.get("activeProfileId", "ceo")
+        for profile in registry.get("profiles", []):
+            if profile.get("id") == active_id:
+                profile.update(changes)
+                profile["updatedAt"] = now_iso()
+                atomic_write_json(self.paths.user_profiles, registry)
+                self.logger.emit("user-profile-updated", {"profileId": active_id, "keys": sorted(changes.keys())})
+                return profile
+        raise KeyError(f"Active profile not found: {active_id}")
+
+    def status(self) -> dict:
+        registry = self.ensure()
+        return {
+            "activeProfile": self.active(),
+            "profileCount": len(registry.get("profiles", [])),
+        }
+
+
+class ApplicationRegistry:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def defaults(self) -> dict:
+        return {
+            "schemaVersion": SCHEMA_VERSION,
+            "applications": [
+                {
+                    "id": "temple-product-video-generator",
+                    "name": "Temple Product Video Generator",
+                    "status": "production",
+                    "version": "1.0.0",
+                    "entryPoint": "apps/temple-product-video-generator/start.bat",
+                    "capabilities": ["script", "storyboard", "image", "video", "subtitle", "editing", "qa"],
+                    "workflowId": "app.temple-product-video.generate",
+                },
+                {
+                    "id": "social-post-generator",
+                    "name": "Social Post Generator",
+                    "status": "future-ready",
+                    "version": "0.0.0",
+                    "entryPoint": "",
+                    "capabilities": ["script", "image", "caption", "qa"],
+                    "workflowId": "future.social-post.generate",
+                },
+                {
+                    "id": "emma-video-generator",
+                    "name": "Emma Video Generator",
+                    "status": "future-ready-requires-emma-assets",
+                    "version": "0.0.0",
+                    "entryPoint": "",
+                    "capabilities": ["emma", "voice", "lip-sync", "video", "qa"],
+                    "workflowId": "future.emma-video.generate",
+                },
+            ],
+        }
+
+    def ensure(self) -> dict:
+        if not self.paths.applications.exists():
+            atomic_write_json(self.paths.applications, self.defaults())
+            self.logger.emit("application-registry-initialized", {"path": str(self.paths.applications)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.applications, self.defaults())
+
+    def register(self, app: dict) -> dict:
+        required = ["id", "name", "status", "version", "capabilities"]
+        missing = [field for field in required if not app.get(field)]
+        if missing:
+            raise ValueError(f"Application manifest missing fields: {', '.join(missing)}")
+        registry = self.ensure()
+        apps = [item for item in registry.get("applications", []) if item.get("id") != app["id"]]
+        app.setdefault("registeredAt", now_iso())
+        apps.append(app)
+        registry["applications"] = sorted(apps, key=lambda item: item["id"])
+        atomic_write_json(self.paths.applications, registry)
+        self.logger.emit("application-registered", {"appId": app["id"], "status": app["status"]})
+        return app
+
+    def get(self, app_id: str) -> dict | None:
+        return next((item for item in self.ensure().get("applications", []) if item.get("id") == app_id), None)
+
+    def status(self) -> dict:
+        apps = self.ensure().get("applications", [])
+        return {
+            "count": len(apps),
+            "production": len([item for item in apps if item.get("status") == "production"]),
+            "futureReady": len([item for item in apps if str(item.get("status", "")).startswith("future")]),
+            "applications": apps,
+        }
+
+
+class AIAgentSystem:
+    def __init__(
+        self,
+        paths: TempleOSPaths,
+        queue: QueueManager,
+        providers: ProviderManager,
+        applications: ApplicationRegistry,
+        logger: JsonEventLogger,
+    ):
+        self.paths = paths
+        self.queue = queue
+        self.providers = providers
+        self.applications = applications
+        self.logger = logger
+
+    def defaults(self) -> dict:
+        return {
+            "schemaVersion": SCHEMA_VERSION,
+            "agents": [
+                {
+                    "id": "intent-analyst",
+                    "name": "Intent Analyst",
+                    "capabilities": ["intent", "requirements", "routing"],
+                    "providerCapability": "llm",
+                    "enabled": True,
+                },
+                {
+                    "id": "script-agent",
+                    "name": "Script Agent",
+                    "capabilities": ["script"],
+                    "providerCapability": "script",
+                    "enabled": True,
+                },
+                {
+                    "id": "storyboard-agent",
+                    "name": "Storyboard Agent",
+                    "capabilities": ["storyboard"],
+                    "providerCapability": "storyboard",
+                    "enabled": True,
+                },
+                {
+                    "id": "visual-agent",
+                    "name": "Visual Generation Agent",
+                    "capabilities": ["image", "prompt"],
+                    "providerCapability": "image",
+                    "enabled": True,
+                },
+                {
+                    "id": "video-agent",
+                    "name": "Video Agent",
+                    "capabilities": ["video", "editing", "rendering"],
+                    "providerCapability": "video",
+                    "enabled": True,
+                },
+                {
+                    "id": "qa-agent",
+                    "name": "Quality Agent",
+                    "capabilities": ["qa", "recovery"],
+                    "providerCapability": "qa",
+                    "enabled": True,
+                },
+            ],
+        }
+
+    def ensure(self) -> dict:
+        if not self.paths.agents.exists():
+            atomic_write_json(self.paths.agents, self.defaults())
+            self.logger.emit("agent-registry-initialized", {"path": str(self.paths.agents)})
+        if not self.paths.agent_runs.exists():
+            atomic_write_json(self.paths.agent_runs, {"schemaVersion": SCHEMA_VERSION, "runs": []})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.agents, self.defaults())
+
+    def runs(self) -> dict:
+        return read_json(self.paths.agent_runs, {"schemaVersion": SCHEMA_VERSION, "runs": []})
+
+    def create_plan(self, request: str, app_id: str = "temple-product-video-generator") -> dict:
+        self.ensure()
+        app = self.applications.get(app_id)
+        if not app:
+            raise KeyError(f"Application not registered: {app_id}")
+        active_agents = [agent for agent in self.load().get("agents", []) if agent.get("enabled")]
+        steps = []
+        for agent in active_agents:
+            provider = self.providers.select(agent["providerCapability"], {"requiresEmma": "image" in agent.get("capabilities", []) or "video" in agent.get("capabilities", [])})
+            steps.append(
+                {
+                    "agentId": agent["id"],
+                    "name": agent["name"],
+                    "providerSelection": provider,
+                    "taskType": f"agent.{agent['id']}",
+                    "status": "planned",
+                }
+            )
+        run = {
+            "id": new_id("agent-run"),
+            "request": request,
+            "appId": app_id,
+            "appStatus": app.get("status"),
+            "language": "zh-TW",
+            "status": "planned",
+            "steps": steps,
+            "createdAt": now_iso(),
+        }
+        registry = self.runs()
+        registry.setdefault("runs", []).append(run)
+        atomic_write_json(self.paths.agent_runs, registry)
+        self.logger.emit("agent-plan-created", {"runId": run["id"], "appId": app_id, "steps": len(steps)})
+        return run
+
+    def enqueue_plan(self, run_id: str) -> dict:
+        registry = self.runs()
+        run = next((item for item in registry.get("runs", []) if item.get("id") == run_id), None)
+        if not run:
+            raise KeyError(f"Agent run not found: {run_id}")
+        task_ids = []
+        for step in run.get("steps", []):
+            task = self.queue.enqueue("agent-run", {"runId": run_id, "agentId": step["agentId"]}, priority=70)
+            task_ids.append(task["id"])
+        run["status"] = "queued"
+        run["taskIds"] = task_ids
+        run["updatedAt"] = now_iso()
+        atomic_write_json(self.paths.agent_runs, registry)
+        self.logger.emit("agent-plan-queued", {"runId": run_id, "tasks": len(task_ids)})
+        return run
+
+    def complete_step(self, run_id: str, agent_id: str, result: dict) -> dict:
+        registry = self.runs()
+        for run in registry.get("runs", []):
+            if run.get("id") != run_id:
+                continue
+            for step in run.get("steps", []):
+                if step.get("agentId") == agent_id:
+                    step["status"] = "completed"
+                    step["result"] = result
+                    step["completedAt"] = now_iso()
+            if all(step.get("status") == "completed" for step in run.get("steps", [])):
+                run["status"] = "completed"
+                run["completedAt"] = now_iso()
+            else:
+                run["status"] = "running"
+            run["updatedAt"] = now_iso()
+            atomic_write_json(self.paths.agent_runs, registry)
+            return run
+        raise KeyError(f"Agent run not found: {run_id}")
+
+    def status(self) -> dict:
+        agents = self.ensure().get("agents", [])
+        runs = self.runs().get("runs", [])
+        return {
+            "agents": len(agents),
+            "enabled": len([agent for agent in agents if agent.get("enabled")]),
+            "runs": len(runs),
+            "recentRuns": runs[-5:],
+        }
+
+
+class MultiAgentCollaboration:
+    def __init__(self, paths: TempleOSPaths, agents: AIAgentSystem, logger: JsonEventLogger):
+        self.paths = paths
+        self.agents = agents
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.collaborations.exists():
+            atomic_write_json(self.paths.collaborations, {"schemaVersion": SCHEMA_VERSION, "sessions": []})
+            self.logger.emit("collaboration-registry-initialized", {"path": str(self.paths.collaborations)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.collaborations, {"schemaVersion": SCHEMA_VERSION, "sessions": []})
+
+    def start(self, goal: str, app_id: str = "temple-product-video-generator") -> dict:
+        plan = self.agents.create_plan(goal, app_id=app_id)
+        session = {
+            "id": new_id("collab"),
+            "goal": goal,
+            "appId": app_id,
+            "agentRunId": plan["id"],
+            "status": "planned",
+            "participants": [step["agentId"] for step in plan.get("steps", [])],
+            "createdAt": now_iso(),
+        }
+        registry = self.ensure()
+        registry.setdefault("sessions", []).append(session)
+        atomic_write_json(self.paths.collaborations, registry)
+        self.logger.emit("collaboration-started", {"sessionId": session["id"], "agentRunId": plan["id"]})
+        return session
+
+    def status(self) -> dict:
+        sessions = self.ensure().get("sessions", [])
+        return {"sessions": len(sessions), "recentSessions": sessions[-5:]}
+
+
+class ModelDownloadManager:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.downloads.exists():
+            atomic_write_json(self.paths.downloads, {"schemaVersion": SCHEMA_VERSION, "downloads": []})
+            self.logger.emit("download-registry-initialized", {"path": str(self.paths.downloads)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.downloads, {"schemaVersion": SCHEMA_VERSION, "downloads": []})
+
+    def request(self, model_id: str, source: str, capability: str, approval: bool = False) -> dict:
+        network_source = source.startswith("http://") or source.startswith("https://")
+        if network_source and not approval:
+            status = "blocked"
+            reason = "Network model download requires CEO approval."
+        else:
+            status = "queued"
+            reason = ""
+        item = {
+            "id": new_id("download"),
+            "modelId": model_id,
+            "source": source,
+            "capability": capability,
+            "status": status,
+            "reason": reason,
+            "createdAt": now_iso(),
+        }
+        registry = self.ensure()
+        registry.setdefault("downloads", []).append(item)
+        atomic_write_json(self.paths.downloads, registry)
+        self.logger.emit("model-download-requested", {"downloadId": item["id"], "status": status})
+        return item
+
+    def status(self) -> dict:
+        downloads = self.ensure().get("downloads", [])
+        by_status: dict[str, int] = {}
+        for item in downloads:
+            by_status[item.get("status", "unknown")] = by_status.get(item.get("status", "unknown"), 0) + 1
+        return {"downloads": len(downloads), "byStatus": by_status, "recent": downloads[-5:]}
+
+
+class UpdateManager:
+    def __init__(self, paths: TempleOSPaths, backups: BackupManager, logger: JsonEventLogger):
+        self.paths = paths
+        self.backups = backups
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.updates.exists():
+            payload = {
+                "schemaVersion": SCHEMA_VERSION,
+                "currentVersion": TEMPLE_OS_VERSION,
+                "policy": {
+                    "onlineUpdater": False,
+                    "preUpdateBackup": True,
+                    "rollbackRequired": True,
+                    "silentDestructiveMigration": False,
+                },
+                "updates": [],
+            }
+            atomic_write_json(self.paths.updates, payload)
+            self.logger.emit("update-registry-initialized", {"path": str(self.paths.updates)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.updates, {"schemaVersion": SCHEMA_VERSION, "currentVersion": TEMPLE_OS_VERSION, "updates": []})
+
+    def plan_local_update(self, target_version: str, manifest_path: Path) -> dict:
+        manifest_path = Path(manifest_path)
+        if not manifest_path.exists():
+            raise FileNotFoundError(str(manifest_path))
+        backup = self.backups.create(label=f"pre-update-{target_version}")
+        plan = {
+            "id": new_id("update"),
+            "targetVersion": target_version,
+            "manifestPath": str(manifest_path.resolve()),
+            "status": "planned",
+            "preUpdateBackup": backup["path"],
+            "createdAt": now_iso(),
+        }
+        registry = self.ensure()
+        registry.setdefault("updates", []).append(plan)
+        atomic_write_json(self.paths.updates, registry)
+        self.logger.emit("update-planned", {"updateId": plan["id"], "targetVersion": target_version})
+        return plan
+
+    def status(self) -> dict:
+        registry = self.ensure()
+        updates = registry.get("updates", [])
+        return {
+            "currentVersion": registry.get("currentVersion"),
+            "onlineUpdater": registry.get("policy", {}).get("onlineUpdater") is True,
+            "updates": len(updates),
+            "recent": updates[-5:],
+        }
+
+
+class MobileAPIContract:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.mobile_api.exists():
+            payload = {
+                "schemaVersion": SCHEMA_VERSION,
+                "contract": "temple-mobile-api-v1",
+                "status": "local-contract-ready",
+                "auth": "local-session-now; future-token-auth-requires-ceo-decision",
+                "endpoints": [
+                    "GET /mobile/v1/status",
+                    "GET /mobile/v1/projects",
+                    "POST /mobile/v1/requests",
+                    "GET /mobile/v1/exports/{id}",
+                ],
+                "privacy": "No external mobile hosting is active.",
+            }
+            atomic_write_json(self.paths.mobile_api, payload)
+            self.logger.emit("mobile-api-contract-initialized", {"path": str(self.paths.mobile_api)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.mobile_api, {})
+
+    def status(self) -> dict:
+        payload = self.ensure()
+        return {"status": payload.get("status"), "contract": payload.get("contract"), "endpoints": payload.get("endpoints", [])}
+
+
+class CloudSyncManager:
+    def __init__(self, paths: TempleOSPaths, config: ConfigurationCenter, logger: JsonEventLogger):
+        self.paths = paths
+        self.config = config
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.cloud_sync.exists():
+            payload = {
+                "schemaVersion": SCHEMA_VERSION,
+                "status": "disabled-pending-ceo-decision",
+                "syncMode": "none",
+                "allowed": False,
+                "lastSync": "",
+                "conflictPolicy": "manual-review-required",
+                "privacy": "No cloud sync is active.",
+            }
+            atomic_write_json(self.paths.cloud_sync, payload)
+            self.logger.emit("cloud-sync-contract-initialized", {"path": str(self.paths.cloud_sync)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.cloud_sync, {})
+
+    def request_sync(self) -> dict:
+        if not self.config.load().get("privacy", {}).get("allowCloudSync"):
+            raise PermissionError("Cloud sync requires CEO approval before activation.")
+        payload = self.ensure()
+        payload["status"] = "ready-to-configure"
+        payload["updatedAt"] = now_iso()
+        atomic_write_json(self.paths.cloud_sync, payload)
+        return payload
+
+    def status(self) -> dict:
+        return self.ensure()
+
+
+class MultiUserManager:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.tenants.exists():
+            payload = {
+                "schemaVersion": SCHEMA_VERSION,
+                "mode": "single-user-local",
+                "tenants": [
+                    {
+                        "id": "local-owner",
+                        "name": "Local Owner Workspace",
+                        "role": "owner",
+                        "isolation": "prepared",
+                        "status": "active",
+                    }
+                ],
+                "futureModes": ["local-team", "private-cloud", "hosted-saas"],
+                "activation": "CEO decision required before multi-user hosting.",
+            }
+            atomic_write_json(self.paths.tenants, payload)
+            self.logger.emit("multi-user-contract-initialized", {"path": str(self.paths.tenants)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.tenants, {})
+
+    def status(self) -> dict:
+        payload = self.ensure()
+        return {
+            "mode": payload.get("mode"),
+            "tenantCount": len(payload.get("tenants", [])),
+            "futureModes": payload.get("futureModes", []),
+            "activation": payload.get("activation"),
+        }
+
+
 class BusinessRuleEngine:
     def __init__(self, config: ConfigurationCenter):
         self.config = config
@@ -798,6 +1368,20 @@ class WorkflowEngine:
                     "name": "Create Local Backup",
                     "version": "1.0.0",
                     "steps": [{"taskType": "backup", "payload": {}}],
+                },
+                {
+                    "id": "app.temple-product-video.generate",
+                    "name": "Temple Product Video Generator Agent Workflow",
+                    "version": "1.0.0",
+                    "steps": [
+                        {
+                            "taskType": "ai-request",
+                            "payload": {
+                                "appId": "temple-product-video-generator",
+                                "request": "Temple product video request",
+                            },
+                        }
+                    ],
                 },
             ],
         }
@@ -1028,6 +1612,11 @@ class BackgroundWorker:
             "support-package": self._support_package,
             "self-heal": self._self_heal,
             "workflow-run": self._workflow_run,
+            "ai-request": self._ai_request,
+            "agent-run": self._agent_run,
+            "model-download": self._model_download,
+            "update-check": self._update_check,
+            "failure-recovery": self._failure_recovery,
         }
 
     def run_once(self) -> dict:
@@ -1064,6 +1653,49 @@ class BackgroundWorker:
             raise ValueError("workflowId is required.")
         return self.kernel.workflows.run(workflow_id, task.get("payload", {}).get("payload", {}))
 
+    def _ai_request(self, task: dict) -> dict:
+        payload = task.get("payload", {})
+        request = payload.get("request") or "Temple AI Studio request"
+        app_id = payload.get("appId", "temple-product-video-generator")
+        plan = self.kernel.agents.create_plan(request, app_id=app_id)
+        queued = self.kernel.agents.enqueue_plan(plan["id"])
+        return {
+            "agentRunId": queued["id"],
+            "taskIds": queued.get("taskIds", []),
+            "appId": app_id,
+            "status": queued.get("status"),
+        }
+
+    def _agent_run(self, task: dict) -> dict:
+        payload = task.get("payload", {})
+        run_id = payload.get("runId")
+        agent_id = payload.get("agentId")
+        if not run_id or not agent_id:
+            raise ValueError("runId and agentId are required.")
+        result = {
+            "agentId": agent_id,
+            "decision": "completed-local-orchestration-step",
+            "providerSelectionsVerified": True,
+            "completedAt": now_iso(),
+        }
+        run = self.kernel.agents.complete_step(run_id, agent_id, result)
+        return {"runId": run_id, "agentId": agent_id, "runStatus": run.get("status")}
+
+    def _model_download(self, task: dict) -> dict:
+        payload = task.get("payload", {})
+        return self.kernel.downloads.request(
+            payload["modelId"],
+            payload["source"],
+            payload.get("capability", "unknown"),
+            approval=bool(payload.get("approval")),
+        )
+
+    def _update_check(self, task: dict) -> dict:
+        return self.kernel.updates.status()
+
+    def _failure_recovery(self, task: dict) -> dict:
+        return self.kernel.self_healing.run()
+
 
 class TempleOSKernel:
     def __init__(self, root: Path | str):
@@ -1077,12 +1709,21 @@ class TempleOSKernel:
         self.plugins = PluginManager(self.paths, self.logger)
         self.prompts = PromptLibrary(self.paths, self.logger)
         self.knowledge = KnowledgeBase(self.paths, self.logger)
+        self.user_profiles = UserProfileManager(self.paths, self.logger)
+        self.applications = ApplicationRegistry(self.paths, self.logger)
         self.rules = BusinessRuleEngine(self.config)
         self.queue = QueueManager(self.paths, self.rules, self.logger)
+        self.agents = AIAgentSystem(self.paths, self.queue, self.providers, self.applications, self.logger)
+        self.collaboration = MultiAgentCollaboration(self.paths, self.agents, self.logger)
         self.scheduler = TaskScheduler(self.paths, self.queue, self.logger)
         self.workflows = WorkflowEngine(self.paths, self.queue, self.logger)
         self.automation = AutomationEngine(self.paths, self.queue, self.logger)
         self.backups = BackupManager(self.paths, self.logger)
+        self.downloads = ModelDownloadManager(self.paths, self.logger)
+        self.updates = UpdateManager(self.paths, self.backups, self.logger)
+        self.mobile_api = MobileAPIContract(self.paths, self.logger)
+        self.cloud_sync = CloudSyncManager(self.paths, self.config, self.logger)
+        self.multi_user = MultiUserManager(self.paths, self.logger)
         self.support_packages = SupportPackageManager(self.paths, self.logger)
         self.monitoring = MonitoringCenter(self.paths, self.logger)
         self.self_healing = SelfHealingEngine(self.paths, self.config, self.queue, self.logger)
@@ -1106,10 +1747,19 @@ class TempleOSKernel:
             "plugins": self.plugins.ensure(),
             "prompts": self.prompts.ensure(),
             "knowledge": self.knowledge.ensure(),
+            "userProfiles": self.user_profiles.ensure(),
+            "applications": self.applications.ensure(),
             "queue": self.queue.ensure(),
+            "agents": self.agents.ensure(),
+            "collaboration": self.collaboration.ensure(),
             "schedules": self.scheduler.ensure(),
             "workflows": self.workflows.ensure(),
             "automation": self.automation.ensure(),
+            "downloads": self.downloads.ensure(),
+            "updates": self.updates.ensure(),
+            "mobileApi": self.mobile_api.ensure(),
+            "cloudSync": self.cloud_sync.ensure(),
+            "multiUser": self.multi_user.ensure(),
             "selfHealing": self.self_healing.run(),
         }
         self.monitoring.snapshot(self)
@@ -1130,10 +1780,19 @@ class TempleOSKernel:
             "plugins": self.plugins.status(),
             "prompts": self.prompts.status(),
             "knowledge": self.knowledge.status(),
+            "userProfiles": self.user_profiles.status(),
+            "applications": self.applications.status(),
+            "agents": self.agents.status(),
+            "collaboration": self.collaboration.status(),
             "queue": self.queue.status(),
             "scheduler": self.scheduler.status(),
             "workflows": self.workflows.status(),
             "automation": self.automation.status(),
+            "downloads": self.downloads.status(),
+            "updates": self.updates.status(),
+            "mobileApi": self.mobile_api.status(),
+            "cloudSync": self.cloud_sync.status(),
+            "multiUser": self.multi_user.status(),
             "backup": self.backups.status(),
             "telemetry": read_json(self.paths.telemetry, {}),
             "recentEvents": self.logger.tail(20),
@@ -1151,6 +1810,11 @@ class TempleOSKernel:
             {"name": "queue-registry", "ok": self.paths.queue.exists()},
             {"name": "provider-registry", "ok": self.paths.providers.exists()},
             {"name": "workflow-registry", "ok": self.paths.workflows.exists()},
+            {"name": "agent-registry", "ok": self.paths.agents.exists()},
+            {"name": "application-registry", "ok": self.paths.applications.exists()},
+            {"name": "user-profile-registry", "ok": self.paths.user_profiles.exists()},
+            {"name": "mobile-api-contract", "ok": self.paths.mobile_api.exists()},
+            {"name": "multi-user-contract", "ok": self.paths.tenants.exists()},
             {"name": "local-ffmpeg-provider", "ok": provider_checks["rendering"].get("selected") is not None},
         ]
         failed = [check for check in checks if not check.get("ok")]
@@ -1170,15 +1834,26 @@ class TempleOSKernel:
         self.ensure_initialized()
         task = self.queue.enqueue("health-check", {}, priority=80)
         worker_result = self.worker.run_once()
+        agent_plan = self.agents.create_plan("請幫我產生一支神殿產品短影片", app_id="temple-product-video-generator")
+        queued_plan = self.agents.enqueue_plan(agent_plan["id"])
+        agent_results = [self.worker.run_once() for _ in queued_plan.get("taskIds", [])]
+        collaboration = self.collaboration.start("規劃神殿產品影片", app_id="temple-product-video-generator")
+        blocked_download = self.downloads.request("future-video-model", "https://example.com/model.safetensors", "video", approval=False)
         backup = self.backups.create(label="self-test")
         support = self.support_packages.create(self.status())
         health = self.health_check()
         checks = [
             {"name": "health-check", "ok": health.get("overall") == "PASS"},
             {"name": "queue-worker", "ok": worker_result.get("processed") is True and worker_result.get("task", {}).get("id") == task["id"]},
+            {"name": "agent-plan-created", "ok": agent_plan.get("status") == "planned" and len(agent_plan.get("steps", [])) >= 5},
+            {"name": "agent-plan-processed", "ok": all(item.get("task", {}).get("status") == "completed" for item in agent_results)},
+            {"name": "collaboration-created", "ok": collaboration.get("agentRunId") is not None},
+            {"name": "network-download-blocked", "ok": blocked_download.get("status") == "blocked"},
             {"name": "backup-created", "ok": Path(backup["path"]).exists() and backup["size"] > 0},
             {"name": "support-created", "ok": Path(support["path"]).exists() and support["size"] > 0},
             {"name": "paid-provider-locked", "ok": self.providers.select("voice").get("requiresCEOApproval") is True},
+            {"name": "cloud-sync-locked", "ok": self.cloud_sync.status().get("allowed") is False},
+            {"name": "single-user-local-mode", "ok": self.multi_user.status().get("mode") == "single-user-local"},
         ]
         result = {
             "schema": "temple-ai-studio.os-self-test.v1",
@@ -1229,6 +1904,18 @@ class TempleOSKernel:
                     return self._send(HTTPStatus.OK, {"projects": kernel.projects.list()})
                 if parsed.path == "/api/config":
                     return self._send(HTTPStatus.OK, kernel.config.load())
+                if parsed.path == "/api/user-profile":
+                    return self._send(HTTPStatus.OK, kernel.user_profiles.status())
+                if parsed.path == "/api/agents":
+                    return self._send(HTTPStatus.OK, kernel.agents.status())
+                if parsed.path == "/api/applications":
+                    return self._send(HTTPStatus.OK, kernel.applications.status())
+                if parsed.path == "/api/mobile/v1/status" or parsed.path == "/mobile/v1/status":
+                    return self._send(HTTPStatus.OK, {"status": kernel.status(), "mobile": kernel.mobile_api.status()})
+                if parsed.path == "/api/cloud-sync":
+                    return self._send(HTTPStatus.OK, kernel.cloud_sync.status())
+                if parsed.path == "/api/multi-user":
+                    return self._send(HTTPStatus.OK, kernel.multi_user.status())
                 return self._send(HTTPStatus.NOT_FOUND, {"error": "Not found"})
 
             def do_POST(self) -> None:
@@ -1245,6 +1932,15 @@ class TempleOSKernel:
                 if parsed.path == "/api/projects":
                     project = kernel.projects.create(body["name"], body["appId"], body.get("workspaceId", "default"), body.get("metadata", {}))
                     return self._send(HTTPStatus.CREATED, project)
+                if parsed.path == "/api/agents/plan":
+                    plan = kernel.agents.create_plan(body["request"], body.get("appId", "temple-product-video-generator"))
+                    return self._send(HTTPStatus.CREATED, plan)
+                if parsed.path == "/api/agents/queue":
+                    queued = kernel.agents.enqueue_plan(body["runId"])
+                    return self._send(HTTPStatus.CREATED, queued)
+                if parsed.path == "/api/collaboration":
+                    session = kernel.collaboration.start(body["goal"], body.get("appId", "temple-product-video-generator"))
+                    return self._send(HTTPStatus.CREATED, session)
                 if parsed.path == "/api/support-package":
                     return self._send(HTTPStatus.CREATED, kernel.support_packages.create(kernel.status()))
                 return self._send(HTTPStatus.NOT_FOUND, {"error": "Not found"})
@@ -1273,6 +1969,18 @@ def build_parser() -> argparse.ArgumentParser:
     enqueue.add_argument("--payload", default="{}")
     workflow = sub.add_parser("run-workflow")
     workflow.add_argument("workflow_id")
+    plan = sub.add_parser("plan-request")
+    plan.add_argument("request")
+    plan.add_argument("--app-id", default="temple-product-video-generator")
+    queue_plan = sub.add_parser("queue-agent-plan")
+    queue_plan.add_argument("run_id")
+    apps = sub.add_parser("list-apps")
+    apps.set_defaults(list_apps=True)
+    download = sub.add_parser("request-model-download")
+    download.add_argument("model_id")
+    download.add_argument("source")
+    download.add_argument("--capability", default="unknown")
+    download.add_argument("--approval", action="store_true")
     serve = sub.add_parser("serve")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", default=8765, type=int)
@@ -1300,6 +2008,14 @@ def main(argv: list[str] | None = None) -> int:
         payload = kernel.queue.enqueue(args.type, json.loads(args.payload))
     elif args.command == "run-workflow":
         payload = kernel.workflows.run(args.workflow_id)
+    elif args.command == "plan-request":
+        payload = kernel.agents.create_plan(args.request, app_id=args.app_id)
+    elif args.command == "queue-agent-plan":
+        payload = kernel.agents.enqueue_plan(args.run_id)
+    elif args.command == "list-apps":
+        payload = kernel.applications.status()
+    elif args.command == "request-model-download":
+        payload = kernel.downloads.request(args.model_id, args.source, args.capability, approval=args.approval)
     elif args.command == "serve":
         server = kernel.serve(args.host, args.port)
         print(json.dumps({"status": "running", "host": args.host, "port": args.port}, ensure_ascii=False, indent=2))

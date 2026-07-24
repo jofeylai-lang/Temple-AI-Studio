@@ -29,11 +29,16 @@ class TempleOSKernelTests(unittest.TestCase):
     def test_initializes_platform_state(self) -> None:
         payload = self.kernel.ensure_initialized()
         self.assertIn("config", payload)
+        self.assertIn("agents", payload)
+        self.assertIn("applications", payload)
+        self.assertIn("userProfiles", payload)
         self.assertTrue(self.kernel.paths.config.exists())
         self.assertTrue((self.kernel.paths.workspaces / "default" / "workspace.json").exists())
         status = self.kernel.status()
         self.assertEqual(status["version"], "0.1.0")
         self.assertGreaterEqual(status["providers"]["enabled"], 3)
+        self.assertEqual(status["multiUser"]["mode"], "single-user-local")
+        self.assertEqual(status["cloudSync"]["allowed"], False)
 
     def test_provider_selection_is_local_first_and_paid_locked(self) -> None:
         image = self.kernel.providers.select("image", {"requiresEmma": True})
@@ -56,6 +61,24 @@ class TempleOSKernelTests(unittest.TestCase):
         second = self.kernel.worker.run_once()
         self.assertEqual(second["task"]["status"], "completed")
 
+    def test_ai_agent_plan_queue_and_collaboration(self) -> None:
+        plan = self.kernel.agents.create_plan("請用繁體中文產生一支產品短影片", app_id="temple-product-video-generator")
+        self.assertEqual(plan["status"], "planned")
+        self.assertGreaterEqual(len(plan["steps"]), 5)
+
+        queued = self.kernel.agents.enqueue_plan(plan["id"])
+        self.assertEqual(queued["status"], "queued")
+        for _task_id in queued["taskIds"]:
+            result = self.kernel.worker.run_once()
+            self.assertEqual(result["task"]["status"], "completed")
+        runs = self.kernel.agents.runs()["runs"]
+        completed = next(item for item in runs if item["id"] == plan["id"])
+        self.assertEqual(completed["status"], "completed")
+
+        session = self.kernel.collaboration.start("建立神殿影片專案", app_id="temple-product-video-generator")
+        self.assertEqual(session["status"], "planned")
+        self.assertGreaterEqual(len(session["participants"]), 5)
+
     def test_business_rules_block_destructive_and_paid_tasks(self) -> None:
         task = self.kernel.queue.enqueue("delete-data", {})
         self.assertEqual(task["status"], "blocked")
@@ -63,6 +86,27 @@ class TempleOSKernelTests(unittest.TestCase):
 
         paid = self.kernel.queue.enqueue("video-generation", {"paidProvider": True})
         self.assertEqual(paid["status"], "blocked")
+
+    def test_application_user_download_update_and_future_contracts(self) -> None:
+        apps = self.kernel.applications.status()
+        self.assertEqual(apps["production"], 1)
+        self.assertIsNotNone(self.kernel.applications.get("temple-product-video-generator"))
+
+        profile = self.kernel.user_profiles.active()
+        self.assertEqual(profile["language"], "zh-TW")
+
+        download = self.kernel.downloads.request("remote-model", "https://example.com/model.gguf", "llm")
+        self.assertEqual(download["status"], "blocked")
+
+        manifest = self.root / "update-manifest.json"
+        manifest.write_text(json.dumps({"version": "0.1.1"}), encoding="utf-8")
+        update = self.kernel.updates.plan_local_update("0.1.1", manifest)
+        self.assertTrue(Path(update["preUpdateBackup"]).exists())
+
+        self.assertEqual(self.kernel.mobile_api.status()["status"], "local-contract-ready")
+        with self.assertRaises(PermissionError):
+            self.kernel.cloud_sync.request_sync()
+        self.assertEqual(self.kernel.multi_user.status()["mode"], "single-user-local")
 
     def test_self_healing_requeues_stale_running_tasks(self) -> None:
         task = self.kernel.queue.enqueue("health-check", {})
@@ -130,6 +174,30 @@ class TempleOSKernelTests(unittest.TestCase):
             with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/health", timeout=5) as response:
                 payload = json.loads(response.read().decode("utf-8"))
             self.assertEqual(payload["overall"], "PASS")
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=5)
+
+    def test_rest_api_agent_plan_and_mobile_status(self) -> None:
+        server = self.kernel.serve("127.0.0.1", 0)
+        port = server.server_address[1]
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            request = urllib.request.Request(
+                f"http://127.0.0.1:{port}/api/agents/plan",
+                data=json.dumps({"request": "請產生影片"}).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(request, timeout=5) as response:
+                plan = json.loads(response.read().decode("utf-8"))
+            self.assertEqual(plan["status"], "planned")
+
+            with urllib.request.urlopen(f"http://127.0.0.1:{port}/mobile/v1/status", timeout=5) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            self.assertEqual(payload["mobile"]["status"], "local-contract-ready")
         finally:
             server.shutdown()
             server.server_close()
