@@ -62,6 +62,7 @@ build/
 cache/
 tmp/
 temp/
+work/
 
 # Large product generation outputs
 videos/factory/exports/

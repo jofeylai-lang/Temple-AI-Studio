@@ -1,0 +1,9 @@
+{
+  "schema": "temple-ai-studio.script-engine-self-test.v1",
+  "createdAt": "2026-07-24T12:26:12",
+  "overall": "PASS",
+  "sceneCount": 6,
+  "duration": 30,
+  "platform": "Instagram Reels",
+  "failedChecks": []
+}

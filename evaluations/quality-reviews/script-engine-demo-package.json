@@ -1,0 +1,372 @@
+{
+  "requirement": "請做一支溫柔、有儀式感、能引導私訊購買的 IG Reels。",
+  "platform": "Instagram Reels",
+  "targetAudience": "想在日常中建立靜心儀式感的顧客",
+  "duration": 30,
+  "script": "有時候，我們需要的不是更多忙碌，而是一個讓心慢下來的片刻。\n這是Temple Energy Candle，一款為香氛蠟燭而設計的 Temple 商品。\n手工製作、氣味溫柔、包裝精緻，適合自用與送禮。\n象徵祝福、淨化與陪伴，提醒使用者回到安定的內在節奏。\n如果你也想為生活準備一份安定的提醒，歡迎把Temple Energy Candle帶回你的日常。\nTemple，陪你把每一天過得更有光。",
+  "scenes": [
+    {
+      "id": "scene-01-hook",
+      "order": 1,
+      "purpose": "Hook",
+      "duration": 4,
+      "start": 0.0,
+      "end": 4.0,
+      "visualDescription": "以安靜、有呼吸感的畫面開場，呈現想在日常中建立靜心儀式感的顧客在日常中渴望被安定與照顧的情境。",
+      "narration": "有時候，我們需要的不是更多忙碌，而是一個讓心慢下來的片刻。",
+      "subtitle": "給自己一個安定片刻",
+      "prompt": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Hook. Visual goal: 以安靜、有呼吸感的畫面開場，呈現想在日常中建立靜心儀式感的顧客在日常中渴望被安定與照顧的情境。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "music": "溫柔環境音、冥想質感、低干擾節奏，避免蓋過旁白。",
+      "transition": "柔和淡入淡出或乾淨剪接，保持手機短影音節奏。",
+      "optionalEffects": [
+        "輕微推鏡",
+        "柔光",
+        "細緻陰影",
+        "字幕安全區"
+      ],
+      "status": "Ready for Preview",
+      "approved": false,
+      "version": 1,
+      "updatedAt": "2026-07-24T12:24:02"
+    },
+    {
+      "id": "scene-02-introduction",
+      "order": 2,
+      "purpose": "Introduction",
+      "duration": 5,
+      "start": 4.0,
+      "end": 9.0,
+      "visualDescription": "清楚展示Temple Energy Candle，畫面乾淨，商品要成為第一視覺焦點。",
+      "narration": "這是Temple Energy Candle，一款為香氛蠟燭而設計的 Temple 商品。",
+      "subtitle": "香氛蠟燭｜Temple Energ…",
+      "prompt": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Introduction. Visual goal: 清楚展示Temple Energy Candle，畫面乾淨，商品要成為第一視覺焦點。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "music": "溫柔環境音、冥想質感、低干擾節奏，避免蓋過旁白。",
+      "transition": "柔和淡入淡出或乾淨剪接，保持手機短影音節奏。",
+      "optionalEffects": [
+        "輕微推鏡",
+        "柔光",
+        "細緻陰影",
+        "字幕安全區"
+      ],
+      "status": "Ready for Preview",
+      "approved": false,
+      "version": 1,
+      "updatedAt": "2026-07-24T12:24:02"
+    },
+    {
+      "id": "scene-03-product-features",
+      "order": 3,
+      "purpose": "Product Features",
+      "duration": 7,
+      "start": 9.0,
+      "end": 16.0,
+      "visualDescription": "用近景展示商品細節、材質、包裝或使用情境，讓觀眾理解它的具體特色。",
+      "narration": "手工製作、氣味溫柔、包裝精緻，適合自用與送禮。",
+      "subtitle": "看得見的細節與心意",
+      "prompt": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Product Features. Visual goal: 用近景展示商品細節、材質、包裝或使用情境，讓觀眾理解它的具體特色。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "music": "溫柔環境音、冥想質感、低干擾節奏，避免蓋過旁白。",
+      "transition": "柔和淡入淡出或乾淨剪接，保持手機短影音節奏。",
+      "optionalEffects": [
+        "輕微推鏡",
+        "柔光",
+        "細緻陰影",
+        "字幕安全區"
+      ],
+      "status": "Ready for Preview",
+      "approved": false,
+      "version": 1,
+      "updatedAt": "2026-07-24T12:24:02"
+    },
+    {
+      "id": "scene-04-spiritual-value",
+      "order": 4,
+      "purpose": "Spiritual Value",
+      "duration": 6,
+      "start": 16.0,
+      "end": 22.0,
+      "visualDescription": "呈現商品被使用時的氛圍，不做誇大承諾，重點放在感受、祝福與日常儀式。",
+      "narration": "象徵祝福、淨化與陪伴，提醒使用者回到安定的內在節奏。",
+      "subtitle": "把祝福放進日常",
+      "prompt": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Spiritual Value. Visual goal: 呈現商品被使用時的氛圍，不做誇大承諾，重點放在感受、祝福與日常儀式。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "music": "溫柔環境音、冥想質感、低干擾節奏，避免蓋過旁白。",
+      "transition": "柔和淡入淡出或乾淨剪接，保持手機短影音節奏。",
+      "optionalEffects": [
+        "輕微推鏡",
+        "柔光",
+        "細緻陰影",
+        "字幕安全區"
+      ],
+      "status": "Ready for Preview",
+      "approved": false,
+      "version": 1,
+      "updatedAt": "2026-07-24T12:24:02"
+    },
+    {
+      "id": "scene-05-call-to-action",
+      "order": 5,
+      "purpose": "Call To Action",
+      "duration": 4,
+      "start": 22.0,
+      "end": 26.0,
+      "visualDescription": "再次展示Temple Energy Candle與可購買、私訊或預約的下一步提示。",
+      "narration": "如果你也想為生活準備一份安定的提醒，歡迎把Temple Energy Candle帶回你的日常。",
+      "subtitle": "歡迎私訊了解",
+      "prompt": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Call To Action. Visual goal: 再次展示Temple Energy Candle與可購買、私訊或預約的下一步提示。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "music": "溫柔環境音、冥想質感、低干擾節奏，避免蓋過旁白。",
+      "transition": "柔和淡入淡出或乾淨剪接，保持手機短影音節奏。",
+      "optionalEffects": [
+        "輕微推鏡",
+        "柔光",
+        "細緻陰影",
+        "字幕安全區"
+      ],
+      "status": "Ready for Preview",
+      "approved": false,
+      "version": 1,
+      "updatedAt": "2026-07-24T12:24:02"
+    },
+    {
+      "id": "scene-06-ending",
+      "order": 6,
+      "purpose": "Ending",
+      "duration": 4,
+      "start": 26.0,
+      "end": 30.0,
+      "visualDescription": "品牌收尾，保留商品、Logo 或品牌名稱，畫面安靜結束。",
+      "narration": "Temple，陪你把每一天過得更有光。",
+      "subtitle": "Temple 陪你安定日常",
+      "prompt": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Ending. Visual goal: 品牌收尾，保留商品、Logo 或品牌名稱，畫面安靜結束。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "music": "溫柔環境音、冥想質感、低干擾節奏，避免蓋過旁白。",
+      "transition": "柔和淡入淡出或乾淨剪接，保持手機短影音節奏。",
+      "optionalEffects": [
+        "輕微推鏡",
+        "柔光",
+        "細緻陰影",
+        "字幕安全區"
+      ],
+      "status": "Ready for Preview",
+      "approved": false,
+      "version": 1,
+      "updatedAt": "2026-07-24T12:24:02"
+    }
+  ],
+  "prompts": [
+    {
+      "id": "prompt-20260724-ce343172",
+      "sceneId": "scene-01-hook",
+      "category": "video",
+      "providerMode": "local-template",
+      "text": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Hook. Visual goal: 以安靜、有呼吸感的畫面開場，呈現想在日常中建立靜心儀式感的顧客在日常中渴望被安定與照顧的情境。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "createdAt": "2026-07-24T12:24:02"
+    },
+    {
+      "id": "prompt-20260724-bcaf52a2",
+      "sceneId": "scene-02-introduction",
+      "category": "video",
+      "providerMode": "local-template",
+      "text": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Introduction. Visual goal: 清楚展示Temple Energy Candle，畫面乾淨，商品要成為第一視覺焦點。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "createdAt": "2026-07-24T12:24:02"
+    },
+    {
+      "id": "prompt-20260724-0828d036",
+      "sceneId": "scene-03-product-features",
+      "category": "video",
+      "providerMode": "local-template",
+      "text": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Product Features. Visual goal: 用近景展示商品細節、材質、包裝或使用情境，讓觀眾理解它的具體特色。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "createdAt": "2026-07-24T12:24:02"
+    },
+    {
+      "id": "prompt-20260724-7eba45c6",
+      "sceneId": "scene-04-spiritual-value",
+      "category": "video",
+      "providerMode": "local-template",
+      "text": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Spiritual Value. Visual goal: 呈現商品被使用時的氛圍，不做誇大承諾，重點放在感受、祝福與日常儀式。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "createdAt": "2026-07-24T12:24:02"
+    },
+    {
+      "id": "prompt-20260724-ead9d7a8",
+      "sceneId": "scene-05-call-to-action",
+      "category": "video",
+      "providerMode": "local-template",
+      "text": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Call To Action. Visual goal: 再次展示Temple Energy Candle與可購買、私訊或預約的下一步提示。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "createdAt": "2026-07-24T12:24:02"
+    },
+    {
+      "id": "prompt-20260724-6ff885c5",
+      "sceneId": "scene-06-ending",
+      "category": "video",
+      "providerMode": "local-template",
+      "text": "Temple product video scene. Product: Temple Energy Candle. Scene purpose: Ending. Visual goal: 品牌收尾，保留商品、Logo 或品牌名稱，畫面安靜結束。 Motion: subtle cinematic movement, stable product framing, vertical 9:16. Style: 溫柔、精緻、適合手機直式觀看. Tone: 溫柔但明確，引導觀眾採取下一步. Source fidelity: use uploaded product photos as identity and product reference. Avoid exaggerated medical, spiritual, or guaranteed-result claims. Commercial quality, clean lighting, readable composition.",
+      "createdAt": "2026-07-24T12:24:02"
+    }
+  ],
+  "caption": "Temple Energy Candle｜把一份安定感放進日常。\n\n適合想要想在日常中建立靜心儀式感的顧客的你，也適合作為一份帶著心意的祝福。\n\n不需要把生活變得很複雜，只要留一個片刻，讓自己慢慢回到內在。\n\n歡迎私訊了解。",
+  "tags": [
+    "Temple",
+    "香氛蠟燭",
+    "身心靈",
+    "儀式感",
+    "Instagram Reels",
+    "銷售轉換"
+  ],
+  "seoKeywords": [
+    "Temple Energy Candle",
+    "香氛蠟燭",
+    "Temple",
+    "儀式感",
+    "祝福禮物",
+    "靜心"
+  ],
+  "thumbnailSuggestion": "以Temple Energy Candle清楚入鏡，搭配短字標題「給自己一個安定片刻」，保留品牌名稱 Temple。",
+  "metadata": {
+    "schema": "temple-ai-studio.script-package.v1",
+    "scriptEngineVersion": "1.0.0",
+    "projectId": "script-engine-demo",
+    "productName": "Temple Energy Candle",
+    "productCategory": "香氛蠟燭",
+    "productType": "香氛儀式商品",
+    "targetAudience": "想在日常中建立靜心儀式感的顧客",
+    "marketingObjective": "銷售轉換",
+    "tone": "溫柔但明確，引導觀眾採取下一步",
+    "platform": "Instagram Reels",
+    "language": "zh-TW",
+    "duration": 30,
+    "sceneCount": 6,
+    "providerMode": "local-rule-template",
+    "createdAt": "2026-07-24T12:24:02",
+    "sourceMaterials": [
+      "demo-candle.png"
+    ]
+  },
+  "quality": {
+    "schema": "temple-ai-studio.script-quality.v1",
+    "createdAt": "2026-07-24T12:24:02",
+    "overall": "PASS",
+    "checks": [
+      {
+        "name": "scene-count",
+        "ok": true,
+        "expected": 6,
+        "actual": 6
+      },
+      {
+        "name": "script-not-empty",
+        "ok": true,
+        "characters": 195
+      },
+      {
+        "name": "caption-not-empty",
+        "ok": true,
+        "characters": 112
+      },
+      {
+        "name": "scene-01-hook:narration-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-01-hook:subtitle-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-01-hook:prompt-present",
+        "ok": true
+      },
+      {
+        "name": "scene-01-hook:duration-positive",
+        "ok": true,
+        "duration": 4
+      },
+      {
+        "name": "scene-02-introduction:narration-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-02-introduction:subtitle-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-02-introduction:prompt-present",
+        "ok": true
+      },
+      {
+        "name": "scene-02-introduction:duration-positive",
+        "ok": true,
+        "duration": 5
+      },
+      {
+        "name": "scene-03-product-features:narration-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-03-product-features:subtitle-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-03-product-features:prompt-present",
+        "ok": true
+      },
+      {
+        "name": "scene-03-product-features:duration-positive",
+        "ok": true,
+        "duration": 7
+      },
+      {
+        "name": "scene-04-spiritual-value:narration-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-04-spiritual-value:subtitle-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-04-spiritual-value:prompt-present",
+        "ok": true
+      },
+      {
+        "name": "scene-04-spiritual-value:duration-positive",
+        "ok": true,
+        "duration": 6
+      },
+      {
+        "name": "scene-05-call-to-action:narration-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-05-call-to-action:subtitle-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-05-call-to-action:prompt-present",
+        "ok": true
+      },
+      {
+        "name": "scene-05-call-to-action:duration-positive",
+        "ok": true,
+        "duration": 4
+      },
+      {
+        "name": "scene-06-ending:narration-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-06-ending:subtitle-zh-tw",
+        "ok": true
+      },
+      {
+        "name": "scene-06-ending:prompt-present",
+        "ok": true
+      },
+      {
+        "name": "scene-06-ending:duration-positive",
+        "ok": true,
+        "duration": 4
+      },
+      {
+        "name": "no-high-risk-claims",
+        "ok": true,
+        "riskyTerms": []
+      }
+    ],
+    "failedChecks": []
+  }
+}

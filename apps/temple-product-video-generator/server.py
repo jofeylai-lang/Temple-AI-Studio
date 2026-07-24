@@ -21,6 +21,13 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 
 APP_ROOT = Path(__file__).resolve().parent
+REPO_ROOT = APP_ROOT.parents[1]
+SCRIPTS_ROOT = REPO_ROOT / "scripts"
+if str(SCRIPTS_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_ROOT))
+
+from temple_ai_studio.script_engine import generate_video_script_package
+
 DATA_ROOT = Path(os.environ.get("TPVG_DATA_DIR", APP_ROOT / "data")).resolve()
 DB_PATH = DATA_ROOT / "database.json"
 CONFIG_PATH = DATA_ROOT / "config.json"
@@ -516,112 +523,7 @@ def find_item(items: list[dict], item_id: str) -> dict:
 
 
 def generate_content(product: dict, payload: dict, project_id: str) -> dict:
-    total_duration = int(payload.get("duration") or load_config().get("defaultDuration", 30))
-    total_duration = max(18, min(60, total_duration))
-    durations = split_durations(total_duration)
-    audience = payload.get("targetAudience") or product.get("targetAudience") or "重視質感生活與日常儀式感的使用者"
-    requirement = payload.get("requirement") or "做一支溫柔、有儀式感、適合社群發布的商品短影片。"
-    cultural = payload.get("spiritualInfo") or product.get("spiritualInfo") or "以安定、祝福、專注與日常陪伴作為核心價值。"
-    platform = payload.get("platform") or "Instagram Reels"
-    scene_specs = [
-        ("Hook", "用安靜但有吸引力的第一眼抓住注意力", f"你是否也想在忙碌裡，留一個安定自己的片刻？", f"為自己留一個安定片刻"),
-        ("Introduction", "清楚介紹商品與用途", f"這是{product['name']}，為日常儀式與平靜空間而準備。", f"{product['name']}"),
-        ("Product Features", "呈現商品特色與細節", f"{product['sellingPoint']}，讓每一次使用都更容易被感受。", "看得見的細節與質感"),
-        ("Spiritual Value", "連結靈性與文化價值", f"{cultural}，不誇大承諾，只陪你回到當下。", "把注意力帶回當下"),
-        ("CTA", "給出溫和行動呼籲", f"如果你也想建立自己的儀式感，可以從{product['name']}開始。", "從一份日常儀式開始"),
-        ("Ending", "完成品牌收尾", "願每一天，都有一個能讓心安定下來的小小開始。", "Temple AI Studio"),
-    ]
-    scenes = []
-    prompts = []
-    cursor = 0.0
-    for index, (purpose, visual_goal, narration, subtitle) in enumerate(scene_specs):
-        duration = durations[index]
-        scene_id = f"scene-{index + 1:02d}-{purpose.lower().replace(' ', '-')}"
-        start = cursor
-        end = cursor + duration
-        cursor = end
-        prompt = (
-            f"以真實商品照片為核心，保持商品外觀、Logo、文字與主要細節不變。"
-            f"場景目的：{purpose}。畫面方向：{visual_goal}。平台：{platform}。"
-        )
-        scenes.append(
-            {
-                "id": scene_id,
-                "order": index + 1,
-                "purpose": purpose,
-                "duration": duration,
-                "start": round(start, 2),
-                "end": round(end, 2),
-                "visualDescription": visual_goal,
-                "narration": narration,
-                "subtitle": subtitle,
-                "prompt": prompt,
-                "music": "V1 預設無版權風險，若未設定音樂則輸出無背景音樂版本。",
-                "transition": "柔和淡入淡出",
-                "status": "Ready for Preview",
-                "approved": False,
-                "version": 1,
-                "updatedAt": now_iso(),
-            }
-        )
-        prompts.append(
-            {
-                "id": new_id("prompt"),
-                "sceneId": scene_id,
-                "category": "video",
-                "text": prompt,
-                "createdAt": now_iso(),
-            }
-        )
-    caption = f"{product['name']}｜把日常變成一個可以安定下來的儀式。"
-    tags = unique_list(["Temple", product["category"], "儀式感", "質感生活", "身心靈", platform])
-    metadata = {
-        "projectId": project_id,
-        "productName": product["name"],
-        "productCategory": product["category"],
-        "targetAudience": audience,
-        "platform": platform,
-        "language": "繁體中文",
-        "duration": total_duration,
-        "sceneCount": len(scenes),
-        "providerMode": "local-template + ffmpeg",
-        "createdAt": now_iso(),
-        "sourceMaterials": [m["fileName"] for m in product.get("materials", [])],
-    }
-    return {
-        "requirement": requirement,
-        "platform": platform,
-        "targetAudience": audience,
-        "duration": total_duration,
-        "script": "\n".join([scene["narration"] for scene in scenes]),
-        "scenes": scenes,
-        "prompts": prompts,
-        "caption": caption,
-        "tags": tags,
-        "seoKeywords": unique_list([product["name"], product["category"], "Temple", "儀式感", "平靜", "祝福"]),
-        "thumbnailSuggestion": f"使用{product['name']}最清楚的直式主視覺，封面字控制在 8 個中文字內。",
-        "metadata": metadata,
-    }
-
-
-def split_durations(total: int) -> list[int]:
-    weights = [0.12, 0.17, 0.24, 0.2, 0.15, 0.12]
-    values = [max(2, round(total * weight)) for weight in weights]
-    diff = total - sum(values)
-    values[-1] += diff
-    return values
-
-
-def unique_list(items: list[str]) -> list[str]:
-    seen = set()
-    result = []
-    for item in items:
-        item = str(item).strip()
-        if item and item not in seen:
-            seen.add(item)
-            result.append(item)
-    return result
-
+    return generate_video_script_package(product, payload, project_id)
 
 def create_project(payload: dict) -> dict:
     with DB_LOCK:
