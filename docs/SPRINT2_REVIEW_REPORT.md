@@ -199,7 +199,7 @@ Medium.
 
 Recommendation:
 
-Repair older documentation in a separate documentation cleanup sprint.
+Repair older documentation as autonomous engineering work when unreadable documentation blocks delivery or operations.
 
 ### Git Ownership Risk
 
@@ -211,7 +211,7 @@ Medium.
 
 Recommendation:
 
-Resolve only after explicit approval.
+Resolve as autonomous engineering work when it blocks delivery. Ask CEO only if administrator permission is required and no user-level alternative exists.
 
 ### Provider Quality Risk
 
@@ -223,7 +223,7 @@ Medium.
 
 Recommendation:
 
-Before implementation, choose local ComfyUI, cloud generation, or hybrid workflow for V1 validation.
+Before changing provider direction, follow `TEMPLE_AI_CONSTITUTION.md`: research, benchmark, optimise and exhaust the current path before proposing replacement. Paid/cloud providers require CEO approval.
 
 ### Media Storage Risk
 
@@ -257,6 +257,6 @@ Readiness interpretation:
 
 Sprint 2 internal review passed.
 
-The documentation package is ready for CEO review.
+The documentation package passed Sprint 2 review. Future work is governed by `TEMPLE_AI_CONSTITUTION.md`.
 
 

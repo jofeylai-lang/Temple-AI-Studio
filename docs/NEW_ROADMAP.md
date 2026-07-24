@@ -139,6 +139,10 @@ Recommended scope:
 
 ## 90-Day Roadmap
 
+Constitution note:
+
+`TEMPLE_AI_CONSTITUTION.md` is now the highest project authority. This roadmap is a strategic planning document. Any roadmap sentence that appears to require CEO approval for ordinary engineering work is superseded by the constitution's Autonomous Engineering and CTO principles.
+
 ### Phase 0: Stabilize Understanding
 
 Goal: Make the existing project understandable without changing architecture.
@@ -148,8 +152,8 @@ Actions:
 - Keep this audit report as the baseline.
 - Decide whether the public strategic name is Temple AI Studio or Jofey AI Studio.
 - Identify which experiments are active, paused, or archive candidates.
-- Fix documentation encoding only after approval.
-- Resolve Git safe-directory issue only after approval.
+- Fix documentation encoding as autonomous engineering work when it blocks readability or delivery.
+- Resolve Git safe-directory or local Git configuration issues as autonomous engineering work when they block delivery, unless administrator permission or destructive action is required.
 
 Exit criteria:
 
@@ -255,7 +259,7 @@ Keep the existing folders for now. They already represent the intended operating
 
 ### Add Product Boundaries Later
 
-When implementation begins, add product boundaries only after approval. A future structure could include a product layer, but it should not be introduced during this audit.
+Product boundaries should be added through milestone-driven work packages. CEO approval is required only when boundaries change business scope, product identity, paid services, or destructive migration risk.
 
 Potential future direction:
 
@@ -316,18 +320,18 @@ Recommended options:
 
 Avoid implementing five provider integrations before one product works.
 
-## Immediate Decision Needed
+## Historical Decision Gates
 
-Before development resumes, decide:
+At the time of this roadmap, the following decisions were open. Later V1 implementation and production deployment resolved several of them. Future work should treat unresolved items through `TEMPLE_AI_CONSTITUTION.md` decision gates:
 
 1. Should the strategic name be Temple AI Studio while the local folder remains Jofey AI Studio?
 2. Which product is approved as V1?
 3. Should the first product use local ComfyUI, cloud video platforms, or a hybrid workflow?
 4. What output quality is acceptable for V1?
-5. Should corrupted docs be repaired before product work starts?
+5. Should corrupted docs be repaired before product work starts? Resolved: documentation corruption that blocks operations is autonomous engineering work.
 
 ## Stop Point
 
-This roadmap is analysis only. No product features, refactors, deletions, renames, or architecture changes should happen until approval is given.
+This roadmap was originally analysis only. After adoption of `TEMPLE_AI_CONSTITUTION.md`, future work should not be blocked by this historical stop point. Use constitution stopping conditions instead: business scope change, paid approval, destructive action, administrator permission, missing source material, or genuine creative ambiguity.
 
 

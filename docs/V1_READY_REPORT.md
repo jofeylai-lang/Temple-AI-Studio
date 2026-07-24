@@ -4,13 +4,25 @@ Product: Temple Product Video Generator
 
 Date: 2026-07-23
 
-Status: Ready for CEO Review
+Status: Historical V1 Ready Baseline
+
+Current governance note:
+
+`TEMPLE_AI_CONSTITUTION.md` is now the highest authority. This report records the documentation readiness state before implementation and production deployment. It must not override later production reports or the constitution.
 
 ## Executive Summary
 
 Temple Product Video Generator is now defined to V1 Ready documentation standard.
 
-The product is ready for CEO review, not implementation release.
+At the time of this report, the product was ready for CEO review, not implementation release.
+
+Later status:
+
+- V1 implementation completed.
+- CEO acceptance completed.
+- Production deployment completed.
+- `v1.0.0` production tag was created.
+- Post-acceptance operational hardening was committed.
 
 The V1 scope is clear:
 
@@ -47,12 +59,12 @@ V1 Ready means:
 
 V1 Ready does not mean:
 
-- Code has been implemented.
-- UI has been built.
-- APIs have been created.
-- Media generation quality has been validated.
-- Cloud provider access has been approved.
-- Production deployment has occurred.
+- Code has been implemented. Historical note: implementation occurred later.
+- UI has been built. Historical note: UI was built later.
+- APIs have been created. Historical note: local APIs were built later.
+- Media generation quality has been validated. Historical note: V1 local MP4 export was validated later.
+- Cloud provider access has been approved. This remains approval-based under the constitution.
+- Production deployment has occurred. Historical note: production deployment occurred later.
 
 ## Final V1 Document Set
 
@@ -98,6 +110,20 @@ Validation and QA:
 Operations:
 
 - `OPERATIONS_MANUAL_V1.md`
+
+Post-readiness production documents:
+
+- `V1_CEO_ACCEPTANCE_REPORT.md`
+- `V1_FINAL_QA_REPORT.md`
+- `V1_IMPLEMENTATION_REPORT.md`
+- `V1_OPERATOR_HANDOFF.md`
+- `V1_PRODUCTION_DEPLOYMENT_REPORT.md`
+- `V1_PRODUCTION_PATHS.md`
+- `V1_RELEASE_MANIFEST.md`
+- `V1_RELEASE_NOTES.md`
+- `V1_SUPPORT_AND_DIAGNOSTICS.md`
+- `V1_UPGRADE_AND_ROLLBACK.md`
+- `V1_VALIDATION_REPORT.md`
 
 Navigation:
 
@@ -181,9 +207,9 @@ CEO should approve or decide:
 
 1. Confirm product name: Temple Product Video Generator.
 2. Confirm V1 scope.
-3. Confirm first generation path: local, cloud, or hybrid.
-4. Confirm whether older corrupted docs should be cleaned before implementation.
-5. Confirm whether Git safe-directory issue should be fixed.
+3. Confirm first generation path: local, cloud, or hybrid. Historical note: V1 production uses local-first FFmpeg fallback with optional ComfyUI/Whisper/TTS settings.
+4. Confirm whether older corrupted docs should be cleaned before implementation. Superseded: documentation corruption that blocks operations is autonomous engineering work.
+5. Confirm whether Git safe-directory issue should be fixed. Superseded when Git configuration blocks delivery; administrator permission still requires approval.
 
 ## Readiness Score
 
@@ -205,6 +231,6 @@ Breakdown:
 
 ## Final Status
 
-Temple Product Video Generator is V1 Ready for CEO Review.
+Temple Product Video Generator reached V1 Ready for CEO Review at the time of this report.
 
-Implementation should not begin until CEO review is complete and generation path is approved.
+This final status is historical. Future work must follow `TEMPLE_AI_CONSTITUTION.md`, `V1_PRODUCTION_DEPLOYMENT_REPORT.md`, and current CEO work packages rather than this historical implementation stop point.

@@ -106,7 +106,7 @@ Medium.
 
 Disposition:
 
-Not blocking document readiness. Requires later approval to fix.
+Not blocking document readiness. Future Git configuration issues should be fixed autonomously when they block delivery. Ask CEO only if administrator permission, destructive Git history changes, or external authentication is required.
 
 ### Generation Quality
 
@@ -146,13 +146,17 @@ Folder Structure V1 defines draft/export separation at planning level.
 
 ## CEO Decision Gates
 
+Constitution note:
+
+`TEMPLE_AI_CONSTITUTION.md` is the highest authority. CEO decision gates apply to business direction, paid services, destructive action, administrator permission, missing source material and genuine creative ambiguity. Ordinary engineering fixes should be handled autonomously.
+
 CEO should approve:
 
 1. V1 scope.
 2. Product name.
-3. Generation path for first validation.
-4. Whether to repair older corrupted docs.
-5. Whether to fix Git safe-directory issue.
+3. Generation path changes that affect business scope, cost, privacy or provider direction.
+4. Paid/cloud provider activation.
+5. Destructive migration or irreversible data deletion.
 
 ## Definition of Done
 
