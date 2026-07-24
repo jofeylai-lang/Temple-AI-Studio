@@ -13,6 +13,10 @@ Desktop.ini
 .env
 .env.*
 *.local
+*.dpapi
+*.secret
+*.token
+secrets/
 
 # Generated media and binary assets
 *.mp4
@@ -56,6 +60,7 @@ node_modules/
 .next/
 dist/
 build/
+*.zip
 
 # Local caches and generated working folders
 .cache/

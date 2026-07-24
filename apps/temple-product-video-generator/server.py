@@ -31,6 +31,10 @@ from temple_ai_studio.image_pipeline import run_image_pipeline
 from temple_ai_studio.emma_core import EmmaCore
 from temple_ai_studio.temple_os import TempleOSKernel
 from temple_ai_studio.video_intelligence import run_video_generation_pipeline
+from temple_ai_studio.production_workflow import (
+    ProductionWorkflowBlocked,
+    RealProductionWorkflow,
+)
 
 DATA_ROOT = Path(os.environ.get("TPVG_DATA_DIR", APP_ROOT / "data")).resolve()
 DB_PATH = DATA_ROOT / "database.json"
@@ -194,8 +198,22 @@ def save_db(db: dict) -> None:
 
 
 def detect_ffmpeg() -> str:
+    local = Path(os.environ.get("LOCALAPPDATA", ""))
     candidates = [
         shutil.which("ffmpeg"),
+        str(
+            local
+            / "Comfy-Desktop"
+            / "ComfyUI-Installs"
+            / "ComfyUI"
+            / "ComfyUI"
+            / ".venv"
+            / "Lib"
+            / "site-packages"
+            / "imageio_ffmpeg"
+            / "binaries"
+            / "ffmpeg-win-x86_64-v7.1.exe"
+        ),
         r"C:\Program Files\Softdeluxe\Free Download Manager\ffmpeg.exe",
         str(APP_ROOT / "bin" / "ffmpeg.exe"),
     ]
@@ -246,6 +264,27 @@ def temple_os_status() -> dict:
 def health_payload() -> dict:
     config = load_config()
     ffmpeg = config.get("ffmpegPath") or detect_ffmpeg()
+    production_root = Path(
+        os.environ.get(
+            "TEMPLE_PRODUCTION_DATA_ROOT",
+            REPO_ROOT.parent / "Temple AI Studio Production Data",
+        )
+    ).resolve()
+    try:
+        production_activation = RealProductionWorkflow(
+            REPO_ROOT,
+            production_root,
+        ).preflight(run_health=False)
+    except Exception as error:
+        production_activation = {
+            "overall": "BLOCKED",
+            "blockers": [
+                {
+                    "code": "production-activation-error",
+                    "message": str(error),
+                }
+            ],
+        }
     return {
         "status": "ok",
         "time": now_iso(),
@@ -268,6 +307,7 @@ def health_payload() -> dict:
         },
         "emmaCore": EmmaCore(REPO_ROOT).status(),
         "templeOS": temple_os_status(),
+        "productionActivation": production_activation,
     }
 
 
@@ -941,19 +981,21 @@ def create_release_package() -> dict:
 
 def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
     config = load_config()
+    if config.get("providerMode") == "production":
+        return build_real_production_assets(project, product, preview)
     ffmpeg = config.get("ffmpegPath") or detect_ffmpeg()
     if not ffmpeg or not Path(ffmpeg).exists():
-        raise RuntimeError("??? FFmpeg????? MP4?")
+        raise RuntimeError("找不到 FFmpeg，暫時無法輸出 MP4。")
     output_dir = Path(project["outputDir"])
     output_dir.mkdir(parents=True, exist_ok=True)
     material_paths = [Path(m["path"]) for m in product.get("materials", []) if Path(m["path"]).exists()]
     if not material_paths:
-        raise RuntimeError("???????????")
+        raise RuntimeError("請先上傳至少一張商品照片。")
 
     visual_report = run_image_pipeline(project, product, Path(project["projectDir"]), emma_root=REPO_ROOT)
     if visual_report.get("quality", {}).get("overall") != "PASS":
         append_log("generation.log", "visual-pipeline-quality-failed", {"projectId": project["id"], "quality": visual_report.get("quality")})
-        raise RuntimeError("???????????????????????")
+        raise RuntimeError("圖片品質檢查未通過，請調整素材後再試一次。")
 
     video_report = run_video_generation_pipeline(project, product, output_dir, Path(project["projectDir"]), Path(ffmpeg), preview=preview)
     target = Path(video_report["outputVideo"])
@@ -973,6 +1015,96 @@ def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
         "videoIntelligenceReport": str(Path(project["projectDir"]) / ("video-intelligence-preview-report.json" if preview else "video-intelligence-final-report.json")),
         "videoQuality": video_report.get("quality"),
         "videoSpec": "1080x1920, MP4, local FFmpeg motion pipeline, silent sync audio track, subtitles burned into frames",
+    }
+
+
+def build_real_production_assets(project: dict, product: dict, preview: bool) -> dict:
+    production_root = Path(
+        os.environ.get(
+            "TEMPLE_PRODUCTION_DATA_ROOT",
+            REPO_ROOT.parent / "Temple AI Studio Production Data",
+        )
+    ).resolve()
+    run_id = (
+        f"{project['id']}-{'preview' if preview else 'export'}-"
+        f"{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    )
+    request = {
+        "runId": run_id,
+        "request": project.get("requirement")
+        or f"請為{product.get('name', '此商品')}製作神殿商品影片。",
+        "product": product,
+        "scriptPackage": {
+            key: project[key]
+            for key in [
+                "requirement",
+                "platform",
+                "targetAudience",
+                "duration",
+                "script",
+                "scenes",
+                "prompts",
+                "caption",
+                "tags",
+                "seoKeywords",
+                "thumbnailSuggestion",
+                "metadata",
+                "quality",
+            ]
+            if key in project
+        },
+        "scenarioType": "product-introduction",
+        "duration": project.get("duration", 30),
+        "platform": project.get("platform", "Instagram Reels"),
+        "aspectRatio": "9:16",
+        "researchRequired": False,
+    }
+    workflow = RealProductionWorkflow(REPO_ROOT, production_root)
+    try:
+        result = workflow.run(request)
+    except ProductionWorkflowBlocked as error:
+        messages = [
+            item.get("message", item.get("code", "未知阻擋"))
+            for item in error.report.get("blockers", [])
+        ]
+        raise RuntimeError("生產模式尚未就緒：" + "；".join(messages)) from error
+    output_dir = Path(project["outputDir"])
+    output_dir.mkdir(parents=True, exist_ok=True)
+    target = output_dir / ("preview_video.mp4" if preview else "final_video.mp4")
+    subtitles = output_dir / "subtitles.zh-TW.srt"
+    shutil.copy2(Path(result["exportPath"]), target)
+    source_subtitles = (
+        production_root
+        / "projects"
+        / run_id
+        / "export"
+        / "subtitles.zh-TW.srt"
+    )
+    shutil.copy2(source_subtitles, subtitles)
+    quality_path = production_root / "projects" / run_id / "quality-evidence.json"
+    quality = json.loads(quality_path.read_text(encoding="utf-8-sig"))
+    return {
+        "previewVideo": file_url(target) if preview else project.get("previewVideo"),
+        "finalVideo": file_url(target) if not preview else project.get("finalVideo"),
+        "subtitles": file_url(subtitles),
+        "ffmpegPath": result.get("ffmpeg"),
+        "scenes": project["scenes"],
+        "storyboard": json.loads(
+            (production_root / "projects" / run_id / "storyboard.json").read_text(
+                encoding="utf-8-sig"
+            )
+        ),
+        "providerPrompts": json.loads(
+            (
+                production_root / "projects" / run_id / "provider-prompts.json"
+            ).read_text(encoding="utf-8-sig")
+        ),
+        "visualQuality": quality,
+        "videoQuality": quality,
+        "commercialRun": str(
+            production_root / "projects" / run_id / "commercial-run.json"
+        ),
+        "videoSpec": "真實本機 AI Provider、Emma 身分與聲音、唇同步、繁中字幕、FFmpeg 商業輸出",
     }
 
 def write_export_package(project: dict) -> None:

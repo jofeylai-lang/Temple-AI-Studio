@@ -354,6 +354,9 @@ function renderHome() {
           <tr><th>版本</th><td>${escapeHtml(state.health.version || "1.0.0")}</td></tr>
           <tr><th>FFmpeg</th><td>${escapeHtml(state.health.ffmpeg?.path || "未找到")}</td></tr>
           <tr><th>ComfyUI</th><td>${escapeHtml(state.health.comfyui?.message || "")}</td></tr>
+          <tr><th>正式生產</th><td>${state.health.productionActivation?.overall === "PASS"
+            ? "已就緒"
+            : `尚未就緒（${state.health.productionActivation?.blockers?.length || 0} 項）`}</td></tr>
           <tr><th>Whisper</th><td>${state.health.whisper?.available ? "已設定" : "未設定，V1 會使用文字旁白備援"}</td></tr>
         </tbody></table>
       </div>
@@ -574,7 +577,12 @@ function renderSettings() {
       ${input("預設影片秒數", "defaultDuration", config.defaultDuration || 30, "number")}
       ${select("是否加入 Logo", "includeLogo", ["true", "false"], String(config.includeLogo ?? true))}
       ${input("字幕樣式", "subtitleStyle", config.subtitleStyle || "")}
-      ${select("生成模式", "providerMode", ["local-first", "comfyui-preferred", "cloud-disabled"], config.providerMode || "local-first")}
+      ${select("生成模式", "providerMode", [
+        { value: "production", label: "正式生產" },
+        { value: "local-first", label: "本機預覽" },
+        { value: "comfyui-preferred", label: "優先使用 ComfyUI" },
+        { value: "cloud-disabled", label: "停用雲端服務" }
+      ], config.providerMode || "local-first")}
       <div class="notice">V1 預設使用本機流程，不會自動呼叫付費 API。未連線的工具會使用可用的本機備援。</div>
       <button class="button" type="button" data-action="save-settings">儲存設定</button>
       <hr>
@@ -739,7 +747,11 @@ function textarea(label, name, value) {
 }
 
 function select(label, name, values, current) {
-  return `<div class="field"><label>${label}</label><select name="${name}">${values.map((value) => option(value, value, String(value) === String(current))).join("")}</select></div>`;
+  return `<div class="field"><label>${label}</label><select name="${name}">${values.map((item) => {
+    const value = typeof item === "object" ? item.value : item;
+    const text = typeof item === "object" ? item.label : item;
+    return option(value, text, String(value) === String(current));
+  }).join("")}</select></div>`;
 }
 
 function option(value, label, selected) {
