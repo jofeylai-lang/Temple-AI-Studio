@@ -63,6 +63,11 @@ cache/
 tmp/
 temp/
 work/
+operations/temple-os/state/
+operations/temple-os/logs/
+operations/temple-os/backups/
+operations/temple-os/support/
+operations/temple-os/tmp/
 
 # Large product generation outputs
 videos/factory/exports/

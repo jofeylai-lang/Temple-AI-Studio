@@ -1,0 +1,11 @@
+{
+  "id": "example-plugin",
+  "name": "Example Temple Plugin",
+  "version": "1.0.0",
+  "sdkVersion": "temple-plugin-sdk-v1",
+  "capabilities": [
+    "image"
+  ],
+  "entryPoint": "plugin.py",
+  "description": "Example manifest only. Copy into plugins/<plugin-id>/plugin.json when creating a real plugin."
+}

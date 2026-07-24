@@ -29,6 +29,7 @@ if str(SCRIPTS_ROOT) not in sys.path:
 from temple_ai_studio.script_engine import generate_video_script_package
 from temple_ai_studio.image_pipeline import run_image_pipeline
 from temple_ai_studio.emma_core import EmmaCore
+from temple_ai_studio.temple_os import TempleOSKernel
 from temple_ai_studio.video_intelligence import run_video_generation_pipeline
 
 DATA_ROOT = Path(os.environ.get("TPVG_DATA_DIR", APP_ROOT / "data")).resolve()
@@ -231,6 +232,17 @@ def comfyui_health(url: str) -> dict:
         return {"connected": False, "message": f"ComfyUI 尚未連線：{error.__class__.__name__}"}
 
 
+def temple_os_status() -> dict:
+    try:
+        return TempleOSKernel(REPO_ROOT).status()
+    except Exception as error:
+        return {
+            "status": "degraded",
+            "message": str(error),
+            "errorType": error.__class__.__name__,
+        }
+
+
 def health_payload() -> dict:
     config = load_config()
     ffmpeg = config.get("ffmpegPath") or detect_ffmpeg()
@@ -255,6 +267,7 @@ def health_payload() -> dict:
             "available": config.get("ttsProvider") not in ["", "none"],
         },
         "emmaCore": EmmaCore(REPO_ROOT).status(),
+        "templeOS": temple_os_status(),
     }
 
 
@@ -975,6 +988,7 @@ def write_export_package(project: dict) -> None:
     (output_dir / "visual_quality.json").write_text(json.dumps(project.get("visualQuality", {}), ensure_ascii=False, indent=2), encoding="utf-8")
     (output_dir / "video_intelligence.json").write_text(json.dumps(project.get("videoIntelligence", {}), ensure_ascii=False, indent=2), encoding="utf-8")
     (output_dir / "video_quality.json").write_text(json.dumps(project.get("videoQuality", {}), ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "temple_os.json").write_text(json.dumps(temple_os_status(), ensure_ascii=False, indent=2), encoding="utf-8")
     (output_dir / "emma_core.json").write_text(
         json.dumps(
             {
