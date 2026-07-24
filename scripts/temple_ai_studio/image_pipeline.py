@@ -10,6 +10,7 @@ from typing import Any
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from temple_ai_studio.asset_manager import AssetManager
+from temple_ai_studio.emma_core import EmmaCore
 from temple_ai_studio.prompt_translation_engine import translate_prompts
 from temple_ai_studio.quality_analyzer import evaluate_image, evaluate_project
 from temple_ai_studio.storyboard_engine import build_storyboard
@@ -175,8 +176,10 @@ class ImagePipeline:
         self.max_retries = max_retries
         self.provider = LocalCommercialCompositeProvider()
 
-    def run(self, project: dict[str, Any], product: dict[str, Any], project_dir: Path) -> dict[str, Any]:
+    def run(self, project: dict[str, Any], product: dict[str, Any], project_dir: Path, emma_root: Path | None = None) -> dict[str, Any]:
         asset_manager = AssetManager(Path(project_dir), project["id"])
+        emma_core = EmmaCore(emma_root)
+        emma_status = emma_core.initialize()
         product_assets = asset_manager.register_product_assets(product)
         source_images = [Path(item["path"]) for item in product_assets if Path(item["path"]).exists()]
         if not source_images:
@@ -193,12 +196,18 @@ class ImagePipeline:
             seed = self._stable_seed(project["id"], scene["id"], scene.get("version", 1))
             prompt_bundle = prompt_by_scene[scene["id"]]["openai"]
             story_scene = story_by_scene[scene["id"]]
+            require_emma = scene_requires_emma(scene)
+            emma_references = emma_core.select_references("openai", generation_type="image", require_emma=require_emma)
+            if require_emma and emma_references["overall"] == "BLOCKED":
+                raise RuntimeError(f"Emma references are required but unavailable for scene: {scene['id']}")
             best_record = None
             best_quality = None
+            best_emma = None
             for attempt in range(self.max_retries + 1):
                 output = asset_manager.generated_root / f"{scene['order']:02d}-{scene['id']}-v{scene.get('version', 1)}-a{attempt}.png"
                 generation = self.provider.generate(scene, story_scene, prompt_bundle, product, source, output, seed, attempt)
-                quality = evaluate_image(output, scene, prompt_bundle)
+                emma_eval = emma_core.evaluate_generation(output, scene=scene, provider="openai", require_emma=require_emma)
+                quality = evaluate_image(output, scene, prompt_bundle, emma_eval)
                 asset = asset_manager.register(
                     output,
                     asset_type="generated-image",
@@ -206,16 +215,28 @@ class ImagePipeline:
                     scene_id=scene["id"],
                     provider=self.provider.name,
                     source=str(source),
-                    metadata={"seed": seed, "attempt": attempt, "qualityScore": quality["score"], "qualityOverall": quality["overall"]},
+                    metadata={
+                        "seed": seed,
+                        "attempt": attempt,
+                        "qualityScore": quality["score"],
+                        "qualityOverall": quality["overall"],
+                        "emmaConsistency": emma_eval,
+                    },
                 )
-                history.append({"sceneId": scene["id"], "attempt": attempt, "assetId": asset["id"], "quality": quality})
+                history.append({"sceneId": scene["id"], "attempt": attempt, "assetId": asset["id"], "quality": quality, "emma": emma_eval})
                 if best_quality is None or quality["score"] > best_quality["score"]:
                     best_record = {**generation, "asset": asset}
                     best_quality = quality
+                    best_emma = emma_eval
                 if quality["overall"] == "PASS":
                     break
             scene["storyboard"] = story_scene
             scene["providerPrompts"] = prompt_by_scene[scene["id"]]
+            scene["emmaCore"] = {
+                "required": require_emma,
+                "referenceSelection": emma_references,
+                "consistency": best_emma,
+            }
             scene["generatedImagePath"] = best_record["output"] if best_record else ""
             scene["visualQuality"] = best_quality
             scene["visualStatus"] = best_quality["overall"] if best_quality else "FAIL"
@@ -230,6 +251,10 @@ class ImagePipeline:
             "provider": self.provider.name,
             "storyboard": storyboard,
             "providerPrompts": provider_prompts,
+            "emmaCore": {
+                "status": emma_status,
+                "knowledgeProfile": emma_core.get_context("future", require_emma=False).get("knowledge"),
+            },
             "generatedImages": generated,
             "quality": project_quality,
             "history": history,
@@ -244,8 +269,21 @@ class ImagePipeline:
         return abs(hash(value)) % 2_147_483_647
 
 
-def run_image_pipeline(project: dict[str, Any], product: dict[str, Any], project_dir: Path, provider: str = DEFAULT_PROVIDER) -> dict[str, Any]:
-    return ImagePipeline(provider=provider).run(project, product, project_dir)
+def scene_requires_emma(scene: dict[str, Any]) -> bool:
+    content = " ".join(
+        str(scene.get(key, "")) for key in ["narration", "subtitle", "prompt", "visualDescription"]
+    ).lower()
+    return "emma" in content or "艾瑪" in content
+
+
+def run_image_pipeline(
+    project: dict[str, Any],
+    product: dict[str, Any],
+    project_dir: Path,
+    provider: str = DEFAULT_PROVIDER,
+    emma_root: Path | None = None,
+) -> dict[str, Any]:
+    return ImagePipeline(provider=provider).run(project, product, project_dir, emma_root=emma_root)
 
 
 def main() -> int:

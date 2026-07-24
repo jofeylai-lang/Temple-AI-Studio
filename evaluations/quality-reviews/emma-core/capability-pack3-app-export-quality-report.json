@@ -1,0 +1,188 @@
+{
+  "schema": "temple-ai-studio.quality-report.v1",
+  "createdAt": "2026-07-24T13:14:01",
+  "exportDir": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416",
+  "overall": "PASS",
+  "checks": [
+    {
+      "name": "required-file:final_video.mp4",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\final_video.mp4",
+      "size": 7725567
+    },
+    {
+      "name": "required-file:subtitles.srt",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\subtitles.srt",
+      "size": 380
+    },
+    {
+      "name": "required-file:narration.txt",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\narration.txt",
+      "size": 490
+    },
+    {
+      "name": "required-file:caption.txt",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\caption.txt",
+      "size": 314
+    },
+    {
+      "name": "required-file:metadata.json",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\metadata.json",
+      "size": 684
+    },
+    {
+      "name": "required-file:scenes.json",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\scenes.json",
+      "size": 87649
+    },
+    {
+      "name": "required-file:prompts.json",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\prompts.json",
+      "size": 4784
+    },
+    {
+      "name": "required-file:storyboard.json",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\storyboard.json",
+      "size": 9276
+    },
+    {
+      "name": "required-file:provider_prompts.json",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\provider_prompts.json",
+      "size": 60339
+    },
+    {
+      "name": "required-file:visual_quality.json",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\visual_quality.json",
+      "size": 4645
+    },
+    {
+      "name": "required-file:emma_core.json",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\emma_core.json",
+      "size": 1766
+    },
+    {
+      "name": "required-file:asset_index.json",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\asset_index.json",
+      "size": 27248
+    },
+    {
+      "name": "required-file:thumbnail_suggestion.txt",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\thumbnail_suggestion.txt",
+      "size": 120
+    },
+    {
+      "name": "required-file:materials_used.txt",
+      "ok": true,
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\materials_used.txt",
+      "size": 138
+    },
+    {
+      "name": "json-valid:metadata.json",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\metadata.json",
+      "ok": true
+    },
+    {
+      "name": "json-valid:scenes.json",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\scenes.json",
+      "ok": true
+    },
+    {
+      "name": "json-valid:prompts.json",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\prompts.json",
+      "ok": true
+    },
+    {
+      "name": "json-valid:storyboard.json",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\storyboard.json",
+      "ok": true
+    },
+    {
+      "name": "json-valid:provider_prompts.json",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\provider_prompts.json",
+      "ok": true
+    },
+    {
+      "name": "json-valid:visual_quality.json",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\visual_quality.json",
+      "ok": true
+    },
+    {
+      "name": "json-valid:emma_core.json",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\emma_core.json",
+      "ok": true
+    },
+    {
+      "name": "json-valid:asset_index.json",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\asset_index.json",
+      "ok": true
+    },
+    {
+      "name": "text-quality:subtitles.srt",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\subtitles.srt",
+      "ok": true,
+      "characters": 269,
+      "mojibakeHints": []
+    },
+    {
+      "name": "text-quality:narration.txt",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\narration.txt",
+      "ok": true,
+      "characters": 201,
+      "mojibakeHints": []
+    },
+    {
+      "name": "text-quality:caption.txt",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\caption.txt",
+      "ok": true,
+      "characters": 120,
+      "mojibakeHints": []
+    },
+    {
+      "name": "text-quality:thumbnail_suggestion.txt",
+      "path": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-088d9416\\thumbnail_suggestion.txt",
+      "ok": true,
+      "characters": 58,
+      "mojibakeHints": []
+    },
+    {
+      "name": "ffmpeg-decode",
+      "ok": true,
+      "ffmpeg": "C:\\Program Files\\Softdeluxe\\Free Download Manager\\ffmpeg.exe",
+      "elapsedSeconds": 0.234,
+      "returnCode": 0,
+      "metadata": {
+        "duration": "00:00:24.00",
+        "codec": "h264 (Constrained Baseline) (avc1 / 0x31637661)",
+        "size": {
+          "width": 1080,
+          "height": 1920
+        },
+        "fps": 25.0,
+        "videoLine": "Stream #0:0(und): Video: h264 (Constrained Baseline) (avc1 / 0x31637661), yuv420p, 1080x1920, 2574 kb/s, 25 fps, 25 tbr, 12800 tbn, 50 tbc (default)"
+      },
+      "errorTail": ""
+    },
+    {
+      "name": "platform-format:vertical-9x16",
+      "ok": true,
+      "size": {
+        "width": 1080,
+        "height": 1920
+      },
+      "expected": "vertical 9:16 video"
+    }
+  ],
+  "failedChecks": []
+}

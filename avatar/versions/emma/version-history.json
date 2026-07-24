@@ -1,0 +1,71 @@
+{
+  "schema": "temple-ai-studio.emma-core.version-history.v1",
+  "identityId": "emma",
+  "createdAt": "2026-07-24T13:11:10",
+  "updatedAt": "2026-07-24T13:13:44",
+  "currentVersion": "emma-v1",
+  "versions": [
+    {
+      "version": "emma-v1",
+      "createdAt": "2026-07-24T13:11:10",
+      "reason": "Initial Emma Core identity infrastructure.",
+      "profileSnapshot": {
+        "schema": "temple-ai-studio.emma-core.identity.v1",
+        "identityId": "emma",
+        "displayName": "Emma",
+        "identityVersion": "emma-v1",
+        "createdAt": "2026-07-24T13:11:10",
+        "updatedAt": "2026-07-24T13:11:10",
+        "status": "infrastructure-ready-missing-ceo-reference-dataset",
+        "permanentIdentity": {
+          "faceIdentity": {
+            "status": "requires-ceo-approved-reference",
+            "description": "same face identity across all modules"
+          },
+          "bodyIdentity": {
+            "status": "requires-ceo-approved-reference",
+            "description": "same body identity and proportions across all modules"
+          },
+          "hairstyle": {
+            "status": "profile-managed",
+            "mutableWithinIdentity": true
+          },
+          "clothingProfile": {
+            "status": "profile-managed",
+            "mutableWithinBrandRules": true
+          },
+          "accessories": {
+            "status": "profile-managed",
+            "mutableWithinBrandRules": true
+          },
+          "bodyProportions": {
+            "status": "requires-ceo-approved-reference"
+          },
+          "skinTone": {
+            "status": "requires-ceo-approved-reference"
+          },
+          "facialGeometry": {
+            "status": "requires-ceo-approved-reference"
+          }
+        },
+        "identityRules": {
+          "samePersonAlways": true,
+          "doNotInventPermanentFace": true,
+          "doNotInventPermanentBody": true,
+          "trainingRequiresCeoDatasetApproval": true,
+          "voiceCloningDisabledInThisPack": true,
+          "modelFineTuningDisabledInThisPack": true
+        },
+        "thresholds": {
+          "faceSimilarity": 0.82,
+          "bodySimilarity": 0.78,
+          "hairConsistency": 0.72,
+          "clothingConsistency": 0.65,
+          "poseConsistency": 0.62,
+          "commercialConsistency": 0.78,
+          "overallEmmaScore": 0.82
+        }
+      }
+    }
+  ]
+}

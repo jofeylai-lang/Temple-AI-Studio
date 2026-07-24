@@ -85,7 +85,7 @@ def evaluate_image(
         }
     if emma_identity_report:
         overall = emma_identity_report.get("overall")
-        scores["emmaIdentityConsistency"] = 1.0 if overall == "PASS" else 0.0 if overall == "FAIL" else 0.5
+        scores["emmaIdentityConsistency"] = 1.0 if overall in ["PASS", "NOT_REQUIRED"] else 0.0 if overall == "FAIL" else 0.5
     else:
         emma_required_text = " ".join(
             str(scene.get(key, "")) for key in ["narration", "subtitle", "prompt", "visualDescription"]

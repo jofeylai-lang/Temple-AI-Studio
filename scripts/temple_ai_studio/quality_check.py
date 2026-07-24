@@ -21,6 +21,7 @@ REQUIRED_EXPORT_FILES = [
     "storyboard.json",
     "provider_prompts.json",
     "visual_quality.json",
+    "emma_core.json",
     "asset_index.json",
     "thumbnail_suggestion.txt",
     "materials_used.txt",
@@ -133,7 +134,7 @@ def evaluate_export(export_dir: Path, ffmpeg_path: str | None) -> dict:
             "size": path.stat().st_size if path.exists() else 0,
         })
 
-    for name in ["metadata.json", "scenes.json", "prompts.json", "storyboard.json", "provider_prompts.json", "visual_quality.json", "asset_index.json"]:
+    for name in ["metadata.json", "scenes.json", "prompts.json", "storyboard.json", "provider_prompts.json", "visual_quality.json", "emma_core.json", "asset_index.json"]:
         path = export_dir / name
         if path.exists():
             result = check_json(path)

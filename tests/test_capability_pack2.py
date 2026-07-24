@@ -74,7 +74,7 @@ class CapabilityPack2Tests(unittest.TestCase):
         self.assertIn("Preserve product appearance", first["openai"]["positive"])
 
     def test_image_pipeline_generates_assets_and_quality(self) -> None:
-        report = run_image_pipeline(self.project, self.product, Path(self.project["projectDir"]))
+        report = run_image_pipeline(self.project, self.product, Path(self.project["projectDir"]), emma_root=self.root)
         self.assertEqual(report["quality"]["overall"], "PASS")
         self.assertEqual(len(report["generatedImages"]), 6)
         self.assertTrue(Path(report["assetIndex"]).exists())
@@ -83,7 +83,7 @@ class CapabilityPack2Tests(unittest.TestCase):
             self.assertEqual(scene["visualQuality"]["overall"], "PASS")
 
     def test_quality_analyzer_scores_generated_image(self) -> None:
-        report = run_image_pipeline(self.project, self.product, Path(self.project["projectDir"]))
+        report = run_image_pipeline(self.project, self.product, Path(self.project["projectDir"]), emma_root=self.root)
         scene = self.project["scenes"][0]
         quality = evaluate_image(Path(scene["generatedImagePath"]), scene, scene["providerPrompts"]["openai"])
         self.assertEqual(quality["overall"], "PASS")

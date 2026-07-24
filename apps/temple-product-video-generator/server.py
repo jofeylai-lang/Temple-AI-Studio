@@ -28,6 +28,7 @@ if str(SCRIPTS_ROOT) not in sys.path:
 
 from temple_ai_studio.script_engine import generate_video_script_package
 from temple_ai_studio.image_pipeline import run_image_pipeline
+from temple_ai_studio.emma_core import EmmaCore
 
 DATA_ROOT = Path(os.environ.get("TPVG_DATA_DIR", APP_ROOT / "data")).resolve()
 DB_PATH = DATA_ROOT / "database.json"
@@ -254,6 +255,7 @@ def health_payload() -> dict:
             "provider": config.get("ttsProvider", "none"),
             "available": config.get("ttsProvider") not in ["", "none"],
         },
+        "emmaCore": EmmaCore(REPO_ROOT).status(),
     }
 
 
@@ -940,7 +942,7 @@ def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
     if not material_paths:
         raise RuntimeError("???????????")
 
-    visual_report = run_image_pipeline(project, product, Path(project["projectDir"]))
+    visual_report = run_image_pipeline(project, product, Path(project["projectDir"]), emma_root=REPO_ROOT)
     if visual_report.get("quality", {}).get("overall") != "PASS":
         append_log("generation.log", "visual-pipeline-quality-failed", {"projectId": project["id"], "quality": visual_report.get("quality")})
         raise RuntimeError("???????????????????????")
@@ -1046,6 +1048,25 @@ def write_export_package(project: dict) -> None:
     (output_dir / "storyboard.json").write_text(json.dumps(project.get("storyboard", {}), ensure_ascii=False, indent=2), encoding="utf-8")
     (output_dir / "provider_prompts.json").write_text(json.dumps(project.get("providerPrompts", {}), ensure_ascii=False, indent=2), encoding="utf-8")
     (output_dir / "visual_quality.json").write_text(json.dumps(project.get("visualQuality", {}), ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "emma_core.json").write_text(
+        json.dumps(
+            {
+                "status": health_payload().get("emmaCore"),
+                "sceneUsage": [
+                    {
+                        "sceneId": scene.get("id"),
+                        "required": scene.get("emmaCore", {}).get("required"),
+                        "referenceSelection": scene.get("emmaCore", {}).get("referenceSelection", {}).get("overall"),
+                        "consistency": scene.get("emmaCore", {}).get("consistency", {}).get("overall"),
+                    }
+                    for scene in project.get("scenes", [])
+                ],
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
     if project.get("assetIndex") and Path(project["assetIndex"]).exists():
         shutil.copyfile(project["assetIndex"], output_dir / "asset_index.json")
     (output_dir / "thumbnail_suggestion.txt").write_text(project["thumbnailSuggestion"], encoding="utf-8")
@@ -1276,6 +1297,11 @@ def smoke_test() -> int:
         output_dir / "metadata.json",
         output_dir / "scenes.json",
         output_dir / "prompts.json",
+        output_dir / "storyboard.json",
+        output_dir / "provider_prompts.json",
+        output_dir / "visual_quality.json",
+        output_dir / "emma_core.json",
+        output_dir / "asset_index.json",
         output_dir / "thumbnail_suggestion.txt",
         output_dir / "materials_used.txt",
     ]

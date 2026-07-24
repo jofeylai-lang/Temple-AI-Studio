@@ -1,0 +1,12 @@
+{
+  "schema": "temple-ai-studio.emma-core-self-test.v1",
+  "createdAt": "2026-07-24T13:11:22",
+  "overall": "PASS",
+  "imported": "PASS",
+  "duplicateDetection": "DUPLICATE",
+  "providerSelection": "PASS",
+  "passScore": 0.89,
+  "failScore": 0.7157,
+  "createdVersion": "emma-v2",
+  "rollback": "PASS"
+}
