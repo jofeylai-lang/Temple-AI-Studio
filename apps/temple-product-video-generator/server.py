@@ -65,6 +65,15 @@ VIDEO_STATES = [
 DB_LOCK = threading.Lock()
 
 
+def production_data_root() -> Path:
+    return Path(
+        os.environ.get(
+            "TEMPLE_PRODUCTION_DATA_ROOT",
+            REPO_ROOT.parent / "Temple AI Studio Production Data",
+        )
+    ).resolve()
+
+
 def now_iso() -> str:
     return datetime.now().replace(microsecond=0).isoformat()
 
@@ -264,12 +273,7 @@ def temple_os_status() -> dict:
 def health_payload() -> dict:
     config = load_config()
     ffmpeg = config.get("ffmpegPath") or detect_ffmpeg()
-    production_root = Path(
-        os.environ.get(
-            "TEMPLE_PRODUCTION_DATA_ROOT",
-            REPO_ROOT.parent / "Temple AI Studio Production Data",
-        )
-    ).resolve()
+    production_root = production_data_root()
     try:
         production_activation = RealProductionWorkflow(
             REPO_ROOT,
@@ -305,7 +309,7 @@ def health_payload() -> dict:
             "provider": config.get("ttsProvider", "none"),
             "available": config.get("ttsProvider") not in ["", "none"],
         },
-        "emmaCore": EmmaCore(REPO_ROOT).status(),
+        "emmaCore": EmmaCore(production_root).status(),
         "templeOS": temple_os_status(),
         "productionActivation": production_activation,
     }
@@ -992,7 +996,12 @@ def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
     if not material_paths:
         raise RuntimeError("請先上傳至少一張商品照片。")
 
-    visual_report = run_image_pipeline(project, product, Path(project["projectDir"]), emma_root=REPO_ROOT)
+    visual_report = run_image_pipeline(
+        project,
+        product,
+        Path(project["projectDir"]),
+        emma_root=production_data_root(),
+    )
     if visual_report.get("quality", {}).get("overall") != "PASS":
         append_log("generation.log", "visual-pipeline-quality-failed", {"projectId": project["id"], "quality": visual_report.get("quality")})
         raise RuntimeError("圖片品質檢查未通過，請調整素材後再試一次。")

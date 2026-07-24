@@ -45,6 +45,17 @@ def default_comfy_install() -> Path:
     return local / "Comfy-Desktop" / "ComfyUI-Installs" / "ComfyUI" / "ComfyUI"
 
 
+def default_local_runtime_root() -> Path:
+    configured = os.environ.get("TEMPLE_LOCAL_RUNTIME_ROOT")
+    if configured:
+        return Path(configured).resolve()
+    return (
+        Path(os.environ.get("LOCALAPPDATA", ""))
+        / "TempleAIStudio"
+        / "runtimes"
+    )
+
+
 def command_exists(command: str) -> bool:
     candidate = Path(command)
     return candidate.exists() if candidate.is_absolute() else shutil.which(command) is not None
@@ -85,6 +96,7 @@ class ProviderActivationManager:
     def defaults(self) -> dict[str, Any]:
         comfy_root = default_comfy_root()
         comfy_install = default_comfy_install()
+        runtime_root = default_local_runtime_root()
         return {
             "schema": "temple-ai-studio.production-providers.v1",
             "version": PROVIDER_ACTIVATION_VERSION,
@@ -273,9 +285,35 @@ class ProviderActivationManager:
                     "stability": 0.82,
                     "privacy": "local",
                     "licensePolicy": "apache-2.0",
-                    "python": str(self.root.parent / "runtimes" / "qwen3-tts" / "Scripts" / "python.exe"),
+                    "python": str(runtime_root / "qwen3-tts" / "Scripts" / "python.exe"),
                     "modelPath": str(self.root.parent / "models" / "Qwen3-TTS-12Hz-0.6B-Base"),
                     "module": "qwen_tts",
+                    "workerPath": str(
+                        Path(__file__).resolve().parents[1] / "qwen3_tts_worker.py"
+                    ),
+                },
+                {
+                    "id": "qwen3-voice-design-local",
+                    "name": "Qwen3-TTS 1.7B VoiceDesign",
+                    "kind": "local-python",
+                    "enabled": True,
+                    "paid": False,
+                    "capabilities": ["synthetic-voice-design"],
+                    "priority": 100,
+                    "quality": 0.89,
+                    "stability": 0.82,
+                    "privacy": "local",
+                    "licensePolicy": "apache-2.0",
+                    "python": str(runtime_root / "qwen3-tts" / "Scripts" / "python.exe"),
+                    "modelPath": str(
+                        self.root.parent
+                        / "models"
+                        / "Qwen3-TTS-12Hz-1.7B-VoiceDesign"
+                    ),
+                    "module": "qwen_tts",
+                    "workerPath": str(
+                        Path(__file__).resolve().parents[1] / "qwen3_tts_worker.py"
+                    ),
                 },
                 {
                     "id": "musetalk-local",
@@ -290,15 +328,46 @@ class ProviderActivationManager:
                     "privacy": "local",
                     "licensePolicy": "mit-and-model-commercial",
                     "runtimePath": str(
-                        self.root.parent / "runtimes" / "musetalk" / "Scripts" / "python.exe"
+                        runtime_root / "musetalk" / "Scripts" / "python.exe"
                     ),
                     "entryPoint": str(
-                        self.root.parent / "tools" / "MuseTalk" / "scripts" / "inference.py"
+                        Path(__file__).resolve().parents[1] / "musetalk_worker.py"
                     ),
-                    "modelRoot": str(self.root.parent / "models" / "musetalk"),
+                    "modelRoot": str(self.root.parent / "tools" / "MuseTalk" / "models"),
                     "requiredModels": ["**/*.pth"],
                     "commandDescriptor": str(
                         self.root.parent / "workflows" / "musetalk-production.json"
+                    ),
+                },
+                {
+                    "id": "emma-quality-local",
+                    "name": "Emma Identity and Commercial Quality Local",
+                    "kind": "local-script",
+                    "enabled": True,
+                    "paid": False,
+                    "capabilities": ["quality-image", "identity-quality", "anatomy-quality"],
+                    "priority": 100,
+                    "quality": 0.9,
+                    "stability": 0.85,
+                    "privacy": "local",
+                    "licensePolicy": "mixed-open-source-local",
+                    "runtimePath": str(
+                        runtime_root / "musetalk" / "Scripts" / "python.exe"
+                    ),
+                    "entryPoint": str(
+                        Path(__file__).resolve().parents[1] / "emma_quality_worker.py"
+                    ),
+                    "modelRoot": str(self.root.parent / "models"),
+                    "requiredModels": [
+                        "opencv/face_detection_yunet_2023mar.onnx",
+                        "opencv/face_recognition_sface_2021dec.onnx",
+                        "wavlm-base-plus-sv/pytorch_model.bin",
+                        "openclip-vit-b32/open_clip_pytorch_model.bin",
+                        "mediapipe/pose_landmarker_full.task",
+                        "mediapipe/hand_landmarker.task",
+                    ],
+                    "commandDescriptor": str(
+                        self.root.parent / "workflows" / "emma-quality-production.json"
                     ),
                 },
                 {
@@ -338,22 +407,18 @@ class ProviderActivationManager:
                     "privacy": "local",
                     "licensePolicy": "per-model",
                     "runtimePath": str(
-                        self.root.parent
-                        / "runtimes"
-                        / "commercial-quality"
-                        / "Scripts"
-                        / "python.exe"
+                        runtime_root / "musetalk" / "Scripts" / "python.exe"
                     ),
                     "entryPoint": str(
-                        self.root.parent
-                        / "tools"
-                        / "commercial-quality"
-                        / "evaluate.py"
+                        Path(__file__).resolve().parents[1]
+                        / "video_quality_worker.py"
                     ),
-                    "modelRoot": str(
-                        self.root.parent / "models" / "commercial-quality"
-                    ),
-                    "requiredModels": ["**/syncnet*.pt", "**/open_clip*.safetensors"],
+                    "modelRoot": str(self.root.parent),
+                    "requiredModels": [
+                        "tools/MuseTalk/models/syncnet/latentsync_syncnet.pt",
+                        "models/openclip-vit-b32/open_clip_pytorch_model.bin",
+                        "models/opencv/face_detection_yunet_2023mar.onnx",
+                    ],
                     "commandDescriptor": str(
                         self.root.parent
                         / "workflows"
@@ -486,13 +551,7 @@ class ProviderActivationManager:
                 else:
                     provider.pop(policy_field, None)
             provider["requiredModels"] = list(
-                dict.fromkeys(
-                    default_provider.get("requiredModels", [])
-                    + current_by_id.get(default_provider["id"], {}).get(
-                        "requiredModels",
-                        [],
-                    )
-                )
+                dict.fromkeys(default_provider.get("requiredModels", []))
             )
             if (
                 provider["id"] == "ffmpeg-local"
@@ -694,8 +753,13 @@ class ProviderActivationManager:
                         ]
                     )
                     if python.exists():
+                        module_name = provider.get("module", "qwen_tts")
+                        health_source = (
+                            "import importlib.util,sys;"
+                            f"sys.exit(0 if importlib.util.find_spec({module_name!r}) else 1)"
+                        )
                         result = subprocess.run(
-                            [str(python), "-c", f"import {provider.get('module', 'qwen_tts')}"],
+                            [str(python), "-c", health_source],
                             capture_output=True,
                             text=True,
                             timeout=timeout,
