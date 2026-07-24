@@ -38,6 +38,18 @@ It is not a standalone product. It provides the reusable runtime services that f
 - Future Mobile API local contract
 - Future Cloud Sync governance contract
 - Future Multi-user governance contract
+- Workflow Visual Editor
+- Agent Memory Store
+- Prompt Laboratory
+- Provider Simulator
+- Model Sandbox
+- Project Workspace snapshots and template cloning
+- Structured Knowledge Engine
+- Testing Infrastructure
+- Performance Optimizer and local cache
+- Packaging Manager
+- Production Readiness Center
+- Temple Studio Launcher
 
 ## Local CLI
 
@@ -80,6 +92,16 @@ Local-only endpoints:
 - `GET /mobile/v1/status`
 - `GET /api/cloud-sync`
 - `GET /api/multi-user`
+- `GET /api/workflow-editor`
+- `GET /api/prompt-lab`
+- `GET /api/provider-simulator`
+- `GET /api/model-sandbox`
+- `GET /api/developer-sdk`
+- `GET /api/testing`
+- `GET /api/performance`
+- `GET /api/packaging`
+- `GET /api/production-readiness`
+- `GET /`
 - `POST /api/queue`
 - `POST /api/worker/run-once`
 - `POST /api/workflows/run`
@@ -88,6 +110,27 @@ Local-only endpoints:
 - `POST /api/agents/queue`
 - `POST /api/collaboration`
 - `POST /api/support-package`
+- `POST /api/workflow-editor/clone-template`
+- `POST /api/workflow-editor/save`
+- `POST /api/prompt-lab/optimize`
+- `POST /api/prompt-lab/compare`
+- `POST /api/provider-simulator/generate`
+- `POST /api/model-sandbox/benchmark`
+- `POST /api/production-readiness/diagnostics`
+- `POST /api/packaging/portable-manifest`
+
+## Offline Development
+
+Temple OS includes local simulators so engineering can continue before paid APIs, API keys or Emma datasets arrive.
+
+- Mock image generation writes `.mock-image.json` artifacts.
+- Mock video generation writes `.mock-video.json` artifacts.
+- Mock TTS writes `.mock-tts.json` artifacts.
+- Model Sandbox benchmarks mock providers offline.
+- Prompt Laboratory versions, compares, scores and optimizes prompts.
+- Workflow Visual Editor stores node-based workflow graphs and validates edges.
+- Job Queue supports priority, dependencies, cancellation, resume, retry and worker batches.
+- Production Readiness Center supports startup diagnostics, safe mode and repair-mode readiness.
 
 ## Safety Rules
 

@@ -68,6 +68,9 @@ operations/temple-os/logs/
 operations/temple-os/backups/
 operations/temple-os/support/
 operations/temple-os/tmp/
+operations/temple-os/cache/
+operations/temple-os/packages/
+operations/temple-os/diagnostics/
 
 # Large product generation outputs
 videos/factory/exports/

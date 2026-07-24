@@ -61,6 +61,22 @@ class TempleOSKernelTests(unittest.TestCase):
         second = self.kernel.worker.run_once()
         self.assertEqual(second["task"]["status"], "completed")
 
+    def test_job_queue_dependencies_cancel_resume_and_parallel(self) -> None:
+        first = self.kernel.queue.enqueue("prompt-optimize", {"prompt": "Temple product"}, priority=20)
+        second = self.kernel.queue.enqueue("provider-simulate", {"capability": "image", "prompt": "Temple product"}, priority=90, depends_on=[first["id"]])
+        result = self.kernel.worker.run_once()
+        self.assertEqual(result["task"]["id"], first["id"])
+        result = self.kernel.worker.run_once()
+        self.assertEqual(result["task"]["id"], second["id"])
+
+        cancelled = self.kernel.queue.enqueue("health-check", {})
+        self.assertEqual(self.kernel.queue.cancel(cancelled["id"])["status"], "cancelled")
+        self.assertEqual(self.kernel.queue.resume(cancelled["id"])["status"], "queued")
+        graph = self.kernel.queue.dependency_graph()
+        self.assertGreaterEqual(len(graph["nodes"]), 3)
+        batch = self.kernel.queue.run_parallel(self.kernel.worker, limit=2)
+        self.assertGreaterEqual(batch["processed"], 1)
+
     def test_ai_agent_plan_queue_and_collaboration(self) -> None:
         plan = self.kernel.agents.create_plan("請用繁體中文產生一支產品短影片", app_id="temple-product-video-generator")
         self.assertEqual(plan["status"], "planned")
@@ -136,6 +152,56 @@ class TempleOSKernelTests(unittest.TestCase):
         status = self.kernel.plugins.status()
         self.assertEqual(status["installed"], 1)
         self.assertTrue(status["plugins"][0]["validation"]["ok"])
+        self.assertTrue(self.kernel.plugins.configure("sample", {"mode": "test"})["lifecycle"]["configured"])
+        self.assertTrue(self.kernel.plugins.load_plugin("sample")["lifecycle"]["loaded"])
+        self.assertFalse(self.kernel.plugins.set_enabled("sample", False)["lifecycle"]["enabled"])
+
+    def test_local_capability_infrastructure(self) -> None:
+        workflow = self.kernel.workflow_editor.clone_template("template.product-video", "Unit Workflow")
+        self.assertTrue(workflow["validation"]["ok"])
+
+        memory = self.kernel.agent_memory.remember("intent-analyst", "preference", {"tone": "commercial"})
+        self.assertEqual(memory["key"], "preference")
+        self.assertEqual(len(self.kernel.agent_memory.recall("intent-analyst", "preference")), 1)
+
+        optimized = self.kernel.prompt_lab.optimize("Temple product", "comfyui-local")
+        self.assertIn("commercial-ready", optimized["optimized"])
+        compared = self.kernel.prompt_lab.compare("short", optimized["optimized"])
+        self.assertEqual(compared["winner"], "b")
+
+        image = self.kernel.provider_simulator.generate("image", "Temple product")
+        self.assertTrue(Path(image["artifact"]).exists())
+        bench = self.kernel.model_sandbox.run_benchmark("mock-model", "video", ["A", "B"])
+        self.assertEqual(bench["prompts"], 2)
+
+        project = self.kernel.projects.create("Workspace Unit", "temple-product-video-generator")
+        snapshot = self.kernel.workspace_system.snapshot(project["id"], "unit")
+        self.assertEqual(snapshot["projectId"], project["id"])
+        clone = self.kernel.workspace_system.clone_template(project["id"], "Workspace Clone")
+        self.assertEqual(clone["metadata"]["clonedFrom"], project["id"])
+
+        knowledge = self.kernel.structured_knowledge.add("product", "Incense", {"material": "wood"}, ["product"])
+        self.assertEqual(knowledge["fields"]["material"], "wood")
+
+        sdk = self.kernel.developer_sdk.generate_docs()
+        self.assertTrue(Path(sdk["docsPath"]).exists())
+
+        test_run = self.kernel.testing.stress_queue(self.kernel.queue, count=2)
+        self.assertEqual(test_run["overall"], "PASS")
+
+        self.kernel.performance.cache_put("unit", {"value": 1})
+        self.assertEqual(self.kernel.performance.cache_get("unit"), {"value": 1})
+        self.assertEqual(self.kernel.performance.cleanup()["removed"], 0)
+
+        env = self.kernel.packaging.environment_check()
+        self.assertEqual(env["overall"], "PASS")
+        portable = self.kernel.packaging.create_portable_manifest()
+        self.assertTrue(Path(portable["manifestPath"]).exists())
+
+        diagnostics = self.kernel.production_readiness.startup_diagnostics()
+        self.assertEqual(diagnostics["overall"], "PASS")
+        self.assertTrue(self.kernel.production_readiness.set_safe_mode(True)["safeMode"])
+        self.assertIn("Temple AI Studio", self.kernel.launcher.html(self.kernel.status()))
 
     def test_backup_and_confirmed_restore(self) -> None:
         self.kernel.ensure_initialized()
@@ -198,6 +264,10 @@ class TempleOSKernelTests(unittest.TestCase):
             with urllib.request.urlopen(f"http://127.0.0.1:{port}/mobile/v1/status", timeout=5) as response:
                 payload = json.loads(response.read().decode("utf-8"))
             self.assertEqual(payload["mobile"]["status"], "local-contract-ready")
+
+            with urllib.request.urlopen(f"http://127.0.0.1:{port}/", timeout=5) as response:
+                html = response.read().decode("utf-8")
+            self.assertIn("Temple AI Studio", html)
         finally:
             server.shutdown()
             server.server_close()

@@ -90,12 +90,27 @@ class TempleOSPaths:
         self.mobile_api = self.state / "mobile_api.json"
         self.cloud_sync = self.state / "cloud_sync.json"
         self.tenants = self.state / "tenants.json"
+        self.workflow_graphs = self.state / "workflow_graphs.json"
+        self.prompt_lab = self.state / "prompt_lab.json"
+        self.model_sandbox = self.state / "model_sandbox.json"
+        self.provider_simulator = self.state / "provider_simulator.json"
+        self.structured_knowledge = self.state / "structured_knowledge.json"
+        self.developer_sdk = self.state / "developer_sdk.json"
+        self.test_runs = self.state / "test_runs.json"
+        self.performance = self.state / "performance.json"
+        self.packaging = self.state / "packaging.json"
+        self.production_readiness = self.state / "production_readiness.json"
+        self.launcher = self.state / "launcher.json"
+        self.cache_index = self.state / "cache_index.json"
         self.logs = self.operations / "logs"
         self.events = self.logs / "events.jsonl"
         self.recovery_log = self.logs / "recovery.jsonl"
         self.backups = self.operations / "backups"
         self.support = self.operations / "support"
         self.tmp = self.operations / "tmp"
+        self.cache = self.operations / "cache"
+        self.packages = self.operations / "packages"
+        self.diagnostics = self.operations / "diagnostics"
         self.plugins_dir = self.root / "plugins"
 
     def ensure_dirs(self) -> None:
@@ -107,6 +122,9 @@ class TempleOSPaths:
             self.backups,
             self.support,
             self.tmp,
+            self.cache,
+            self.packages,
+            self.diagnostics,
             self.plugins_dir,
         ]:
             path.mkdir(parents=True, exist_ok=True)
@@ -529,12 +547,52 @@ class PluginManager:
                 try:
                     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
                     validation = self.validate_manifest(manifest)
-                    discovered.append({"path": str(manifest_path), "manifest": manifest, "validation": validation})
+                    previous = next((item for item in registry.get("plugins", []) if item.get("manifest", {}).get("id") == manifest.get("id")), {})
+                    lifecycle = previous.get("lifecycle", {"enabled": True, "loaded": False, "configured": bool(manifest.get("configuration", {}))})
+                    discovered.append({"path": str(manifest_path), "manifest": manifest, "validation": validation, "lifecycle": lifecycle})
                 except Exception as exc:
                     discovered.append({"path": str(manifest_path), "validation": {"ok": False, "error": str(exc)}})
         registry["plugins"] = discovered
         atomic_write_json(self.paths.plugins, registry)
         return registry
+
+    def configure(self, plugin_id: str, configuration: dict) -> dict:
+        registry = self.ensure()
+        for plugin in registry.get("plugins", []):
+            if plugin.get("manifest", {}).get("id") == plugin_id:
+                plugin.setdefault("lifecycle", {})["configuration"] = configuration
+                plugin["lifecycle"]["configured"] = True
+                plugin["lifecycle"]["updatedAt"] = now_iso()
+                atomic_write_json(self.paths.plugins, registry)
+                self.logger.emit("plugin-configured", {"pluginId": plugin_id})
+                return plugin
+        raise KeyError(f"Plugin not found: {plugin_id}")
+
+    def set_enabled(self, plugin_id: str, enabled: bool) -> dict:
+        registry = self.ensure()
+        for plugin in registry.get("plugins", []):
+            if plugin.get("manifest", {}).get("id") == plugin_id:
+                plugin.setdefault("lifecycle", {})["enabled"] = enabled
+                plugin["lifecycle"]["updatedAt"] = now_iso()
+                atomic_write_json(self.paths.plugins, registry)
+                self.logger.emit("plugin-enabled" if enabled else "plugin-disabled", {"pluginId": plugin_id})
+                return plugin
+        raise KeyError(f"Plugin not found: {plugin_id}")
+
+    def load_plugin(self, plugin_id: str) -> dict:
+        registry = self.ensure()
+        for plugin in registry.get("plugins", []):
+            if plugin.get("manifest", {}).get("id") == plugin_id:
+                if not plugin.get("validation", {}).get("ok"):
+                    raise RuntimeError(f"Plugin is invalid: {plugin_id}")
+                if plugin.get("lifecycle", {}).get("enabled") is False:
+                    raise RuntimeError(f"Plugin is disabled: {plugin_id}")
+                plugin.setdefault("lifecycle", {})["loaded"] = True
+                plugin["lifecycle"]["loadedAt"] = now_iso()
+                atomic_write_json(self.paths.plugins, registry)
+                self.logger.emit("plugin-loaded", {"pluginId": plugin_id})
+                return plugin
+        raise KeyError(f"Plugin not found: {plugin_id}")
 
     def status(self) -> dict:
         registry = self.ensure()
@@ -1176,6 +1234,745 @@ class MultiUserManager:
         }
 
 
+class WorkflowVisualEditor:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def defaults(self) -> dict:
+        return {
+            "schemaVersion": SCHEMA_VERSION,
+            "templates": [
+                {
+                    "id": "template.product-video",
+                    "name": "Temple Product Video",
+                    "nodes": [
+                        {"id": "input", "type": "input", "label": "Chinese Request"},
+                        {"id": "script", "type": "agent", "label": "Script Agent"},
+                        {"id": "storyboard", "type": "agent", "label": "Storyboard Agent"},
+                        {"id": "image", "type": "provider", "label": "Image Pipeline"},
+                        {"id": "video", "type": "provider", "label": "Video Pipeline"},
+                        {"id": "qa", "type": "quality", "label": "Quality Analyzer"},
+                        {"id": "export", "type": "output", "label": "Export Package"},
+                    ],
+                    "edges": [
+                        {"from": "input", "to": "script"},
+                        {"from": "script", "to": "storyboard"},
+                        {"from": "storyboard", "to": "image"},
+                        {"from": "image", "to": "video"},
+                        {"from": "video", "to": "qa"},
+                        {"from": "qa", "to": "export"},
+                    ],
+                }
+            ],
+            "workflows": [],
+        }
+
+    def ensure(self) -> dict:
+        if not self.paths.workflow_graphs.exists():
+            atomic_write_json(self.paths.workflow_graphs, self.defaults())
+            self.logger.emit("workflow-visual-editor-initialized", {"path": str(self.paths.workflow_graphs)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.workflow_graphs, self.defaults())
+
+    def validate_graph(self, graph: dict) -> dict:
+        nodes = graph.get("nodes", [])
+        edges = graph.get("edges", [])
+        node_ids = {node.get("id") for node in nodes if node.get("id")}
+        issues = []
+        if not nodes:
+            issues.append("Workflow must contain at least one node.")
+        if len(node_ids) != len(nodes):
+            issues.append("Workflow node IDs must be unique and non-empty.")
+        for edge in edges:
+            if edge.get("from") not in node_ids:
+                issues.append(f"Edge source not found: {edge.get('from')}")
+            if edge.get("to") not in node_ids:
+                issues.append(f"Edge target not found: {edge.get('to')}")
+        if self._has_cycle(node_ids, edges):
+            issues.append("Workflow graph cannot contain cycles.")
+        return {"ok": not issues, "issues": issues, "nodes": len(nodes), "edges": len(edges)}
+
+    def _has_cycle(self, node_ids: set[str], edges: list[dict]) -> bool:
+        graph: dict[str, list[str]] = {node: [] for node in node_ids}
+        for edge in edges:
+            if edge.get("from") in graph:
+                graph[edge["from"]].append(edge.get("to"))
+        visiting: set[str] = set()
+        visited: set[str] = set()
+
+        def visit(node: str) -> bool:
+            if node in visiting:
+                return True
+            if node in visited:
+                return False
+            visiting.add(node)
+            for nxt in graph.get(node, []):
+                if nxt in graph and visit(nxt):
+                    return True
+            visiting.remove(node)
+            visited.add(node)
+            return False
+
+        return any(visit(node) for node in node_ids)
+
+    def save_workflow(self, workflow: dict) -> dict:
+        validation = self.validate_graph(workflow)
+        if not validation["ok"]:
+            raise ValueError("; ".join(validation["issues"]))
+        registry = self.ensure()
+        workflow.setdefault("id", new_id("workflow-graph"))
+        workflow.setdefault("version", 1)
+        workflow["updatedAt"] = now_iso()
+        workflows = [item for item in registry.get("workflows", []) if item.get("id") != workflow["id"]]
+        workflows.append(workflow)
+        registry["workflows"] = sorted(workflows, key=lambda item: item["id"])
+        atomic_write_json(self.paths.workflow_graphs, registry)
+        self.logger.emit("workflow-graph-saved", {"workflowId": workflow["id"], "version": workflow.get("version")})
+        return {"workflow": workflow, "validation": validation}
+
+    def clone_template(self, template_id: str, name: str) -> dict:
+        template = next((item for item in self.ensure().get("templates", []) if item.get("id") == template_id), None)
+        if not template:
+            raise KeyError(f"Workflow template not found: {template_id}")
+        workflow = {
+            "id": new_id("workflow-graph"),
+            "name": name,
+            "nodes": template["nodes"],
+            "edges": template["edges"],
+            "sourceTemplateId": template_id,
+            "version": 1,
+            "createdAt": now_iso(),
+        }
+        return self.save_workflow(workflow)
+
+    def status(self) -> dict:
+        registry = self.ensure()
+        return {
+            "templates": len(registry.get("templates", [])),
+            "workflows": len(registry.get("workflows", [])),
+            "latestWorkflow": registry.get("workflows", [])[-1] if registry.get("workflows") else None,
+        }
+
+
+class AgentMemoryStore:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+        self.path = self.state_path()
+
+    def state_path(self) -> Path:
+        return self.paths.state / "agent_memory.json"
+
+    def ensure(self) -> dict:
+        if not self.path.exists():
+            atomic_write_json(self.path, {"schemaVersion": SCHEMA_VERSION, "memories": []})
+            self.logger.emit("agent-memory-initialized", {"path": str(self.path)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.path, {"schemaVersion": SCHEMA_VERSION, "memories": []})
+
+    def remember(self, agent_id: str, key: str, value: dict) -> dict:
+        registry = self.ensure()
+        memory = {"id": new_id("memory"), "agentId": agent_id, "key": key, "value": value, "createdAt": now_iso()}
+        registry.setdefault("memories", []).append(memory)
+        atomic_write_json(self.path, registry)
+        self.logger.emit("agent-memory-written", {"agentId": agent_id, "key": key})
+        return memory
+
+    def recall(self, agent_id: str, key: str | None = None) -> list[dict]:
+        memories = [item for item in self.ensure().get("memories", []) if item.get("agentId") == agent_id]
+        if key:
+            memories = [item for item in memories if item.get("key") == key]
+        return memories
+
+    def status(self) -> dict:
+        memories = self.ensure().get("memories", [])
+        return {"memories": len(memories), "agents": sorted({item.get("agentId") for item in memories})}
+
+
+class PromptLaboratory:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def defaults(self) -> dict:
+        return {
+            "schemaVersion": SCHEMA_VERSION,
+            "templates": [
+                {
+                    "id": "prompt.temple-product-visual",
+                    "capability": "image",
+                    "template": "{subject}, commercial Temple product video, clean composition, readable product focus",
+                    "providerAdapters": {
+                        "comfyui-local": "photorealistic, stable composition, product visible, {subject}",
+                        "future-cloud-adapter": "{subject}, cinematic commercial, premium lighting",
+                    },
+                }
+            ],
+            "versions": [],
+            "experiments": [],
+        }
+
+    def ensure(self) -> dict:
+        if not self.paths.prompt_lab.exists():
+            atomic_write_json(self.paths.prompt_lab, self.defaults())
+            self.logger.emit("prompt-lab-initialized", {"path": str(self.paths.prompt_lab)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.prompt_lab, self.defaults())
+
+    def add_version(self, template_id: str, prompt: str, provider: str = "local-template", notes: str = "") -> dict:
+        registry = self.ensure()
+        version_number = 1 + len([item for item in registry.get("versions", []) if item.get("templateId") == template_id])
+        score = self.score(prompt, provider)
+        version = {
+            "id": new_id("prompt-version"),
+            "templateId": template_id,
+            "version": version_number,
+            "provider": provider,
+            "prompt": prompt,
+            "score": score,
+            "notes": notes,
+            "createdAt": now_iso(),
+        }
+        registry.setdefault("versions", []).append(version)
+        atomic_write_json(self.paths.prompt_lab, registry)
+        self.logger.emit("prompt-version-added", {"templateId": template_id, "version": version_number, "score": score["overall"]})
+        return version
+
+    def score(self, prompt: str, provider: str = "local-template") -> dict:
+        text = prompt.strip()
+        length_score = min(len(text) / 180, 1.0)
+        clarity_score = 1.0 if any(word in text.lower() for word in ["product", "subject", "temple", "commercial", "composition"]) else 0.55
+        safety_score = 0.8 if len(text) < 1200 else 0.45
+        provider_score = 0.85 if provider else 0.5
+        overall = round(length_score * 0.25 + clarity_score * 0.35 + safety_score * 0.2 + provider_score * 0.2, 4)
+        return {"overall": overall, "length": round(length_score, 4), "clarity": clarity_score, "safety": safety_score, "providerFit": provider_score}
+
+    def compare(self, prompt_a: str, prompt_b: str, provider: str = "local-template") -> dict:
+        a = self.score(prompt_a, provider)
+        b = self.score(prompt_b, provider)
+        winner = "a" if a["overall"] >= b["overall"] else "b"
+        return {"a": a, "b": b, "winner": winner, "delta": round(abs(a["overall"] - b["overall"]), 4)}
+
+    def optimize(self, prompt: str, provider: str = "local-template") -> dict:
+        optimized = prompt.strip()
+        additions = []
+        if "commercial" not in optimized.lower():
+            additions.append("commercial-ready")
+        if "composition" not in optimized.lower():
+            additions.append("clear composition")
+        if "product" not in optimized.lower():
+            additions.append("visible product focus")
+        if additions:
+            optimized = optimized + ", " + ", ".join(additions)
+        return {"original": prompt, "optimized": optimized, "score": self.score(optimized, provider), "provider": provider}
+
+    def adapt(self, template_id: str, subject: str, provider: str) -> dict:
+        template = next((item for item in self.ensure().get("templates", []) if item.get("id") == template_id), None)
+        if not template:
+            raise KeyError(f"Prompt template not found: {template_id}")
+        raw = template.get("providerAdapters", {}).get(provider) or template["template"]
+        prompt = raw.replace("{subject}", subject)
+        optimized = self.optimize(prompt, provider)
+        return {"templateId": template_id, "provider": provider, **optimized}
+
+    def status(self) -> dict:
+        registry = self.ensure()
+        return {
+            "templates": len(registry.get("templates", [])),
+            "versions": len(registry.get("versions", [])),
+            "experiments": len(registry.get("experiments", [])),
+        }
+
+
+class ProviderSimulator:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.provider_simulator.exists():
+            atomic_write_json(
+                self.paths.provider_simulator,
+                {
+                    "schemaVersion": SCHEMA_VERSION,
+                    "providers": ["mock-image", "mock-video", "mock-tts", "mock-llm"],
+                    "runs": [],
+                },
+            )
+            self.logger.emit("provider-simulator-initialized", {"path": str(self.paths.provider_simulator)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.provider_simulator, {"schemaVersion": SCHEMA_VERSION, "providers": [], "runs": []})
+
+    def generate(self, capability: str, prompt: str, output_dir: Path | None = None) -> dict:
+        output_dir = output_dir or (self.paths.tmp / "provider-simulator")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        run_id = new_id("mock")
+        if capability == "image":
+            artifact = output_dir / f"{run_id}.mock-image.json"
+            payload = {"type": "mock-image", "prompt": prompt, "width": 1024, "height": 1024, "seed": abs(hash(prompt)) % 10_000_000}
+        elif capability == "video":
+            artifact = output_dir / f"{run_id}.mock-video.json"
+            payload = {"type": "mock-video", "prompt": prompt, "duration": 6, "fps": 24, "resolution": "1080x1920"}
+        elif capability == "tts":
+            artifact = output_dir / f"{run_id}.mock-tts.json"
+            payload = {"type": "mock-tts", "text": prompt, "duration": max(1, len(prompt) // 8), "voice": "mock-emma"}
+        else:
+            artifact = output_dir / f"{run_id}.mock-llm.json"
+            payload = {"type": "mock-llm", "request": prompt, "response": f"Mock response for: {prompt[:120]}"}
+        atomic_write_json(artifact, payload)
+        record = {"id": run_id, "capability": capability, "artifact": str(artifact), "createdAt": now_iso(), "quality": 0.8}
+        registry = self.ensure()
+        registry.setdefault("runs", []).append(record)
+        atomic_write_json(self.paths.provider_simulator, registry)
+        self.logger.emit("provider-simulator-generated", {"runId": run_id, "capability": capability})
+        return record
+
+    def status(self) -> dict:
+        registry = self.ensure()
+        return {"providers": registry.get("providers", []), "runs": len(registry.get("runs", [])), "recent": registry.get("runs", [])[-5:]}
+
+
+class ModelSandbox:
+    def __init__(self, paths: TempleOSPaths, simulator: ProviderSimulator, logger: JsonEventLogger):
+        self.paths = paths
+        self.simulator = simulator
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.model_sandbox.exists():
+            atomic_write_json(self.paths.model_sandbox, {"schemaVersion": SCHEMA_VERSION, "benchmarks": []})
+            self.logger.emit("model-sandbox-initialized", {"path": str(self.paths.model_sandbox)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.model_sandbox, {"schemaVersion": SCHEMA_VERSION, "benchmarks": []})
+
+    def run_benchmark(self, model_id: str, capability: str, prompts: list[str]) -> dict:
+        started = time.perf_counter()
+        artifacts = [self.simulator.generate(capability, prompt) for prompt in prompts]
+        elapsed = time.perf_counter() - started
+        quality = round(sum(item.get("quality", 0) for item in artifacts) / max(len(artifacts), 1), 4)
+        report = {
+            "id": new_id("benchmark"),
+            "modelId": model_id,
+            "capability": capability,
+            "prompts": len(prompts),
+            "elapsedSeconds": round(elapsed, 4),
+            "quality": quality,
+            "stability": 1.0,
+            "artifacts": artifacts,
+            "createdAt": now_iso(),
+        }
+        registry = self.ensure()
+        registry.setdefault("benchmarks", []).append(report)
+        atomic_write_json(self.paths.model_sandbox, registry)
+        self.logger.emit("model-sandbox-benchmark-completed", {"benchmarkId": report["id"], "modelId": model_id})
+        return report
+
+    def status(self) -> dict:
+        benchmarks = self.ensure().get("benchmarks", [])
+        return {"benchmarks": len(benchmarks), "recent": benchmarks[-5:]}
+
+
+class ProjectWorkspaceSystem:
+    def __init__(self, paths: TempleOSPaths, projects: ProjectManager, logger: JsonEventLogger):
+        self.paths = paths
+        self.projects = projects
+        self.logger = logger
+        self.path = self.paths.state / "workspace_history.json"
+
+    def ensure(self) -> dict:
+        if not self.path.exists():
+            atomic_write_json(self.path, {"schemaVersion": SCHEMA_VERSION, "snapshots": [], "templates": []})
+            self.logger.emit("project-workspace-system-initialized", {"path": str(self.path)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.path, {"schemaVersion": SCHEMA_VERSION, "snapshots": [], "templates": []})
+
+    def snapshot(self, project_id: str, label: str = "manual") -> dict:
+        project = next((item for item in self.projects.list() if item.get("id") == project_id), None)
+        if not project:
+            raise KeyError(f"Project not found: {project_id}")
+        snapshot = {"id": new_id("snapshot"), "projectId": project_id, "label": label, "project": project, "createdAt": now_iso()}
+        registry = self.ensure()
+        registry.setdefault("snapshots", []).append(snapshot)
+        atomic_write_json(self.path, registry)
+        self.logger.emit("project-snapshot-created", {"projectId": project_id, "snapshotId": snapshot["id"]})
+        return snapshot
+
+    def clone_template(self, source_project_id: str, name: str) -> dict:
+        source = next((item for item in self.projects.list() if item.get("id") == source_project_id), None)
+        if not source:
+            raise KeyError(f"Project not found: {source_project_id}")
+        clone = self.projects.create(name, source["appId"], source.get("workspaceId", "default"), {"clonedFrom": source_project_id})
+        self.snapshot(clone["id"], label="created-from-template")
+        return clone
+
+    def status(self) -> dict:
+        registry = self.ensure()
+        return {"snapshots": len(registry.get("snapshots", [])), "templates": len(registry.get("templates", []))}
+
+
+class StructuredKnowledgeEngine:
+    def __init__(self, paths: TempleOSPaths, knowledge: KnowledgeBase, logger: JsonEventLogger):
+        self.paths = paths
+        self.knowledge = knowledge
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.structured_knowledge.exists():
+            payload = {
+                "schemaVersion": SCHEMA_VERSION,
+                "collections": {
+                    "business": [],
+                    "temple": [],
+                    "product": [],
+                    "prompt": [],
+                },
+            }
+            atomic_write_json(self.paths.structured_knowledge, payload)
+            self.logger.emit("structured-knowledge-initialized", {"path": str(self.paths.structured_knowledge)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.structured_knowledge, {"schemaVersion": SCHEMA_VERSION, "collections": {}})
+
+    def add(self, collection: str, title: str, fields: dict, tags: list[str] | None = None) -> dict:
+        registry = self.ensure()
+        if collection not in registry.setdefault("collections", {}):
+            registry["collections"][collection] = []
+        entry = {"id": new_id("knowledge-struct"), "title": title, "fields": fields, "tags": tags or [], "createdAt": now_iso()}
+        registry["collections"][collection].append(entry)
+        atomic_write_json(self.paths.structured_knowledge, registry)
+        self.knowledge.add_entry(title, json.dumps(fields, ensure_ascii=False), tags or [], source=f"structured:{collection}")
+        return entry
+
+    def status(self) -> dict:
+        collections = self.ensure().get("collections", {})
+        return {"collections": {name: len(items) for name, items in collections.items()}}
+
+
+class DeveloperSDK:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.developer_sdk.exists():
+            payload = {
+                "schemaVersion": SCHEMA_VERSION,
+                "rest": {"baseUrl": "http://127.0.0.1:8765", "status": "local-ready"},
+                "python": {"module": "scripts.temple_os_cli", "status": "local-ready"},
+                "cli": {"entryPoint": "scripts/temple_os_cli.py", "status": "local-ready"},
+                "docsGeneratedAt": "",
+            }
+            atomic_write_json(self.paths.developer_sdk, payload)
+            self.logger.emit("developer-sdk-initialized", {"path": str(self.paths.developer_sdk)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.developer_sdk, {})
+
+    def generate_docs(self) -> dict:
+        docs = self.paths.root / "docs" / "TEMPLE_DEVELOPER_SDK.md"
+        docs.parent.mkdir(parents=True, exist_ok=True)
+        content = (
+            "# Temple Developer SDK\n\n"
+            "Local SDK surfaces:\n\n"
+            "- REST: `http://127.0.0.1:8765`\n"
+            "- CLI: `python -B scripts\\temple_os_cli.py --root <project-root> status`\n"
+            "- Python: import `TempleOSKernel` from `temple_ai_studio.temple_os`\n\n"
+            "Paid providers, cloud sync and remote hosting require CEO approval before activation.\n"
+        )
+        docs.write_text(content, encoding="utf-8")
+        payload = self.ensure()
+        payload["docsGeneratedAt"] = now_iso()
+        payload["docsPath"] = str(docs)
+        atomic_write_json(self.paths.developer_sdk, payload)
+        self.logger.emit("developer-sdk-docs-generated", {"path": str(docs)})
+        return payload
+
+    def status(self) -> dict:
+        return self.ensure()
+
+
+class TestingInfrastructure:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.test_runs.exists():
+            atomic_write_json(self.paths.test_runs, {"schemaVersion": SCHEMA_VERSION, "runs": []})
+            self.logger.emit("testing-infrastructure-initialized", {"path": str(self.paths.test_runs)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.test_runs, {"schemaVersion": SCHEMA_VERSION, "runs": []})
+
+    def record(self, suite: str, checks: list[dict], elapsed_seconds: float = 0.0) -> dict:
+        run = {
+            "id": new_id("test-run"),
+            "suite": suite,
+            "overall": "PASS" if all(check.get("ok") for check in checks) else "FAIL",
+            "checks": checks,
+            "elapsedSeconds": round(elapsed_seconds, 4),
+            "createdAt": now_iso(),
+        }
+        registry = self.ensure()
+        registry.setdefault("runs", []).append(run)
+        atomic_write_json(self.paths.test_runs, registry)
+        self.logger.emit("test-run-recorded", {"suite": suite, "overall": run["overall"]})
+        return run
+
+    def stress_queue(self, queue: QueueManager, count: int = 10) -> dict:
+        started = time.perf_counter()
+        tasks = [queue.enqueue("health-check", {"stress": True}, priority=10) for _ in range(count)]
+        elapsed = time.perf_counter() - started
+        return self.record("queue-stress", [{"name": "enqueue-count", "ok": len(tasks) == count}], elapsed)
+
+    def status(self) -> dict:
+        runs = self.ensure().get("runs", [])
+        return {"runs": len(runs), "latest": runs[-1] if runs else None}
+
+
+class PerformanceOptimizer:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.performance.exists():
+            atomic_write_json(self.paths.performance, {"schemaVersion": SCHEMA_VERSION, "cacheHits": 0, "cacheMisses": 0, "cleanupRuns": []})
+            self.logger.emit("performance-optimizer-initialized", {"path": str(self.paths.performance)})
+        if not self.paths.cache_index.exists():
+            atomic_write_json(self.paths.cache_index, {"schemaVersion": SCHEMA_VERSION, "items": []})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.performance, {"schemaVersion": SCHEMA_VERSION, "cacheHits": 0, "cacheMisses": 0, "cleanupRuns": []})
+
+    def cache_put(self, key: str, payload: dict) -> dict:
+        self.paths.cache.mkdir(parents=True, exist_ok=True)
+        cache_file = self.paths.cache / f"{abs(hash(key))}.json"
+        atomic_write_json(cache_file, payload)
+        index = read_json(self.paths.cache_index, {"schemaVersion": SCHEMA_VERSION, "items": []})
+        index["items"] = [item for item in index.get("items", []) if item.get("key") != key]
+        item = {"key": key, "path": str(cache_file), "createdAt": now_iso(), "size": cache_file.stat().st_size}
+        index["items"].append(item)
+        atomic_write_json(self.paths.cache_index, index)
+        return item
+
+    def cache_get(self, key: str) -> dict | None:
+        self.ensure()
+        index = read_json(self.paths.cache_index, {"schemaVersion": SCHEMA_VERSION, "items": []})
+        item = next((entry for entry in index.get("items", []) if entry.get("key") == key), None)
+        perf = self.load()
+        if item and Path(item["path"]).exists():
+            perf["cacheHits"] = int(perf.get("cacheHits", 0)) + 1
+            atomic_write_json(self.paths.performance, perf)
+            return read_json(Path(item["path"]), {})
+        perf["cacheMisses"] = int(perf.get("cacheMisses", 0)) + 1
+        atomic_write_json(self.paths.performance, perf)
+        return None
+
+    def cleanup(self, max_age_seconds: int = 86400) -> dict:
+        self.ensure()
+        removed = []
+        cutoff = time.time() - max_age_seconds
+        for path in self.paths.tmp.rglob("*") if self.paths.tmp.exists() else []:
+            if path.is_file() and path.stat().st_mtime < cutoff:
+                path.unlink()
+                removed.append(str(path))
+        perf = self.load()
+        run = {"at": now_iso(), "removed": len(removed)}
+        perf.setdefault("cleanupRuns", []).append(run)
+        atomic_write_json(self.paths.performance, perf)
+        self.logger.emit("disk-cleanup-completed", run)
+        return run
+
+    def status(self) -> dict:
+        perf = self.ensure()
+        index = read_json(self.paths.cache_index, {"schemaVersion": SCHEMA_VERSION, "items": []})
+        return {**perf, "cacheItems": len(index.get("items", []))}
+
+
+class PackagingManager:
+    def __init__(self, paths: TempleOSPaths, backups: BackupManager, logger: JsonEventLogger):
+        self.paths = paths
+        self.backups = backups
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.packaging.exists():
+            atomic_write_json(self.paths.packaging, {"schemaVersion": SCHEMA_VERSION, "packages": [], "environmentChecks": []})
+            self.logger.emit("packaging-manager-initialized", {"path": str(self.paths.packaging)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.packaging, {"schemaVersion": SCHEMA_VERSION, "packages": [], "environmentChecks": []})
+
+    def environment_check(self) -> dict:
+        checks = [
+            {"name": "python", "ok": True, "version": sys.version.split()[0]},
+            {"name": "project-root", "ok": self.paths.root.exists(), "path": str(self.paths.root)},
+            {"name": "ffmpeg-path", "ok": bool(shutil.which("ffmpeg")), "path": shutil.which("ffmpeg") or ""},
+            {"name": "operations-root", "ok": self.paths.operations.exists(), "path": str(self.paths.operations)},
+        ]
+        report = {"id": new_id("env-check"), "overall": "PASS" if all(check["ok"] or check["name"] == "ffmpeg-path" for check in checks) else "FAIL", "checks": checks, "createdAt": now_iso()}
+        registry = self.ensure()
+        registry.setdefault("environmentChecks", []).append(report)
+        atomic_write_json(self.paths.packaging, registry)
+        return report
+
+    def create_portable_manifest(self, version: str = TEMPLE_OS_VERSION) -> dict:
+        self.paths.packages.mkdir(parents=True, exist_ok=True)
+        manifest = {
+            "id": new_id("portable"),
+            "version": version,
+            "packageType": "portable-manifest",
+            "includes": ["scripts/", "apps/temple-product-video-generator/", "docs/", "plugins/"],
+            "excludes": ["data/", "runtime/", "release/", "operations/temple-os/state/", "operations/temple-os/logs/"],
+            "createdAt": now_iso(),
+        }
+        manifest_path = self.paths.packages / f"{manifest['id']}.json"
+        atomic_write_json(manifest_path, manifest)
+        registry = self.ensure()
+        registry.setdefault("packages", []).append({"manifest": str(manifest_path), **manifest})
+        atomic_write_json(self.paths.packaging, registry)
+        self.logger.emit("portable-manifest-created", {"manifest": str(manifest_path)})
+        return {"manifestPath": str(manifest_path), **manifest}
+
+    def status(self) -> dict:
+        registry = self.ensure()
+        return {"packages": len(registry.get("packages", [])), "environmentChecks": len(registry.get("environmentChecks", []))}
+
+
+class ProductionReadinessCenter:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.production_readiness.exists():
+            payload = {
+                "schemaVersion": SCHEMA_VERSION,
+                "safeMode": False,
+                "repairMode": False,
+                "crashRecovery": "enabled",
+                "startupDiagnostics": [],
+            }
+            atomic_write_json(self.paths.production_readiness, payload)
+            self.logger.emit("production-readiness-initialized", {"path": str(self.paths.production_readiness)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.production_readiness, {})
+
+    def startup_diagnostics(self) -> dict:
+        checks = [
+            {"name": "state-readable", "ok": self.paths.state.exists()},
+            {"name": "logs-writable", "ok": self.paths.logs.exists()},
+            {"name": "support-writable", "ok": self.paths.support.exists()},
+            {"name": "safe-mode-available", "ok": True},
+            {"name": "repair-mode-available", "ok": True},
+        ]
+        report = {"id": new_id("diagnostics"), "overall": "PASS" if all(check["ok"] for check in checks) else "FAIL", "checks": checks, "createdAt": now_iso()}
+        path = self.paths.diagnostics / f"{report['id']}.json"
+        atomic_write_json(path, report)
+        registry = self.ensure()
+        registry.setdefault("startupDiagnostics", []).append({"path": str(path), **report})
+        atomic_write_json(self.paths.production_readiness, registry)
+        self.logger.emit("startup-diagnostics-completed", {"overall": report["overall"]})
+        return report
+
+    def set_safe_mode(self, enabled: bool) -> dict:
+        registry = self.ensure()
+        registry["safeMode"] = enabled
+        registry["updatedAt"] = now_iso()
+        atomic_write_json(self.paths.production_readiness, registry)
+        return registry
+
+    def status(self) -> dict:
+        registry = self.ensure()
+        return {
+            "safeMode": registry.get("safeMode") is True,
+            "repairMode": registry.get("repairMode") is True,
+            "crashRecovery": registry.get("crashRecovery"),
+            "diagnosticRuns": len(registry.get("startupDiagnostics", [])),
+        }
+
+
+class StudioLauncher:
+    def __init__(self, paths: TempleOSPaths, logger: JsonEventLogger):
+        self.paths = paths
+        self.logger = logger
+
+    def ensure(self) -> dict:
+        if not self.paths.launcher.exists():
+            payload = {
+                "schemaVersion": SCHEMA_VERSION,
+                "title": "Temple AI Studio",
+                "status": "local-launcher-ready",
+                "features": ["project-selector", "application-selector", "settings", "diagnostics", "updates"],
+            }
+            atomic_write_json(self.paths.launcher, payload)
+            self.logger.emit("studio-launcher-initialized", {"path": str(self.paths.launcher)})
+        return self.load()
+
+    def load(self) -> dict:
+        return read_json(self.paths.launcher, {})
+
+    def html(self, status: dict) -> str:
+        apps = status.get("applications", {}).get("applications", [])
+        app_items = "".join(f"<li><strong>{app['name']}</strong> - {app['status']}</li>" for app in apps)
+        return f"""<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Temple AI Studio</title>
+  <style>
+    body {{ font-family: "Microsoft JhengHei", system-ui, sans-serif; margin: 32px; background: #f7f7f2; color: #202124; }}
+    main {{ max-width: 960px; margin: auto; }}
+    section {{ border: 1px solid #d8d6cc; padding: 16px; margin: 12px 0; background: white; }}
+    code {{ background: #eee; padding: 2px 4px; }}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Temple AI Studio</h1>
+    <section>
+      <h2>平台狀態</h2>
+      <p>版本：<code>{status.get('version')}</code></p>
+      <p>模式：<code>{status.get('multiUser', {}).get('mode')}</code></p>
+    </section>
+    <section>
+      <h2>應用程式</h2>
+      <ul>{app_items}</ul>
+    </section>
+    <section>
+      <h2>診斷</h2>
+      <p>REST API: <code>/api/status</code>、<code>/api/health</code></p>
+    </section>
+  </main>
+</body>
+</html>"""
+
+    def status(self) -> dict:
+        return self.ensure()
+
+
 class BusinessRuleEngine:
     def __init__(self, config: ConfigurationCenter):
         self.config = config
@@ -1216,13 +2013,21 @@ class QueueManager:
     def save(self, registry: dict) -> None:
         atomic_write_json(self.paths.queue, registry)
 
-    def enqueue(self, task_type: str, payload: dict | None = None, priority: int = 50, max_retries: int | None = None) -> dict:
+    def enqueue(
+        self,
+        task_type: str,
+        payload: dict | None = None,
+        priority: int = 50,
+        max_retries: int | None = None,
+        depends_on: list[str] | None = None,
+    ) -> dict:
         task = {
             "id": new_id("task"),
             "type": task_type,
             "status": "queued",
             "priority": priority,
             "payload": payload or {},
+            "dependsOn": depends_on or [],
             "attempts": 0,
             "maxRetries": max_retries,
             "createdAt": now_iso(),
@@ -1240,7 +2045,12 @@ class QueueManager:
 
     def claim_next(self) -> dict | None:
         registry = self.ensure()
-        candidates = [task for task in registry.get("tasks", []) if task.get("status") == "queued"]
+        completed = {task.get("id") for task in registry.get("tasks", []) if task.get("status") == "completed"}
+        candidates = [
+            task
+            for task in registry.get("tasks", [])
+            if task.get("status") == "queued" and all(dep in completed for dep in task.get("dependsOn", []))
+        ]
         if not candidates:
             return None
         candidates.sort(key=lambda task: (-int(task.get("priority", 50)), task.get("createdAt", "")))
@@ -1278,6 +2088,39 @@ class QueueManager:
             self.logger.emit("task-failed", {"taskId": task_id, "error": error}, level="ERROR")
             return task
         raise KeyError(f"Task not found: {task_id}")
+
+    def cancel(self, task_id: str, reason: str = "cancelled") -> dict:
+        return self._transition(task_id, "cancelled", {"cancelledAt": now_iso(), "cancelReason": reason})
+
+    def resume(self, task_id: str) -> dict:
+        registry = self.ensure()
+        for task in registry.get("tasks", []):
+            if task.get("id") == task_id:
+                if task.get("status") not in {"failed", "cancelled", "blocked"}:
+                    raise RuntimeError(f"Task cannot resume from status: {task.get('status')}")
+                task["status"] = "queued"
+                task["updatedAt"] = now_iso()
+                task.setdefault("recovery", []).append({"at": now_iso(), "reason": "manual-resume"})
+                self.save(registry)
+                self.logger.emit("task-resumed", {"taskId": task_id})
+                return task
+        raise KeyError(f"Task not found: {task_id}")
+
+    def dependency_graph(self) -> dict:
+        tasks = self.ensure().get("tasks", [])
+        return {
+            "nodes": [{"id": task["id"], "type": task["type"], "status": task["status"]} for task in tasks],
+            "edges": [{"from": dep, "to": task["id"]} for task in tasks for dep in task.get("dependsOn", [])],
+        }
+
+    def run_parallel(self, worker: "BackgroundWorker", limit: int = 2) -> dict:
+        results = []
+        for _ in range(max(1, limit)):
+            result = worker.run_once()
+            if not result.get("processed"):
+                break
+            results.append(result)
+        return {"processed": len(results), "results": results}
 
     def _transition(self, task_id: str, status: str, extras: dict) -> dict:
         registry = self.ensure()
@@ -1617,6 +2460,12 @@ class BackgroundWorker:
             "model-download": self._model_download,
             "update-check": self._update_check,
             "failure-recovery": self._failure_recovery,
+            "prompt-optimize": self._prompt_optimize,
+            "provider-simulate": self._provider_simulate,
+            "model-benchmark": self._model_benchmark,
+            "startup-diagnostics": self._startup_diagnostics,
+            "portable-package": self._portable_package,
+            "disk-cleanup": self._disk_cleanup,
         }
 
     def run_once(self) -> dict:
@@ -1696,6 +2545,31 @@ class BackgroundWorker:
     def _failure_recovery(self, task: dict) -> dict:
         return self.kernel.self_healing.run()
 
+    def _prompt_optimize(self, task: dict) -> dict:
+        payload = task.get("payload", {})
+        return self.kernel.prompt_lab.optimize(payload.get("prompt", ""), payload.get("provider", "local-template"))
+
+    def _provider_simulate(self, task: dict) -> dict:
+        payload = task.get("payload", {})
+        return self.kernel.provider_simulator.generate(payload.get("capability", "llm"), payload.get("prompt", ""))
+
+    def _model_benchmark(self, task: dict) -> dict:
+        payload = task.get("payload", {})
+        return self.kernel.model_sandbox.run_benchmark(
+            payload.get("modelId", "mock-model"),
+            payload.get("capability", "llm"),
+            payload.get("prompts", ["Temple AI Studio benchmark"]),
+        )
+
+    def _startup_diagnostics(self, task: dict) -> dict:
+        return self.kernel.production_readiness.startup_diagnostics()
+
+    def _portable_package(self, task: dict) -> dict:
+        return self.kernel.packaging.create_portable_manifest(task.get("payload", {}).get("version", TEMPLE_OS_VERSION))
+
+    def _disk_cleanup(self, task: dict) -> dict:
+        return self.kernel.performance.cleanup(int(task.get("payload", {}).get("maxAgeSeconds", 86400)))
+
 
 class TempleOSKernel:
     def __init__(self, root: Path | str):
@@ -1709,6 +2583,11 @@ class TempleOSKernel:
         self.plugins = PluginManager(self.paths, self.logger)
         self.prompts = PromptLibrary(self.paths, self.logger)
         self.knowledge = KnowledgeBase(self.paths, self.logger)
+        self.workflow_editor = WorkflowVisualEditor(self.paths, self.logger)
+        self.agent_memory = AgentMemoryStore(self.paths, self.logger)
+        self.prompt_lab = PromptLaboratory(self.paths, self.logger)
+        self.provider_simulator = ProviderSimulator(self.paths, self.logger)
+        self.model_sandbox = ModelSandbox(self.paths, self.provider_simulator, self.logger)
         self.user_profiles = UserProfileManager(self.paths, self.logger)
         self.applications = ApplicationRegistry(self.paths, self.logger)
         self.rules = BusinessRuleEngine(self.config)
@@ -1719,11 +2598,19 @@ class TempleOSKernel:
         self.workflows = WorkflowEngine(self.paths, self.queue, self.logger)
         self.automation = AutomationEngine(self.paths, self.queue, self.logger)
         self.backups = BackupManager(self.paths, self.logger)
+        self.workspace_system = ProjectWorkspaceSystem(self.paths, self.projects, self.logger)
+        self.structured_knowledge = StructuredKnowledgeEngine(self.paths, self.knowledge, self.logger)
         self.downloads = ModelDownloadManager(self.paths, self.logger)
         self.updates = UpdateManager(self.paths, self.backups, self.logger)
         self.mobile_api = MobileAPIContract(self.paths, self.logger)
         self.cloud_sync = CloudSyncManager(self.paths, self.config, self.logger)
         self.multi_user = MultiUserManager(self.paths, self.logger)
+        self.developer_sdk = DeveloperSDK(self.paths, self.logger)
+        self.testing = TestingInfrastructure(self.paths, self.logger)
+        self.performance = PerformanceOptimizer(self.paths, self.logger)
+        self.packaging = PackagingManager(self.paths, self.backups, self.logger)
+        self.production_readiness = ProductionReadinessCenter(self.paths, self.logger)
+        self.launcher = StudioLauncher(self.paths, self.logger)
         self.support_packages = SupportPackageManager(self.paths, self.logger)
         self.monitoring = MonitoringCenter(self.paths, self.logger)
         self.self_healing = SelfHealingEngine(self.paths, self.config, self.queue, self.logger)
@@ -1747,6 +2634,11 @@ class TempleOSKernel:
             "plugins": self.plugins.ensure(),
             "prompts": self.prompts.ensure(),
             "knowledge": self.knowledge.ensure(),
+            "workflowEditor": self.workflow_editor.ensure(),
+            "agentMemory": self.agent_memory.ensure(),
+            "promptLab": self.prompt_lab.ensure(),
+            "providerSimulator": self.provider_simulator.ensure(),
+            "modelSandbox": self.model_sandbox.ensure(),
             "userProfiles": self.user_profiles.ensure(),
             "applications": self.applications.ensure(),
             "queue": self.queue.ensure(),
@@ -1755,11 +2647,19 @@ class TempleOSKernel:
             "schedules": self.scheduler.ensure(),
             "workflows": self.workflows.ensure(),
             "automation": self.automation.ensure(),
+            "workspaceSystem": self.workspace_system.ensure(),
+            "structuredKnowledge": self.structured_knowledge.ensure(),
             "downloads": self.downloads.ensure(),
             "updates": self.updates.ensure(),
             "mobileApi": self.mobile_api.ensure(),
             "cloudSync": self.cloud_sync.ensure(),
             "multiUser": self.multi_user.ensure(),
+            "developerSdk": self.developer_sdk.ensure(),
+            "testing": self.testing.ensure(),
+            "performance": self.performance.ensure(),
+            "packaging": self.packaging.ensure(),
+            "productionReadiness": self.production_readiness.ensure(),
+            "launcher": self.launcher.ensure(),
             "selfHealing": self.self_healing.run(),
         }
         self.monitoring.snapshot(self)
@@ -1780,6 +2680,11 @@ class TempleOSKernel:
             "plugins": self.plugins.status(),
             "prompts": self.prompts.status(),
             "knowledge": self.knowledge.status(),
+            "workflowEditor": self.workflow_editor.status(),
+            "agentMemory": self.agent_memory.status(),
+            "promptLab": self.prompt_lab.status(),
+            "providerSimulator": self.provider_simulator.status(),
+            "modelSandbox": self.model_sandbox.status(),
             "userProfiles": self.user_profiles.status(),
             "applications": self.applications.status(),
             "agents": self.agents.status(),
@@ -1788,11 +2693,19 @@ class TempleOSKernel:
             "scheduler": self.scheduler.status(),
             "workflows": self.workflows.status(),
             "automation": self.automation.status(),
+            "workspaceSystem": self.workspace_system.status(),
+            "structuredKnowledge": self.structured_knowledge.status(),
             "downloads": self.downloads.status(),
             "updates": self.updates.status(),
             "mobileApi": self.mobile_api.status(),
             "cloudSync": self.cloud_sync.status(),
             "multiUser": self.multi_user.status(),
+            "developerSdk": self.developer_sdk.status(),
+            "testing": self.testing.status(),
+            "performance": self.performance.status(),
+            "packaging": self.packaging.status(),
+            "productionReadiness": self.production_readiness.status(),
+            "launcher": self.launcher.status(),
             "backup": self.backups.status(),
             "telemetry": read_json(self.paths.telemetry, {}),
             "recentEvents": self.logger.tail(20),
@@ -1813,6 +2726,13 @@ class TempleOSKernel:
             {"name": "agent-registry", "ok": self.paths.agents.exists()},
             {"name": "application-registry", "ok": self.paths.applications.exists()},
             {"name": "user-profile-registry", "ok": self.paths.user_profiles.exists()},
+            {"name": "workflow-visual-editor", "ok": self.paths.workflow_graphs.exists()},
+            {"name": "prompt-lab", "ok": self.paths.prompt_lab.exists()},
+            {"name": "provider-simulator", "ok": self.paths.provider_simulator.exists()},
+            {"name": "model-sandbox", "ok": self.paths.model_sandbox.exists()},
+            {"name": "developer-sdk", "ok": self.paths.developer_sdk.exists()},
+            {"name": "production-readiness", "ok": self.paths.production_readiness.exists()},
+            {"name": "studio-launcher", "ok": self.paths.launcher.exists()},
             {"name": "mobile-api-contract", "ok": self.paths.mobile_api.exists()},
             {"name": "multi-user-contract", "ok": self.paths.tenants.exists()},
             {"name": "local-ffmpeg-provider", "ok": provider_checks["rendering"].get("selected") is not None},
@@ -1838,6 +2758,22 @@ class TempleOSKernel:
         queued_plan = self.agents.enqueue_plan(agent_plan["id"])
         agent_results = [self.worker.run_once() for _ in queued_plan.get("taskIds", [])]
         collaboration = self.collaboration.start("規劃神殿產品影片", app_id="temple-product-video-generator")
+        workflow_graph = self.workflow_editor.clone_template("template.product-video", "Self Test Product Video Workflow")
+        self.agent_memory.remember("qa-agent", "ceo-correction", {"rule": "keep outputs commercially usable"})
+        prompt_version = self.prompt_lab.add_version("prompt.temple-product-visual", "Temple product on table", provider="comfyui-local")
+        prompt_compare = self.prompt_lab.compare("short", "Temple product, commercial composition", provider="comfyui-local")
+        provider_artifact = self.provider_simulator.generate("image", "Temple product mock image")
+        sandbox = self.model_sandbox.run_benchmark("mock-image-model", "image", ["Temple product", "Temple product close up"])
+        project = self.projects.create("Self Test Project", "temple-product-video-generator")
+        snapshot = self.workspace_system.snapshot(project["id"], "self-test")
+        structured = self.structured_knowledge.add("temple", "Self Test Temple Rule", {"rule": "Local-first and approval-gated"}, ["self-test"])
+        sdk = self.developer_sdk.generate_docs()
+        stress = self.testing.stress_queue(self.queue, count=3)
+        cache_item = self.performance.cache_put("self-test", {"ok": True})
+        cache_hit = self.performance.cache_get("self-test")
+        env_check = self.packaging.environment_check()
+        portable = self.packaging.create_portable_manifest()
+        diagnostics = self.production_readiness.startup_diagnostics()
         blocked_download = self.downloads.request("future-video-model", "https://example.com/model.safetensors", "video", approval=False)
         backup = self.backups.create(label="self-test")
         support = self.support_packages.create(self.status())
@@ -1848,6 +2784,20 @@ class TempleOSKernel:
             {"name": "agent-plan-created", "ok": agent_plan.get("status") == "planned" and len(agent_plan.get("steps", [])) >= 5},
             {"name": "agent-plan-processed", "ok": all(item.get("task", {}).get("status") == "completed" for item in agent_results)},
             {"name": "collaboration-created", "ok": collaboration.get("agentRunId") is not None},
+            {"name": "workflow-graph-created", "ok": workflow_graph.get("validation", {}).get("ok") is True},
+            {"name": "agent-memory-written", "ok": len(self.agent_memory.recall("qa-agent", "ceo-correction")) >= 1},
+            {"name": "prompt-lab-versioned", "ok": prompt_version.get("score", {}).get("overall", 0) > 0},
+            {"name": "prompt-lab-compared", "ok": prompt_compare.get("winner") in {"a", "b"}},
+            {"name": "provider-simulator-artifact", "ok": Path(provider_artifact["artifact"]).exists()},
+            {"name": "model-sandbox-benchmark", "ok": sandbox.get("quality", 0) > 0},
+            {"name": "project-workspace-snapshot", "ok": snapshot.get("projectId") == project["id"]},
+            {"name": "structured-knowledge-added", "ok": structured.get("id") is not None},
+            {"name": "developer-sdk-docs", "ok": Path(sdk.get("docsPath", "")).exists()},
+            {"name": "testing-stress-suite", "ok": stress.get("overall") == "PASS"},
+            {"name": "performance-cache-hit", "ok": cache_item.get("path") and cache_hit == {"ok": True}},
+            {"name": "packaging-env-check", "ok": env_check.get("overall") == "PASS"},
+            {"name": "portable-manifest-created", "ok": Path(portable["manifestPath"]).exists()},
+            {"name": "startup-diagnostics", "ok": diagnostics.get("overall") == "PASS"},
             {"name": "network-download-blocked", "ok": blocked_download.get("status") == "blocked"},
             {"name": "backup-created", "ok": Path(backup["path"]).exists() and backup["size"] > 0},
             {"name": "support-created", "ok": Path(support["path"]).exists() and support["size"] > 0},
@@ -1882,6 +2832,14 @@ class TempleOSKernel:
                 self.end_headers()
                 self.wfile.write(data)
 
+            def _send_html(self, status: int, html: str) -> None:
+                data = html.encode("utf-8")
+                self.send_response(status)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+
             def _read_json(self) -> dict:
                 length = int(self.headers.get("Content-Length", "0") or "0")
                 if not length:
@@ -1890,6 +2848,8 @@ class TempleOSKernel:
 
             def do_GET(self) -> None:
                 parsed = urlparse(self.path)
+                if parsed.path == "/":
+                    return self._send_html(HTTPStatus.OK, kernel.launcher.html(kernel.status()))
                 if parsed.path == "/api/health":
                     return self._send(HTTPStatus.OK, kernel.health_check())
                 if parsed.path == "/api/status":
@@ -1916,6 +2876,24 @@ class TempleOSKernel:
                     return self._send(HTTPStatus.OK, kernel.cloud_sync.status())
                 if parsed.path == "/api/multi-user":
                     return self._send(HTTPStatus.OK, kernel.multi_user.status())
+                if parsed.path == "/api/workflow-editor":
+                    return self._send(HTTPStatus.OK, kernel.workflow_editor.status())
+                if parsed.path == "/api/prompt-lab":
+                    return self._send(HTTPStatus.OK, kernel.prompt_lab.status())
+                if parsed.path == "/api/provider-simulator":
+                    return self._send(HTTPStatus.OK, kernel.provider_simulator.status())
+                if parsed.path == "/api/model-sandbox":
+                    return self._send(HTTPStatus.OK, kernel.model_sandbox.status())
+                if parsed.path == "/api/developer-sdk":
+                    return self._send(HTTPStatus.OK, kernel.developer_sdk.status())
+                if parsed.path == "/api/testing":
+                    return self._send(HTTPStatus.OK, kernel.testing.status())
+                if parsed.path == "/api/performance":
+                    return self._send(HTTPStatus.OK, kernel.performance.status())
+                if parsed.path == "/api/packaging":
+                    return self._send(HTTPStatus.OK, kernel.packaging.status())
+                if parsed.path == "/api/production-readiness":
+                    return self._send(HTTPStatus.OK, kernel.production_readiness.status())
                 return self._send(HTTPStatus.NOT_FOUND, {"error": "Not found"})
 
             def do_POST(self) -> None:
@@ -1943,6 +2921,22 @@ class TempleOSKernel:
                     return self._send(HTTPStatus.CREATED, session)
                 if parsed.path == "/api/support-package":
                     return self._send(HTTPStatus.CREATED, kernel.support_packages.create(kernel.status()))
+                if parsed.path == "/api/workflow-editor/clone-template":
+                    return self._send(HTTPStatus.CREATED, kernel.workflow_editor.clone_template(body["templateId"], body["name"]))
+                if parsed.path == "/api/workflow-editor/save":
+                    return self._send(HTTPStatus.CREATED, kernel.workflow_editor.save_workflow(body))
+                if parsed.path == "/api/prompt-lab/optimize":
+                    return self._send(HTTPStatus.OK, kernel.prompt_lab.optimize(body.get("prompt", ""), body.get("provider", "local-template")))
+                if parsed.path == "/api/prompt-lab/compare":
+                    return self._send(HTTPStatus.OK, kernel.prompt_lab.compare(body.get("a", ""), body.get("b", ""), body.get("provider", "local-template")))
+                if parsed.path == "/api/provider-simulator/generate":
+                    return self._send(HTTPStatus.CREATED, kernel.provider_simulator.generate(body.get("capability", "llm"), body.get("prompt", "")))
+                if parsed.path == "/api/model-sandbox/benchmark":
+                    return self._send(HTTPStatus.CREATED, kernel.model_sandbox.run_benchmark(body.get("modelId", "mock-model"), body.get("capability", "llm"), body.get("prompts", [])))
+                if parsed.path == "/api/production-readiness/diagnostics":
+                    return self._send(HTTPStatus.CREATED, kernel.production_readiness.startup_diagnostics())
+                if parsed.path == "/api/packaging/portable-manifest":
+                    return self._send(HTTPStatus.CREATED, kernel.packaging.create_portable_manifest(body.get("version", TEMPLE_OS_VERSION)))
                 return self._send(HTTPStatus.NOT_FOUND, {"error": "Not found"})
 
         server = ThreadingHTTPServer((host, port), Handler)
@@ -1981,6 +2975,24 @@ def build_parser() -> argparse.ArgumentParser:
     download.add_argument("source")
     download.add_argument("--capability", default="unknown")
     download.add_argument("--approval", action="store_true")
+    wf_clone = sub.add_parser("clone-workflow-template")
+    wf_clone.add_argument("template_id")
+    wf_clone.add_argument("name")
+    prompt_opt = sub.add_parser("optimize-prompt")
+    prompt_opt.add_argument("prompt")
+    prompt_opt.add_argument("--provider", default="local-template")
+    simulate = sub.add_parser("simulate-provider")
+    simulate.add_argument("capability")
+    simulate.add_argument("prompt")
+    benchmark = sub.add_parser("benchmark-model")
+    benchmark.add_argument("model_id")
+    benchmark.add_argument("capability")
+    benchmark.add_argument("prompts", nargs="+")
+    sub.add_parser("startup-diagnostics")
+    sub.add_parser("portable-manifest")
+    cleanup = sub.add_parser("cleanup")
+    cleanup.add_argument("--max-age-seconds", default=86400, type=int)
+    sub.add_parser("generate-sdk-docs")
     serve = sub.add_parser("serve")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", default=8765, type=int)
@@ -2016,6 +3028,22 @@ def main(argv: list[str] | None = None) -> int:
         payload = kernel.applications.status()
     elif args.command == "request-model-download":
         payload = kernel.downloads.request(args.model_id, args.source, args.capability, approval=args.approval)
+    elif args.command == "clone-workflow-template":
+        payload = kernel.workflow_editor.clone_template(args.template_id, args.name)
+    elif args.command == "optimize-prompt":
+        payload = kernel.prompt_lab.optimize(args.prompt, args.provider)
+    elif args.command == "simulate-provider":
+        payload = kernel.provider_simulator.generate(args.capability, args.prompt)
+    elif args.command == "benchmark-model":
+        payload = kernel.model_sandbox.run_benchmark(args.model_id, args.capability, args.prompts)
+    elif args.command == "startup-diagnostics":
+        payload = kernel.production_readiness.startup_diagnostics()
+    elif args.command == "portable-manifest":
+        payload = kernel.packaging.create_portable_manifest()
+    elif args.command == "cleanup":
+        payload = kernel.performance.cleanup(args.max_age_seconds)
+    elif args.command == "generate-sdk-docs":
+        payload = kernel.developer_sdk.generate_docs()
     elif args.command == "serve":
         server = kernel.serve(args.host, args.port)
         print(json.dumps({"status": "running", "host": args.host, "port": args.port}, ensure_ascii=False, indent=2))

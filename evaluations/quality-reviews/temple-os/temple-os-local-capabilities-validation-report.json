@@ -1,0 +1,58 @@
+{
+  "schema": "temple-ai-studio.local-capabilities-validation.v1",
+  "createdAt": "2026-07-24T16:17:57",
+  "overall": "PASS",
+  "validatedModules": [
+    "workflow-visual-editor",
+    "agent-orchestrator-memory",
+    "prompt-laboratory",
+    "model-sandbox",
+    "provider-simulator",
+    "job-queue-dependencies-cancel-resume-parallel",
+    "project-workspace-snapshots-template-cloning",
+    "structured-knowledge-engine",
+    "plugin-sdk-lifecycle",
+    "developer-sdk",
+    "testing-infrastructure",
+    "performance-cache-cleanup",
+    "packaging-environment-portable-manifest",
+    "production-readiness-diagnostics-safe-mode",
+    "temple-studio-launcher"
+  ],
+  "validation": {
+    "unitRegression": {
+      "command": "python -B -m unittest tests\\test_emma_core.py tests\\test_capability_pack2.py tests\\test_video_intelligence.py tests\\test_temple_os.py",
+      "result": "PASS",
+      "testsRun": 28
+    },
+    "osSelfTest": {
+      "command": "python -B scripts\\temple_os_cli.py --root \"D:\\AI\\Jofey AI Studio\" self-test",
+      "result": "PASS",
+      "checksPassed": 25
+    },
+    "cliValidation": {
+      "workflowClone": "PASS",
+      "promptOptimization": "PASS",
+      "providerSimulation": "PASS",
+      "modelBenchmark": "PASS",
+      "startupDiagnostics": "PASS",
+      "portableManifest": "PASS",
+      "developerSdkDocs": "PASS"
+    },
+    "appRegression": {
+      "command": "scripts\\run_temple_product_video_generator_v1_smoke_test.bat",
+      "result": "PASS",
+      "projectId": "project-20260724-c6c5bcd5",
+      "finalVideo": "D:\\AI\\Jofey AI Studio\\apps\\temple-product-video-generator\\data\\exports\\project-20260724-c6c5bcd5\\final_video.mp4"
+    },
+    "exportQuality": {
+      "report": "evaluations\\quality-reviews\\temple-os\\temple-os-local-capabilities-export-quality-report.json",
+      "result": "PASS"
+    }
+  },
+  "externalDependencyPolicy": {
+    "emmaDatasets": "not required for local platform infrastructure",
+    "paidProviders": "not required; provider simulator and abstraction are active",
+    "adminPrivilege": "not required"
+  }
+}
