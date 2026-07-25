@@ -323,6 +323,7 @@ class ProductVideoHotfixTests(unittest.TestCase):
         self.assertIn("FFmpeg", self.server.suggested_action("FFmpeg unavailable"))
         self.assertIn("ComfyUI", self.server.suggested_action("ComfyUI connection failed"))
         self.assertIn("聲音", self.server.suggested_action("TTS 聲音失敗"))
+        self.assertIn("Emma", self.server.suggested_action("Emma 身分一致性檢查未通過"))
 
     def test_job_stage_history_is_persisted(self) -> None:
         self.server.start_job = lambda _job_id: None

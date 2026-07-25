@@ -1398,6 +1398,8 @@ def suggested_action(message: str) -> str:
         return "請到設定頁確認 FFmpeg 路徑後，再按「重試工作」。"
     if "comfy" in lowered:
         return "請啟動 ComfyUI 並確認連線狀態，或改用可用的本機模式。"
+    if "emma" in lowered or "身分一致性" in message:
+        return "系統會使用已核准的 Emma 參考重新處理；若仍失敗，請查看場景品質報告。"
     if "tts" in lowered or "聲音" in message:
         return "請檢查聲音工具狀態；內容與場景資料會保留，可直接重試。"
     if "照片" in message or "素材" in message:
@@ -1774,7 +1776,31 @@ def build_video_assets(
     )
     if visual_report.get("quality", {}).get("overall") != "PASS":
         append_log("generation.log", "visual-pipeline-quality-failed", {"projectId": project["id"], "quality": visual_report.get("quality")})
-        raise RuntimeError("圖片品質檢查未通過，請調整素材後再試一次。")
+        quality = visual_report.get("quality", {})
+        failed_scenes = quality.get("failedScenes", [])
+        failed_checks = sorted(
+            {
+                check
+                for item in quality.get("reports", [])
+                if item.get("overall") != "PASS"
+                for check in item.get("failedChecks", [])
+            }
+        )
+        check_labels = {
+            "emmaIdentityConsistency": "Emma 身分一致性",
+            "productVisibility": "商品可見度",
+            "promptQuality": "提示詞品質",
+            "resolution": "解析度",
+            "aspectRatio": "畫面比例",
+            "composition": "構圖",
+            "textReadability": "文字可讀性",
+            "subtitleContrast": "字幕對比",
+            "sharpness": "清晰度",
+            "commercialUsability": "商業可用性",
+        }
+        scene_text = "、".join(failed_scenes) or "未知場景"
+        check_text = "、".join(check_labels.get(item, item) for item in failed_checks) or "整體品質"
+        raise RuntimeError(f"圖片品質檢查未通過：{scene_text}（{check_text}）。系統已完成自動修復嘗試。")
 
     report("emma", 54, "Emma 與商品視覺一致性檢查完成。")
     report("video", 66, "正在生成並組合影片畫面。")

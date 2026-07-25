@@ -232,7 +232,7 @@ class ImagePipeline:
         quality_reports = []
         history = []
         for index, scene in enumerate(project.get("scenes", []) or []):
-            source = source_images[index % len(source_images)]
+            default_source = source_images[index % len(source_images)]
             seed = self._stable_seed(project["id"], scene["id"], scene.get("version", 1))
             prompt_bundle = prompt_by_scene[scene["id"]]["openai"]
             story_scene = story_by_scene[scene["id"]]
@@ -240,12 +240,19 @@ class ImagePipeline:
             emma_references = emma_core.select_references("openai", generation_type="image", require_emma=require_emma)
             if require_emma and emma_references["overall"] == "BLOCKED":
                 raise RuntimeError(f"Emma references are required but unavailable for scene: {scene['id']}")
+            emma_sources = available_reference_paths(emma_references) if require_emma else []
+            if require_emma and not emma_sources:
+                raise RuntimeError(f"Emma references are registered but their files are unavailable for scene: {scene['id']}")
             best_record = None
             best_quality = None
             best_emma = None
             for attempt in range(self.max_retries + 1):
+                source = emma_sources[attempt % len(emma_sources)] if emma_sources else default_source
+                source_role = "emma-identity-reference" if emma_sources else "product-reference"
                 output = asset_manager.generated_root / f"{scene['order']:02d}-{scene['id']}-v{scene.get('version', 1)}-a{attempt}.png"
                 generation = self.provider.generate(scene, story_scene, prompt_bundle, product, source, output, seed, attempt)
+                generation["sourceImage"] = str(source)
+                generation["sourceRole"] = source_role
                 emma_eval = emma_core.evaluate_generation(output, scene=scene, provider="openai", require_emma=require_emma)
                 quality = evaluate_image(output, scene, prompt_bundle, emma_eval)
                 asset = asset_manager.register(
@@ -258,6 +265,7 @@ class ImagePipeline:
                     metadata={
                         "seed": seed,
                         "attempt": attempt,
+                        "sourceRole": source_role,
                         "qualityScore": quality["score"],
                         "qualityOverall": quality["overall"],
                         "emmaConsistency": emma_eval,
@@ -336,6 +344,18 @@ def scene_requires_emma(scene: dict[str, Any]) -> bool:
         str(scene.get(key, "")) for key in ["narration", "subtitle", "prompt", "visualDescription"]
     ).lower()
     return "emma" in content or "艾瑪" in content
+
+
+def available_reference_paths(selection: dict[str, Any]) -> list[Path]:
+    paths: list[Path] = []
+    seen: set[str] = set()
+    for reference in selection.get("references", []):
+        path = Path(str(reference.get("path", "")))
+        key = str(path.resolve()).lower() if path.exists() else ""
+        if key and key not in seen:
+            seen.add(key)
+            paths.append(path)
+    return paths
 
 
 def run_image_pipeline(

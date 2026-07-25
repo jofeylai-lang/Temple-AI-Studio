@@ -13,7 +13,7 @@ if str(SCRIPTS_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_ROOT))
 
 from temple_ai_studio.emma_core import ASSET_CATEGORIES, PROVIDERS, EmmaCore
-from temple_ai_studio.image_pipeline import run_image_pipeline
+from temple_ai_studio.image_pipeline import available_reference_paths, run_image_pipeline
 from temple_ai_studio.script_engine import generate_video_script_package
 
 
@@ -111,6 +111,53 @@ class EmmaCoreTests(unittest.TestCase):
         project["scenes"][0]["visualDescription"] = "Emma looks at camera and presents the product."
         with self.assertRaises(RuntimeError):
             run_image_pipeline(project, product, Path(project["projectDir"]), emma_root=self.root)
+
+    def test_text_only_emma_scene_uses_approved_identity_reference(self) -> None:
+        face_b = self.root / "source" / "emma-face-b.png"
+        face_c = self.root / "source" / "emma-face-c.png"
+        make_emma_image(face_b, (218, 178, 152), "A")
+        make_emma_image(face_c, (220, 180, 154), "A")
+        self.core.import_dataset_item(self.face, "face", "primary-anchor-a", approved_by="test")
+        self.core.import_dataset_item(face_b, "face", "primary-anchor-b", approved_by="test")
+        self.core.import_dataset_item(face_c, "face", "primary-anchor-c", approved_by="test")
+        selection = self.core.select_references("openai", require_emma=True)
+        reference_paths = available_reference_paths(selection)
+        product = {
+            "id": "",
+            "name": "純文字影片",
+            "category": "純文字內容",
+            "description": "Emma 介紹一項泰國宗教商品。",
+            "sellingPoint": "溫暖介紹",
+            "spiritualInfo": "",
+            "targetAudience": "",
+            "materials": [],
+        }
+        project = generate_video_script_package(
+            product,
+            {"requirement": "請讓 Emma 介紹一項泰國宗教商品。", "platform": "Instagram Reels", "duration": 30},
+            "project-text-only-emma",
+        )
+        project["id"] = "project-text-only-emma"
+        project["mode"] = "text-only"
+        project["projectDir"] = str(self.root / "project-text-only-emma")
+        project["scenes"][2]["narration"] = "Emma 介紹一項泰國宗教商品。"
+        report = run_image_pipeline(project, product, Path(project["projectDir"]), emma_root=self.root)
+        emma_scene = next(scene for scene in project["scenes"] if scene["emmaCore"]["required"])
+        generated = next(item for item in report["generatedImages"] if item["asset"]["sceneId"] == emma_scene["id"])
+        self.assertTrue(reference_paths)
+        self.assertEqual(generated["sourceRole"], "emma-identity-reference")
+        self.assertIn(Path(generated["sourceImage"]), reference_paths)
+        source_identity = self.core.evaluate_generation(
+            Path(generated["sourceImage"]),
+            scene=emma_scene,
+            provider="openai",
+            require_emma=True,
+        )
+        self.assertEqual(source_identity["overall"], "PASS")
+        self.assertNotEqual(
+            Path(generated["sourceImage"]).name,
+            "text-only-source.png",
+        )
 
 
 if __name__ == "__main__":
