@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -75,6 +76,8 @@ class VideoIntelligenceTests(unittest.TestCase):
         self.assertEqual(plan["overall"], "PASS")
         self.assertIn("zoomExpression", plan)
         self.assertIn("stability", plan)
+        self.assertFalse(plan["usesFrameRandomness"])
+        self.assertNotIn("sin(", plan["xExpression"])
 
     def test_rendering_retry_uses_fallback_codec(self) -> None:
         frame = Path(self.project["scenes"][0]["generatedImagePath"])
@@ -87,19 +90,65 @@ class VideoIntelligenceTests(unittest.TestCase):
         self.assertEqual(report["codec"], "mpeg4")
         self.assertIn("-b:v", report["videoArgs"])
 
-    def test_full_video_pipeline_outputs_playable_video_with_quality(self) -> None:
+    def test_still_only_video_is_rejected_as_slideshow(self) -> None:
         output_dir = self.root / "exports"
         report = run_video_generation_pipeline(self.project, self.product, output_dir, Path(self.project["projectDir"]), self.ffmpeg, preview=False)
-        self.assertEqual(report["quality"]["overall"], "PASS")
+        self.assertEqual(report["quality"]["overall"], "FAIL")
         self.assertTrue((output_dir / "final_video.mp4").exists())
         self.assertTrue((output_dir / "final_video_subtitled.mp4").exists())
         self.assertTrue((output_dir / "subtitles.srt").exists())
         self.assertTrue(report["quality"]["decode"]["metadata"]["audioLine"])
+        failed = {check["name"] for check in report["quality"]["failedChecks"]}
+        self.assertIn("unique-root-assets", failed)
+        self.assertIn("real-motion-present", failed)
         for scene_report in report["sceneReports"]:
             self.assertEqual(scene_report["subtitle"]["overall"], "PASS")
             self.assertEqual(scene_report["render"]["overall"], "PASS")
             self.assertIn("videoArgs", scene_report["render"])
             self.assertIn(scene_report["lipSync"]["overall"], ["NOT_REQUIRED", "READY", "WAITING_FOR_AUDIO"])
+
+    def test_distinct_real_video_scenes_pass_editorial_gate(self) -> None:
+        colors = ["red", "green", "blue", "yellow", "magenta"]
+        for index, scene in enumerate(self.project["scenes"][:5]):
+            video = self.root / f"source-{index + 1}.mp4"
+            result = subprocess.run(
+                [
+                    str(self.ffmpeg),
+                    "-y",
+                    "-f",
+                    "lavfi",
+                    "-i",
+                    f"testsrc2=size=360x640:rate=25:duration=2,drawbox=color={colors[index]}@0.35:t=fill",
+                    "-c:v",
+                    "mpeg4",
+                    "-pix_fmt",
+                    "yuv420p",
+                    str(video),
+                ],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr[-1000:])
+            scene["sourceVideoPath"] = str(video)
+        output_dir = self.root / "real-motion-exports"
+        report = run_video_generation_pipeline(
+            self.project,
+            self.product,
+            output_dir,
+            Path(self.project["projectDir"]),
+            self.ffmpeg,
+            preview=True,
+        )
+        self.assertEqual(report["quality"]["overall"], "PASS")
+        self.assertEqual(report["quality"]["editorialMetrics"]["videoSceneCount"], 5)
+        self.assertGreaterEqual(report["quality"]["editorialMetrics"]["uniqueRootSourceCount"], 5)
+        progression = next(
+            check
+            for check in report["quality"]["checks"]
+            if check["name"] == "meaningful-shot-progression"
+        )
+        self.assertTrue(progression["ok"])
 
     def test_requested_duration_is_preserved_in_rendered_video(self) -> None:
         short_package = generate_video_script_package(

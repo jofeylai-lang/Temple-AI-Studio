@@ -809,15 +809,26 @@ def validate_project_submission(payload: dict) -> dict:
 
 def inline_product(payload: dict) -> dict:
     requirement = str(payload.get("requirement", "")).strip()
+    inferred_name = "純文字影片"
+    inferred_category = "純文字內容"
+    inferred_selling_point = requirement
+    inferred_spiritual = str(payload.get("spiritualInfo", "")).strip()
+    inferred_audience = str(payload.get("targetAudience", "")).strip()
+    if "泰國" in requirement and any(term in requirement for term in ["宗教", "佛牌", "護身符"]):
+        inferred_name = "泰國祝福佛牌墜飾"
+        inferred_category = "泰國宗教商品"
+        inferred_selling_point = "小巧細緻、方便日常配戴或珍藏，購買前可先了解來源與商品細節。"
+        inferred_spiritual = inferred_spiritual or "承載祝福與自我提醒的文化意涵，應以尊重信仰與來源的方式認識。"
+        inferred_audience = inferred_audience or "想了解泰國祝福飾品與文化意涵的顧客"
     return {
         "id": "",
-        "name": str(payload.get("textProjectName", "")).strip() or "純文字影片",
-        "category": "純文字內容",
+        "name": str(payload.get("textProjectName", "")).strip() or inferred_name,
+        "category": inferred_category,
         "description": requirement,
-        "sellingPoint": requirement,
+        "sellingPoint": inferred_selling_point,
         "productInfo": "",
-        "spiritualInfo": str(payload.get("spiritualInfo", "")).strip(),
-        "targetAudience": str(payload.get("targetAudience", "")).strip(),
+        "spiritualInfo": inferred_spiritual,
+        "targetAudience": inferred_audience,
         "tags": [],
         "seoKeywords": [],
         "materials": [],
@@ -1810,7 +1821,15 @@ def build_video_assets(
 
     report("emma", 54, "Emma 與商品視覺一致性檢查完成。")
     report("video", 66, "正在生成並組合影片畫面。")
-    video_report = run_video_generation_pipeline(project, product, output_dir, Path(project["projectDir"]), Path(ffmpeg), preview=preview)
+    video_report = run_video_generation_pipeline(
+        project,
+        product,
+        output_dir,
+        Path(project["projectDir"]),
+        Path(ffmpeg),
+        preview=preview,
+        production_root=production_data_root(),
+    )
     report("audio", 74, "聲音軌與影片時間軸已同步。")
     report("subtitles", 82, "字幕檔與燒錄版本已建立。")
     report("editing", 89, "場景剪輯與轉場已完成。")

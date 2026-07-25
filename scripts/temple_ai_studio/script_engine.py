@@ -123,6 +123,8 @@ def detect_by_keywords(text: str, mapping: dict[str, list[str]], fallback: str) 
 
 def infer_product_type(product: dict[str, Any], request: str) -> str:
     source = f"{product.get('name', '')} {product.get('category', '')} {product.get('description', '')} {request}"
+    if any(word in source for word in ["泰國宗教", "佛牌", "護身符"]):
+        return "泰國祝福飾品"
     if any(word in source for word in ["蠟燭", "香氛", "香氣", "燭"]):
         return "香氛儀式商品"
     if any(word in source for word in ["水晶", "礦石", "晶石"]):
@@ -184,14 +186,14 @@ def build_scene_templates(product: dict[str, Any], intent: dict[str, Any]) -> li
         {
             "purpose": "Hook",
             "visual": f"以安靜、有呼吸感的畫面開場，呈現{audience}在日常中渴望被安定與照顧的情境。",
-            "narration": f"有時候，我們需要的不是更多忙碌，而是一個讓心慢下來的片刻。",
+            "narration": "想把一份安定與祝福，帶進每天的生活嗎？",
             "subtitle": "給自己一個安定片刻",
             "promptGoal": "quiet emotional opening, soft natural light, vertical short video framing, calm premium Temple atmosphere",
         },
         {
             "purpose": "Introduction",
             "visual": f"清楚展示{name}，畫面乾淨，商品要成為第一視覺焦點。",
-            "narration": f"這是{name}，一款為{category}而設計的 Temple 商品。",
+            "narration": f"這是{name}，讓祝福成為日常可見的提醒。",
             "subtitle": f"{name}｜{category}",
             "promptGoal": "clear product hero shot, premium product photography, gentle camera push in, no clutter",
         },
@@ -212,7 +214,7 @@ def build_scene_templates(product: dict[str, Any], intent: dict[str, Any]) -> li
         {
             "purpose": "Call To Action",
             "visual": f"再次展示{name}與可購買、私訊或預約的下一步提示。",
-            "narration": f"如果你也想為生活準備一份安定的提醒，歡迎把{name}帶回你的日常。",
+            "narration": f"喜歡{name}，歡迎私訊了解。",
             "subtitle": "歡迎私訊了解",
             "promptGoal": "final product offer shot, clean CTA composition, readable space for subtitle, social commerce ready",
         },

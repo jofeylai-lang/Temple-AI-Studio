@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
 from datetime import datetime
@@ -203,13 +204,21 @@ class ImagePipeline:
         asset_manager = AssetManager(Path(project_dir), project["id"])
         emma_core = EmmaCore(emma_root)
         emma_status = emma_core.initialize()
+        project_uses_emma = project_requires_emma(project)
+        emma_catalog = available_fingerprint_paths(emma_core.write_identity_fingerprint())
+        emma_videos = available_emma_video_paths(Path(emma_root)) if emma_root else []
+        used_emma_videos: set[str] = set()
         product_assets = asset_manager.register_product_assets(product)
-        source_images = [
+        product_source_images = [
             Path(item["path"])
             for item in product_assets
             if Path(item["path"]).suffix.lower() in {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
             and Path(item["path"]).exists()
         ]
+        has_product_references = bool(product_source_images)
+        source_images = list(product_source_images)
+        if not source_images and project.get("mode") == "text-only" and project_uses_emma and emma_catalog:
+            source_images = list(emma_catalog)
         if not source_images and project.get("mode") == "text-only":
             source = asset_manager.reference_root / "text-only-source.png"
             self._create_text_only_source(source, project, product)
@@ -233,26 +242,48 @@ class ImagePipeline:
         history = []
         for index, scene in enumerate(project.get("scenes", []) or []):
             default_source = source_images[index % len(source_images)]
+            if (
+                project_uses_emma
+                and not has_product_references
+                and scene.get("purpose") == "Product Features"
+            ):
+                product_hold_anchor = (
+                    Path(emma_root)
+                    / "emma"
+                    / "intake"
+                    / "synthetic-seed-v1"
+                    / "01_identity_anchors"
+                    / "emma_anchor_03_product_hold_white_tee.png"
+                )
+                if product_hold_anchor.is_file():
+                    default_source = product_hold_anchor.resolve()
             seed = self._stable_seed(project["id"], scene["id"], scene.get("version", 1))
             prompt_bundle = prompt_by_scene[scene["id"]]["openai"]
             story_scene = story_by_scene[scene["id"]]
-            require_emma = scene_requires_emma(scene)
+            presenter_purposes = {"Hook", "Spiritual Value", "Call To Action", "Ending"}
+            require_emma = (
+                project_uses_emma and scene.get("purpose") in presenter_purposes
+            ) or scene_requires_emma(scene)
             emma_references = emma_core.select_references("openai", generation_type="image", require_emma=require_emma)
             if require_emma and emma_references["overall"] == "BLOCKED":
                 raise RuntimeError(f"Emma references are required but unavailable for scene: {scene['id']}")
-            emma_sources = available_reference_paths(emma_references) if require_emma else []
+            emma_sources = merge_unique_paths(
+                available_reference_paths(emma_references),
+                emma_catalog,
+            ) if require_emma else []
             if require_emma and not emma_sources:
                 raise RuntimeError(f"Emma references are registered but their files are unavailable for scene: {scene['id']}")
             best_record = None
             best_quality = None
             best_emma = None
             for attempt in range(self.max_retries + 1):
-                source = emma_sources[attempt % len(emma_sources)] if emma_sources else default_source
+                source = emma_sources[(index + attempt) % len(emma_sources)] if emma_sources else default_source
                 source_role = "emma-identity-reference" if emma_sources else "product-reference"
                 output = asset_manager.generated_root / f"{scene['order']:02d}-{scene['id']}-v{scene.get('version', 1)}-a{attempt}.png"
                 generation = self.provider.generate(scene, story_scene, prompt_bundle, product, source, output, seed, attempt)
                 generation["sourceImage"] = str(source)
                 generation["sourceRole"] = source_role
+                generation["sourceSha256"] = sha256_file(source)
                 emma_eval = emma_core.evaluate_generation(output, scene=scene, provider="openai", require_emma=require_emma)
                 quality = evaluate_image(output, scene, prompt_bundle, emma_eval)
                 asset = asset_manager.register(
@@ -286,6 +317,73 @@ class ImagePipeline:
                 "consistency": best_emma,
             }
             scene["generatedImagePath"] = best_record["output"] if best_record else ""
+            scene["visualProvenance"] = {
+                "provider": best_record.get("provider") if best_record else "",
+                "model": best_record.get("model") if best_record else "",
+                "sourceImage": best_record.get("sourceImage") if best_record else "",
+                "sourceRole": best_record.get("sourceRole") if best_record else "",
+                "sourceSha256": best_record.get("sourceSha256") if best_record else "",
+            }
+            if (
+                project_uses_emma
+                and not has_product_references
+                and scene.get("purpose") == "Introduction"
+            ):
+                product_hold_anchor = (
+                    Path(emma_root)
+                    / "emma"
+                    / "intake"
+                    / "synthetic-seed-v1"
+                    / "01_identity_anchors"
+                    / "emma_anchor_03_product_hold_white_tee.png"
+                )
+                if product_hold_anchor.is_file():
+                    hero_path = asset_manager.generated_root / (
+                        f"{scene['order']:02d}-{scene['id']}-product-hero-v{scene.get('version', 1)}.png"
+                    )
+                    self._create_product_hero_still(product_hold_anchor, hero_path)
+                    scene["videoStillPath"] = str(hero_path)
+                    scene["visualProvenance"].update(
+                        {
+                            "sourceImage": str(product_hold_anchor.resolve()),
+                            "sourceRole": "emma-product-hold-anchor",
+                            "sourceSha256": sha256_file(product_hold_anchor),
+                            "videoStill": str(hero_path),
+                            "videoStillRole": "product-hero-crop",
+                        }
+                    )
+            if project_uses_emma and scene.get("purpose") == "Product Features" and best_record:
+                detail_path = asset_manager.generated_root / (
+                    f"{scene['order']:02d}-{scene['id']}-product-detail-v{scene.get('version', 1)}.png"
+                )
+                self._create_product_detail_still(
+                    Path(best_record["sourceImage"]),
+                    detail_path,
+                )
+                scene["videoStillPath"] = str(detail_path)
+                scene["visualProvenance"]["videoStill"] = str(detail_path)
+                scene["visualProvenance"]["videoStillRole"] = "product-detail-crop"
+            if project_uses_emma and scene.get("purpose") == "Hook":
+                scene["preferLocalVideoGeneration"] = True
+            elif (
+                project_uses_emma
+                and scene.get("purpose") != "Product Features"
+                and not scene.get("videoStillPath")
+                and not (
+                    has_product_references
+                    and scene.get("purpose") == "Introduction"
+                )
+                and emma_videos
+            ):
+                source_video = select_emma_video_for_scene(
+                    emma_videos,
+                    str(scene.get("purpose", "")),
+                    used_emma_videos,
+                )
+                if source_video:
+                    scene["sourceVideoPath"] = str(source_video)
+                    scene["sourceVideoRole"] = "approved-emma-source-video"
+                    used_emma_videos.add(str(source_video.resolve()).lower())
             scene["visualQuality"] = best_quality
             scene["visualStatus"] = best_quality["overall"] if best_quality else "FAIL"
             generated.append(best_record)
@@ -334,9 +432,45 @@ class ImagePipeline:
         path.parent.mkdir(parents=True, exist_ok=True)
         canvas.save(path, optimize=True)
 
+    def _create_product_detail_still(self, source_path: Path, output_path: Path) -> None:
+        with Image.open(source_path) as raw:
+            source = raw.convert("RGB")
+            if "emma_anchor_03_product_hold" in source_path.stem.lower():
+                source = source.crop(
+                    (
+                        int(source.width * 0.46),
+                        int(source.height * 0.34),
+                        int(source.width * 0.72),
+                        int(source.height * 0.56),
+                    )
+                )
+            detail = fit_cover(source, FRAME_SIZE)
+            detail = ImageEnhance.Contrast(detail).enhance(1.04)
+            detail = ImageEnhance.Sharpness(detail).enhance(1.18)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        detail.save(output_path, optimize=True, quality=96)
+
+    def _create_product_hero_still(self, source_path: Path, output_path: Path) -> None:
+        with Image.open(source_path) as raw:
+            source = raw.convert("RGB")
+            source = source.crop(
+                (
+                    int(source.width * 0.18),
+                    int(source.height * 0.18),
+                    int(source.width * 0.82),
+                    int(source.height * 0.90),
+                )
+            )
+            hero = fit_cover(source, FRAME_SIZE)
+            hero = ImageEnhance.Contrast(hero).enhance(1.03)
+            hero = ImageEnhance.Sharpness(hero).enhance(1.10)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        hero.save(output_path, optimize=True, quality=96)
+
     def _stable_seed(self, *parts: Any) -> int:
         value = "|".join(str(part) for part in parts)
-        return abs(hash(value)) % 2_147_483_647
+        digest = hashlib.sha256(value.encode("utf-8")).digest()
+        return int.from_bytes(digest[:8], "big") % 2_147_483_647
 
 
 def scene_requires_emma(scene: dict[str, Any]) -> bool:
@@ -346,16 +480,97 @@ def scene_requires_emma(scene: dict[str, Any]) -> bool:
     return "emma" in content or "艾瑪" in content
 
 
+def project_requires_emma(project: dict[str, Any]) -> bool:
+    content = " ".join(
+        str(project.get(key, ""))
+        for key in ["requirement", "title", "description"]
+    ).lower()
+    return "emma" in content or "艾瑪" in content
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
 def available_reference_paths(selection: dict[str, Any]) -> list[Path]:
     paths: list[Path] = []
     seen: set[str] = set()
     for reference in selection.get("references", []):
-        path = Path(str(reference.get("path", "")))
+        source_path = Path(str(reference.get("sourcePath", "")))
+        stored_path = Path(str(reference.get("path", "")))
+        path = source_path if source_path.exists() else stored_path
         key = str(path.resolve()).lower() if path.exists() else ""
         if key and key not in seen:
             seen.add(key)
             paths.append(path)
     return paths
+
+
+def available_fingerprint_paths(fingerprint: dict[str, Any]) -> list[Path]:
+    return merge_unique_paths(
+        [
+            (
+                Path(str(reference.get("sourcePath", "")))
+                if Path(str(reference.get("sourcePath", ""))).exists()
+                else Path(str(reference.get("path", "")))
+            )
+            for reference in fingerprint.get("references", [])
+            if Path(str(reference.get("sourcePath", ""))).exists()
+            or Path(str(reference.get("path", ""))).exists()
+        ]
+    )
+
+
+def merge_unique_paths(*groups: list[Path]) -> list[Path]:
+    paths: list[Path] = []
+    seen: set[str] = set()
+    for group in groups:
+        for path in group:
+            resolved = Path(path).resolve()
+            key = str(resolved).lower()
+            if key not in seen and resolved.is_file():
+                seen.add(key)
+                paths.append(resolved)
+    return paths
+
+
+def available_emma_video_paths(emma_root: Path) -> list[Path]:
+    video_root = Path(emma_root) / "emma" / "intake" / "video"
+    if not video_root.is_dir():
+        return []
+    return sorted(
+        path.resolve()
+        for path in video_root.iterdir()
+        if path.is_file() and path.suffix.lower() in {".mp4", ".mov", ".mkv", ".webm"}
+    )
+
+
+def select_emma_video_for_scene(
+    videos: list[Path],
+    purpose: str,
+    used: set[str],
+) -> Path | None:
+    if not videos:
+        return None
+    preferred_slots = {
+        "Introduction": 4,
+        "Spiritual Value": 1,
+        "Call To Action": 2,
+        "Ending": 3,
+    }
+    preferred = preferred_slots.get(purpose)
+    candidates: list[Path] = []
+    if preferred is not None and preferred < len(videos):
+        candidates.append(videos[preferred])
+    candidates.extend(videos)
+    for candidate in candidates:
+        if str(candidate.resolve()).lower() not in used:
+            return candidate
+    return None
 
 
 def run_image_pipeline(

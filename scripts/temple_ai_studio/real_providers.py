@@ -241,7 +241,11 @@ class ComfyUIProductionClient:
                             "type": item.get("type", "output"),
                         }
                     )
-                    target = output_dir / Path(filename).name
+                    target_name = Path(filename).name
+                    target = output_dir / target_name
+                    if len(str(target.resolve())) >= 240:
+                        suffix = Path(target_name).suffix
+                        target = output_dir / f"{media_key}-{node_id}{suffix}"
                     with urllib.request.urlopen(
                         f"{self.endpoint}/view?{query}",
                         timeout=self.timeout,
