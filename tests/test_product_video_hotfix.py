@@ -325,6 +325,22 @@ class ProductVideoHotfixTests(unittest.TestCase):
         self.assertIn("聲音", self.server.suggested_action("TTS 聲音失敗"))
         self.assertIn("Emma", self.server.suggested_action("Emma 身分一致性檢查未通過"))
 
+    def test_job_result_reports_active_emma_identity_version(self) -> None:
+        self.server.health_payload = lambda: {
+            "emmaCore": {"identityVersion": "emma-v5"},
+            "productionActivation": {},
+        }
+        self.server.get_job_provider = lambda _project_id: "本機優先"
+        result = self.server.job_result(
+            {
+                "id": "project-emma-version",
+                "productName": "純文字影片",
+                "mode": "text-only",
+                "status": "Ready for Preview",
+            }
+        )
+        self.assertEqual(result["emmaVersion"], "emma-v5")
+
     def test_job_stage_history_is_persisted(self) -> None:
         self.server.start_job = lambda _job_id: None
         job, _ = self.server.create_job(

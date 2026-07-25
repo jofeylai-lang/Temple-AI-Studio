@@ -1135,6 +1135,12 @@ def job_result(project: dict) -> dict:
         or project.get("visualQuality", {}).get("overallScore")
     )
     health = health_payload()
+    emma_health = health.get("emmaCore", {})
+    emma_version = (
+        emma_health.get("activeIdentityVersion")
+        or emma_health.get("identityVersion")
+        or "未啟用"
+    )
     return {
         "projectId": project["id"],
         "productId": project.get("productId", ""),
@@ -1145,7 +1151,7 @@ def job_result(project: dict) -> dict:
         "previewVideo": project.get("previewVideo", ""),
         "finalVideo": project.get("finalVideo", ""),
         "qualityScore": quality,
-        "emmaVersion": health.get("emmaCore", {}).get("activeIdentityVersion", "未啟用"),
+        "emmaVersion": emma_version,
         "voiceVersion": health.get("productionActivation", {}).get("voiceProfile", {}).get("version", "依正式設定"),
         "provider": get_job_provider(project.get("id", "")),
         "durationConflict": project.get("durationConflict"),
