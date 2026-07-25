@@ -14,7 +14,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 VIDEO_INTELLIGENCE_SCHEMA = "temple-ai-studio.video-intelligence.v1"
-VIDEO_INTELLIGENCE_VERSION = "1.0.0"
+VIDEO_INTELLIGENCE_VERSION = "1.0.1"
 FRAME_SIZE = (1080, 1920)
 FPS = 25
 SAMPLE_RATE = 44100
@@ -179,9 +179,9 @@ class RenderingPipeline:
         self.provider = provider
         self.codecs = codecs or ["libx264", "h264_mf", "mpeg4"]
 
-    def render_clip(self, frame: Path, output: Path, duration: int, camera: dict[str, Any]) -> dict[str, Any]:
+    def render_clip(self, frame: Path, output: Path, duration: float, camera: dict[str, Any]) -> dict[str, Any]:
         output.parent.mkdir(parents=True, exist_ok=True)
-        frames = max(FPS * int(duration), FPS * 2)
+        frames = max(1, round(FPS * float(duration)))
         vf = (
             f"zoompan=z='{camera['zoomExpression']}':x='{camera['xExpression']}':y='{camera['yExpression']}':"
             f"d={frames}:s={FRAME_SIZE[0]}x{FRAME_SIZE[1]}:fps={FPS},format=yuv420p"
@@ -252,11 +252,20 @@ class VideoQualityAnalyzer:
     def analyze(self, video: Path, scenes: list[dict[str, Any]], scene_reports: list[dict[str, Any]]) -> dict[str, Any]:
         decode = self._decode(video)
         scene_scores = [report["quality"]["score"] for report in scene_reports if report.get("quality")]
+        expected_duration = round(sum(float(scene.get("duration", 0)) for scene in scenes), 3)
+        actual_duration = timecode_seconds(decode.get("metadata", {}).get("duration"))
         checks = [
             {"name": "video-playback", "ok": decode["ok"]},
             {"name": "vertical-format", "ok": decode.get("metadata", {}).get("size", {}).get("height", 0) > decode.get("metadata", {}).get("size", {}).get("width", 0)},
             {"name": "fps-present", "ok": bool(decode.get("metadata", {}).get("fps"))},
             {"name": "audio-stream-present", "ok": bool(decode.get("metadata", {}).get("audioLine"))},
+            {
+                "name": "duration-target",
+                "ok": actual_duration is not None
+                and abs(actual_duration - expected_duration) <= 0.25,
+                "expectedSeconds": expected_duration,
+                "actualSeconds": actual_duration,
+            },
             {"name": "scene-rendering", "ok": all(report.get("render", {}).get("overall") == "PASS" for report in scene_reports)},
             {"name": "subtitle-quality", "ok": all(report.get("subtitle", {}).get("overall") == "PASS" for report in scene_reports)},
             {"name": "motion-quality", "ok": all(report.get("motion", {}).get("overall") == "PASS" for report in scene_reports)},
@@ -307,6 +316,21 @@ def parse_ffmpeg_metadata(output: str) -> dict[str, Any]:
     return {"duration": duration, "size": size or {}, "fps": fps, "videoLine": video_line, "audioLine": audio_line}
 
 
+def timecode_seconds(value: str | None) -> float | None:
+    if not value:
+        return None
+    parts = value.split(":")
+    if len(parts) != 3:
+        return None
+    try:
+        return round(
+            int(parts[0]) * 3600 + int(parts[1]) * 60 + float(parts[2]),
+            3,
+        )
+    except ValueError:
+        return None
+
+
 class VideoGenerationPipeline:
     def __init__(self, ffmpeg: Path, provider: str = LOCAL_PROVIDER):
         self.ffmpeg = Path(ffmpeg)
@@ -341,7 +365,12 @@ class VideoGenerationPipeline:
             talking_report = self.talking_head.plan(scene)
             lip_report = self.lip_sync.plan(scene, audio_available=False)
             clip_path = clip_dir / f"{scene['order']:02d}-{scene['id']}-v{scene.get('version', 1)}.mp4"
-            render_report = self.renderer.render_clip(subtitle_frame, clip_path, int(scene["duration"]), camera_report)
+            render_report = self.renderer.render_clip(
+                subtitle_frame,
+                clip_path,
+                float(scene["duration"]),
+                camera_report,
+            )
             if render_report["overall"] != "PASS":
                 raise RuntimeError(f"Scene render failed: {scene.get('id')}: {render_report.get('error', '')}")
             scene_quality = scene.get("visualQuality") or {"score": 0.8, "overall": "PASS"}

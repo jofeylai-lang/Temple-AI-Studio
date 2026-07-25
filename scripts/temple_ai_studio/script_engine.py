@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 
-SCRIPT_ENGINE_VERSION = "1.0.0"
+SCRIPT_ENGINE_VERSION = "1.0.1"
 DEFAULT_PLATFORM = "Instagram Reels"
 DEFAULT_DURATION = 30
 SCENE_ARC = [
@@ -83,9 +83,14 @@ def clamp(value: int, minimum: int, maximum: int) -> int:
     return max(minimum, min(maximum, value))
 
 
-def split_durations(total: int) -> list[int]:
-    values = [max(2, round(total * weight)) for _, _, weight in SCENE_ARC]
-    values[-1] += total - sum(values)
+def split_durations(total: int) -> list[float]:
+    scene_minimum = 0.5
+    remaining = float(total) - scene_minimum * len(SCENE_ARC)
+    values = [
+        round(scene_minimum + remaining * weight, 2)
+        for _, _, weight in SCENE_ARC
+    ]
+    values[-1] = round(values[-1] + float(total) - sum(values), 2)
     return values
 
 
@@ -237,7 +242,7 @@ def generate_video_script_package(product: dict[str, Any], payload: dict[str, An
     project_id = project_id or new_id("script-project")
     intent = analyze_intent(product, payload)
     platform = intent["platform"]
-    total_duration = clamp(int(payload.get("duration") or DEFAULT_DURATION), 18, 60)
+    total_duration = clamp(int(payload.get("duration") or DEFAULT_DURATION), 5, 180)
     durations = split_durations(total_duration)
     templates = build_scene_templates(product, intent)
     scenes = []

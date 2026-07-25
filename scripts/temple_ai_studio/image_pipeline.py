@@ -204,7 +204,24 @@ class ImagePipeline:
         emma_core = EmmaCore(emma_root)
         emma_status = emma_core.initialize()
         product_assets = asset_manager.register_product_assets(product)
-        source_images = [Path(item["path"]) for item in product_assets if Path(item["path"]).exists()]
+        source_images = [
+            Path(item["path"])
+            for item in product_assets
+            if Path(item["path"]).suffix.lower() in {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
+            and Path(item["path"]).exists()
+        ]
+        if not source_images and project.get("mode") == "text-only":
+            source = asset_manager.reference_root / "text-only-source.png"
+            self._create_text_only_source(source, project, product)
+            asset_manager.register(
+                source,
+                asset_type="generated-reference",
+                role="text-only-visual-source",
+                provider=self.provider.name,
+                source="traditional-chinese-request",
+                metadata={"mode": "text-only"},
+            )
+            source_images = [source]
         if not source_images:
             raise RuntimeError("No product reference images are available for visual generation.")
         storyboard = build_storyboard(project, product)
@@ -286,6 +303,28 @@ class ImagePipeline:
         report_path = Path(project_dir) / "visual-pipeline-report.json"
         report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
         return report
+
+    def _create_text_only_source(self, path: Path, project: dict[str, Any], product: dict[str, Any]) -> None:
+        canvas = Image.new("RGB", FRAME_SIZE, "#eef3ef")
+        draw = ImageDraw.Draw(canvas)
+        title_font = get_font(70)
+        body_font = get_font(46)
+        small_font = get_font(30)
+        draw.rectangle((0, 0, FRAME_SIZE[0], 520), fill="#17231f")
+        draw.rectangle((0, 520, FRAME_SIZE[0], FRAME_SIZE[1]), fill="#f7f3ec")
+        draw.rounded_rectangle((86, 650, 994, 1450), radius=40, fill="#ffffff", outline="#d6c4a8", width=4)
+        draw.text((86, 126), "Temple AI Studio", fill="#e6c98b", font=small_font)
+        title = product.get("name") or "純文字影片"
+        draw.text((86, 210), title, fill="#ffffff", font=title_font)
+        text = project.get("requirement") or product.get("description") or "神殿內容"
+        y = 760
+        for line in wrap_text(draw, text, body_font, 790):
+            draw.text((140, y), line, fill="#25372f", font=body_font)
+            y += 92
+        draw.rounded_rectangle((140, 1280, 940, 1370), radius=18, fill="#245c4f")
+        draw.text((230, 1304), "繁體中文內容視覺來源", fill="#ffffff", font=small_font)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        canvas.save(path, optimize=True)
 
     def _stable_seed(self, *parts: Any) -> int:
         value = "|".join(str(part) for part in parts)

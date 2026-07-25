@@ -101,6 +101,40 @@ class VideoIntelligenceTests(unittest.TestCase):
             self.assertIn("videoArgs", scene_report["render"])
             self.assertIn(scene_report["lipSync"]["overall"], ["NOT_REQUIRED", "READY", "WAITING_FOR_AUDIO"])
 
+    def test_requested_duration_is_preserved_in_rendered_video(self) -> None:
+        short_package = generate_video_script_package(
+            self.product,
+            {
+                "requirement": "請製作一支 8 秒的直式短影音。",
+                "platform": "Instagram Reels",
+                "duration": 8,
+            },
+            "project-duration-test",
+        )
+        self.project["duration"] = short_package["duration"]
+        for scene, short_scene in zip(self.project["scenes"], short_package["scenes"]):
+            scene["duration"] = short_scene["duration"]
+            scene["start"] = short_scene["start"]
+            scene["end"] = short_scene["end"]
+
+        output_dir = self.root / "duration-exports"
+        report = run_video_generation_pipeline(
+            self.project,
+            self.product,
+            output_dir,
+            Path(self.project["projectDir"]),
+            self.ffmpeg,
+            preview=True,
+        )
+        duration_check = next(
+            check
+            for check in report["quality"]["checks"]
+            if check["name"] == "duration-target"
+        )
+        self.assertTrue(duration_check["ok"])
+        self.assertAlmostEqual(duration_check["expectedSeconds"], 8, places=2)
+        self.assertLessEqual(abs(duration_check["actualSeconds"] - 8), 0.25)
+
 
 if __name__ == "__main__":
     unittest.main()

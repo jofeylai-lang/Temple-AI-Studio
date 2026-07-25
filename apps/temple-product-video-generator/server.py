@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import os
 import re
@@ -48,8 +49,8 @@ EVIDENCE_ROOT = DATA_ROOT / "evidence"
 LOG_ROOT = DATA_ROOT / "logs"
 SUPPORT_ROOT = DATA_ROOT / "support"
 RELEASE_ROOT = APP_ROOT / "release"
-VERSION = "1.0.0"
-CURRENT_SCHEMA_VERSION = 1
+VERSION = "1.1.1"
+CURRENT_SCHEMA_VERSION = 2
 
 VIDEO_STATES = [
     "Draft",
@@ -63,6 +64,29 @@ VIDEO_STATES = [
 ]
 
 DB_LOCK = threading.Lock()
+JOB_THREAD_LOCK = threading.Lock()
+ACTIVE_JOB_THREADS: dict[str, threading.Thread] = {}
+DATABASE_RECOVERY_STATE = {
+    "recovered": False,
+    "message": "",
+    "backupPath": "",
+}
+
+JOB_STAGES = [
+    {"key": "validation", "label": "驗證需求", "progress": 3},
+    {"key": "product", "label": "載入商品資料", "progress": 8},
+    {"key": "research", "label": "整理需求與知識", "progress": 14},
+    {"key": "script", "label": "生成腳本", "progress": 22},
+    {"key": "storyboard", "label": "規劃分鏡", "progress": 32},
+    {"key": "images", "label": "處理影像", "progress": 44},
+    {"key": "emma", "label": "檢查 Emma 一致性", "progress": 54},
+    {"key": "video", "label": "生成影片", "progress": 66},
+    {"key": "audio", "label": "處理聲音", "progress": 74},
+    {"key": "subtitles", "label": "建立字幕", "progress": 82},
+    {"key": "editing", "label": "自動剪輯", "progress": 89},
+    {"key": "render", "label": "渲染影片", "progress": 96},
+    {"key": "export", "label": "完成輸出", "progress": 100},
+]
 
 
 def production_data_root() -> Path:
@@ -131,9 +155,11 @@ def default_config() -> dict:
 
 def empty_db() -> dict:
     return {
-        "schemaVersion": 1,
+        "schemaVersion": CURRENT_SCHEMA_VERSION,
+        "dataVersion": "2.0",
         "products": [],
         "projects": [],
+        "jobs": [],
         "errors": [],
         "createdAt": now_iso(),
         "updatedAt": now_iso(),
@@ -144,7 +170,12 @@ def load_config() -> dict:
     ensure_dirs()
     if not CONFIG_PATH.exists():
         atomic_write_json(CONFIG_PATH, default_config())
-    return json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    config = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    if config.get("version") != VERSION:
+        config["version"] = VERSION
+        config["updatedAt"] = now_iso()
+        atomic_write_json(CONFIG_PATH, config)
+    return config
 
 
 def save_config(config: dict) -> dict:
@@ -168,6 +199,7 @@ def save_config(config: dict) -> dict:
     current["defaultDuration"] = int(current.get("defaultDuration") or 30)
     current["includeLogo"] = str(current.get("includeLogo", "true")).lower() == "true"
     current["cloudEnabled"] = False
+    current["version"] = VERSION
     current["updatedAt"] = now_iso()
     atomic_write_json(CONFIG_PATH, current)
     return current
@@ -177,10 +209,33 @@ def load_db() -> dict:
     ensure_dirs()
     if not DB_PATH.exists():
         atomic_write_json(DB_PATH, empty_db())
-    db = json.loads(DB_PATH.read_text(encoding="utf-8"))
+    try:
+        db = json.loads(DB_PATH.read_text(encoding="utf-8"))
+        if not isinstance(db, dict):
+            raise ValueError("資料庫根節點必須是物件")
+    except (json.JSONDecodeError, UnicodeDecodeError, ValueError) as error:
+        corrupt_dir = BACKUP_ROOT / "corrupt-database"
+        corrupt_dir.mkdir(parents=True, exist_ok=True)
+        backup_path = corrupt_dir / f"database-corrupt-{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+        shutil.copy2(DB_PATH, backup_path)
+        db = empty_db()
+        atomic_write_json(DB_PATH, db)
+        DATABASE_RECOVERY_STATE.update(
+            {
+                "recovered": True,
+                "message": f"已隔離損毀資料庫並建立可用空資料庫：{error}",
+                "backupPath": str(backup_path),
+            }
+        )
+        append_log(
+            "recovery.log",
+            "database-corruption-recovered",
+            {"error": str(error), "backupPath": str(backup_path)},
+        )
     db = migrate_db(db)
     db.setdefault("products", [])
     db.setdefault("projects", [])
+    db.setdefault("jobs", [])
     db.setdefault("errors", [])
     return db
 
@@ -194,7 +249,9 @@ def migrate_db(db: dict) -> dict:
         migration_dir.mkdir(parents=True, exist_ok=True)
         backup_path = migration_dir / f"database-before-schema-{CURRENT_SCHEMA_VERSION}-{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
         backup_path.write_text(json.dumps(db, ensure_ascii=False, indent=2), encoding="utf-8")
+        db.setdefault("jobs", [])
         db["schemaVersion"] = CURRENT_SCHEMA_VERSION
+        db["dataVersion"] = "2.0"
         db["migratedAt"] = now_iso()
         atomic_write_json(DB_PATH, db)
         append_log("recovery.log", "database-migrated", {"from": version, "to": CURRENT_SCHEMA_VERSION, "backup": str(backup_path)})
@@ -204,6 +261,45 @@ def migrate_db(db: dict) -> dict:
 def save_db(db: dict) -> None:
     db["updatedAt"] = now_iso()
     atomic_write_json(DB_PATH, db)
+
+
+def database_health() -> dict:
+    ensure_dirs()
+    schema_version = None
+    product_count = 0
+    job_count = 0
+    migration_status = "尚未初始化"
+    error_message = ""
+    try:
+        db = load_db()
+        schema_version = db.get("schemaVersion")
+        product_count = len(db.get("products", []))
+        job_count = len(db.get("jobs", []))
+        migration_status = (
+            "已復原損毀資料庫"
+            if DATABASE_RECOVERY_STATE["recovered"]
+            else "已是最新版本"
+        )
+    except Exception as error:
+        error_message = str(error)
+        migration_status = "資料庫無法使用"
+    exists = DB_PATH.exists()
+    readable = exists and os.access(DB_PATH, os.R_OK)
+    writable = os.access(DB_PATH if exists else DB_PATH.parent, os.W_OK)
+    return {
+        "path": str(DB_PATH),
+        "exists": exists,
+        "readable": readable,
+        "writable": writable,
+        "schemaVersion": schema_version,
+        "targetSchemaVersion": CURRENT_SCHEMA_VERSION,
+        "migrationStatus": migration_status,
+        "productCount": product_count,
+        "jobCount": job_count,
+        "apiHealth": "正常" if not error_message else "異常",
+        "error": error_message,
+        "recovery": dict(DATABASE_RECOVERY_STATE),
+    }
 
 
 def detect_ffmpeg() -> str:
@@ -294,6 +390,7 @@ def health_payload() -> dict:
         "time": now_iso(),
         "dataRoot": str(DATA_ROOT),
         "logRoot": str(LOG_ROOT),
+        "database": database_health(),
         "ffmpeg": {
             "path": ffmpeg,
             "available": bool(ffmpeg and Path(ffmpeg).exists()),
@@ -422,8 +519,11 @@ def create_product(payload: dict) -> dict:
         "category": str(payload.get("category", "")).strip(),
         "description": str(payload.get("description", "")).strip(),
         "sellingPoint": str(payload.get("sellingPoint", "")).strip(),
+        "productInfo": str(payload.get("productInfo", "")).strip(),
         "spiritualInfo": str(payload.get("spiritualInfo", "")).strip(),
         "targetAudience": str(payload.get("targetAudience", "")).strip(),
+        "tags": split_terms(payload.get("tags", "")),
+        "seoKeywords": split_terms(payload.get("seoKeywords", "")),
         "materials": [],
         "createdAt": now_iso(),
         "updatedAt": now_iso(),
@@ -442,9 +542,20 @@ def update_product(product_id: str, payload: dict) -> dict:
     with DB_LOCK:
         db = load_db()
         product = find_item(db["products"], product_id)
-        for key in ["name", "category", "description", "sellingPoint", "spiritualInfo", "targetAudience"]:
+        for key in [
+            "name",
+            "category",
+            "description",
+            "sellingPoint",
+            "productInfo",
+            "spiritualInfo",
+            "targetAudience",
+        ]:
             if key in payload:
                 product[key] = str(payload.get(key, "")).strip()
+        for key in ["tags", "seoKeywords"]:
+            if key in payload:
+                product[key] = split_terms(payload.get(key, ""))
         errors = validate_product(product)
         if errors:
             raise ValueError("；".join(errors))
@@ -464,9 +575,28 @@ def delete_product(product_id: str) -> dict:
     return {"deleted": product_id}
 
 
-def add_materials(product_id: str, files: list[dict]) -> dict:
+def split_terms(value) -> list[str]:
+    if isinstance(value, list):
+        terms = value
+    else:
+        terms = re.split(r"[,，、\n]+", str(value or ""))
+    return list(dict.fromkeys(term.strip() for term in terms if term.strip()))
+
+
+def material_kind(file_name: str, requested: str = "") -> str:
+    if requested in {"image", "logo", "video", "document"}:
+        return requested
+    suffix = Path(file_name).suffix.lower()
+    if suffix in {".png", ".jpg", ".jpeg", ".webp", ".bmp"}:
+        return "image"
+    if suffix in {".mp4", ".mov", ".webm"}:
+        return "video"
+    return "document"
+
+
+def add_materials(product_id: str, files: list[dict], requested_kind: str = "") -> dict:
     if not files:
-        raise ValueError("請至少選擇一張商品照片")
+        raise ValueError("請至少選擇一個商品素材")
     saved = []
     with DB_LOCK:
         db = load_db()
@@ -481,26 +611,59 @@ def add_materials(product_id: str, files: list[dict]) -> dict:
                 data_url = data_url.split(",", 1)[1]
             blob = base64.b64decode(data_url)
             if len(blob) > 25 * 1024 * 1024:
-                raise ValueError("單張圖片不可超過 25MB")
+                raise ValueError("單一素材不可超過 25MB")
             suffix = Path(raw_name).suffix.lower()
-            if suffix not in [".png", ".jpg", ".jpeg", ".webp", ".bmp"]:
-                raise ValueError("僅支援 PNG、JPG、WEBP、BMP 圖片")
+            allowed = {
+                ".png",
+                ".jpg",
+                ".jpeg",
+                ".webp",
+                ".bmp",
+                ".mp4",
+                ".mov",
+                ".webm",
+                ".pdf",
+                ".txt",
+                ".docx",
+            }
+            if suffix not in allowed:
+                raise ValueError("不支援此素材格式")
             material_id = new_id("material")
             path = target_dir / f"{material_id}{suffix}"
             path.write_bytes(blob)
-            with Image.open(path) as img:
-                width, height = img.size
-                img.verify()
+            kind = material_kind(raw_name, item.get("kind") or requested_kind)
+            width = 0
+            height = 0
+            if kind in {"image", "logo"}:
+                with Image.open(path) as img:
+                    width, height = img.size
+                    img.verify()
+            digest = hashlib.sha256(blob).hexdigest()
+            if any(existing.get("sha256") == digest for existing in product.get("materials", [])):
+                path.unlink(missing_ok=True)
+                continue
             material = {
                 "id": material_id,
                 "fileName": raw_name,
                 "mime": item.get("type", "image/*"),
+                "kind": kind,
                 "path": str(path),
                 "url": image_url(str(path)),
-                "role": "商品照片" if next_order > 1 else "主商品照片",
+                "role": (
+                    "品牌 Logo"
+                    if kind == "logo"
+                    else "商品影片"
+                    if kind == "video"
+                    else "商品文件"
+                    if kind == "document"
+                    else "商品照片"
+                    if next_order > 1
+                    else "主商品照片"
+                ),
                 "order": next_order,
                 "width": width,
                 "height": height,
+                "sha256": digest,
                 "createdAt": now_iso(),
             }
             product.setdefault("materials", []).append(material)
@@ -508,6 +671,8 @@ def add_materials(product_id: str, files: list[dict]) -> dict:
             next_order += 1
         product["updatedAt"] = now_iso()
         save_db(db)
+    if not saved:
+        raise ValueError("所選素材與既有檔案重複，未再次加入。")
     return {"materials": saved}
 
 
@@ -556,7 +721,8 @@ def move_material(product_id: str, material_id: str, direction: str) -> dict:
             materials[index], materials[swap] = materials[swap], materials[index]
         for order, item in enumerate(materials, start=1):
             item["order"] = order
-            item["role"] = "主商品照片" if order == 1 else "商品照片"
+            if item.get("kind", "image") == "image":
+                item["role"] = "主商品照片" if order == 1 else "商品照片"
         product["materials"] = materials
         product["updatedAt"] = now_iso()
         save_db(db)
@@ -584,21 +750,102 @@ def find_item(items: list[dict], item_id: str) -> dict:
 def generate_content(product: dict, payload: dict, project_id: str) -> dict:
     return generate_video_script_package(product, payload, project_id)
 
-def create_project(payload: dict) -> dict:
+
+def duration_conflict(payload: dict) -> dict | None:
+    requirement = str(payload.get("requirement", ""))
+    selected = int(payload.get("duration") or load_config().get("defaultDuration") or 30)
+    matches = re.findall(r"(?<!\d)(\d{1,3})\s*(?:秒鐘|秒|seconds?|secs?|s)", requirement, re.IGNORECASE)
+    if not matches:
+        return None
+    requested = int(matches[-1])
+    if requested == selected:
+        return None
+    return {
+        "selectedDuration": selected,
+        "requestDuration": requested,
+        "message": f"文字需求提到 {requested} 秒，但介面選擇 {selected} 秒；本次以介面設定為準。",
+    }
+
+
+def validate_project_submission(payload: dict) -> dict:
+    mode = str(payload.get("mode", "product")).strip().lower()
+    if mode not in {"product", "text-only"}:
+        mode = "product"
+    errors: dict[str, str] = {}
+    requirement = str(payload.get("requirement", "")).strip()
+    if not requirement:
+        errors["requirement"] = "請輸入中文影片需求。"
+    try:
+        duration = int(payload.get("duration") or load_config().get("defaultDuration") or 30)
+    except (TypeError, ValueError):
+        duration = 0
+    if duration < 5 or duration > 180:
+        errors["duration"] = "影片秒數必須介於 5 到 180 秒。"
+
+    product = None
+    if mode == "product":
+        product_id = str(payload.get("productId", "")).strip()
+        if not product_id:
+            errors["productId"] = "請選擇商品，或改用純文字模式。"
+        else:
+            try:
+                product = find_item(load_db()["products"], product_id)
+            except KeyError:
+                errors["productId"] = "找不到所選商品，請重新整理或建立商品。"
+        if product and not any(item.get("kind", "image") in {"image", "logo"} for item in product.get("materials", [])):
+            errors["materials"] = "商品影片至少需要一張商品照片或 Logo。"
+    if errors:
+        error = ValueError("；".join(errors.values()))
+        error.field_errors = errors
+        raise error
+    return {
+        "mode": mode,
+        "duration": duration,
+        "requirement": requirement,
+        "product": product,
+        "durationConflict": duration_conflict({**payload, "duration": duration}),
+    }
+
+
+def inline_product(payload: dict) -> dict:
+    requirement = str(payload.get("requirement", "")).strip()
+    return {
+        "id": "",
+        "name": str(payload.get("textProjectName", "")).strip() or "純文字影片",
+        "category": "純文字內容",
+        "description": requirement,
+        "sellingPoint": requirement,
+        "productInfo": "",
+        "spiritualInfo": str(payload.get("spiritualInfo", "")).strip(),
+        "targetAudience": str(payload.get("targetAudience", "")).strip(),
+        "tags": [],
+        "seoKeywords": [],
+        "materials": [],
+    }
+
+
+def create_project_record(payload: dict, validation: dict | None = None) -> dict:
+    validation = validation or validate_project_submission(payload)
+    mode = validation["mode"]
+    product = validation.get("product") or inline_product(payload)
+    project_id = new_id("project")
+    content_payload = {
+        **payload,
+        "duration": validation["duration"],
+        "requirement": validation["requirement"],
+    }
+    content = generate_content(product, content_payload, project_id)
     with DB_LOCK:
         db = load_db()
-        product = find_item(db["products"], payload.get("productId", ""))
-        if not product.get("materials"):
-            raise ValueError("請先上傳至少一張商品照片")
-        project_id = new_id("project")
-        content = generate_content(product, payload, project_id)
         configured_output = Path(load_config().get("outputDir") or EXPORT_ROOT).resolve()
         project_dir = PROJECT_ROOT / project_id
         project_dir.mkdir(parents=True, exist_ok=True)
         project = {
             "id": project_id,
-            "productId": product["id"],
+            "productId": product.get("id", ""),
             "productName": product["name"],
+            "mode": mode,
+            "inlineProduct": product if mode == "text-only" else None,
             "status": "Planning",
             "reviewStatus": "未審核",
             "createdAt": now_iso(),
@@ -607,12 +854,34 @@ def create_project(payload: dict) -> dict:
             "projectDir": str(project_dir),
             "renderHistory": [],
             "errors": [],
+            "durationConflict": validation.get("durationConflict"),
             **content,
         }
         db["projects"].append(project)
         save_db(db)
-    append_log("generation.log", "project-created", {"projectId": project_id, "productId": product["id"], "platform": project["platform"]})
-    return render_project(project_id, preview=True)
+    append_log(
+        "generation.log",
+        "project-created",
+        {
+            "projectId": project_id,
+            "productId": product.get("id", ""),
+            "mode": mode,
+            "platform": project["platform"],
+            "durationConflict": validation.get("durationConflict"),
+        },
+    )
+    return project
+
+
+def create_project(payload: dict) -> dict:
+    project = create_project_record(payload)
+    return render_project(project["id"], preview=True)
+
+
+def resolve_project_product(db: dict, project: dict) -> dict:
+    if project.get("mode") == "text-only" or not project.get("productId"):
+        return project.get("inlineProduct") or inline_product(project)
+    return find_item(db["products"], project["productId"])
 
 
 def update_scene(project_id: str, scene_id: str, payload: dict) -> dict:
@@ -643,7 +912,7 @@ def approve_scene(project_id: str, scene_id: str) -> dict:
         return project
 
 
-def regenerate_scene(project_id: str, scene_id: str) -> dict:
+def regenerate_scene(project_id: str, scene_id: str, progress_callback=None) -> dict:
     with DB_LOCK:
         db = load_db()
         project = find_item(db["projects"], project_id)
@@ -661,7 +930,7 @@ def regenerate_scene(project_id: str, scene_id: str) -> dict:
             {"type": "scene-regenerate", "sceneId": scene_id, "version": scene["version"], "at": now_iso()}
         )
         save_db(db)
-    return render_project(project_id, preview=True)
+    return render_project(project_id, preview=True, progress_callback=progress_callback)
 
 
 def approve_project(project_id: str) -> dict:
@@ -697,16 +966,21 @@ def cancel_project(project_id: str) -> dict:
         return project
 
 
-def render_project(project_id: str, preview: bool) -> dict:
+def render_project(project_id: str, preview: bool, progress_callback=None) -> dict:
     with DB_LOCK:
         db = load_db()
         project = find_item(db["projects"], project_id)
-        product = find_item(db["products"], project["productId"])
+        product = resolve_project_product(db, project)
         project["status"] = "Generating" if preview else "Exporting"
         project["updatedAt"] = now_iso()
         save_db(db)
     try:
-        output = build_video_assets(project, product, preview=preview)
+        output = build_video_assets(
+            project,
+            product,
+            preview=preview,
+            progress_callback=progress_callback,
+        )
         with DB_LOCK:
             db = load_db()
             project = find_item(db["projects"], project_id)
@@ -720,6 +994,8 @@ def render_project(project_id: str, preview: bool) -> dict:
             save_db(db)
             return project
     except Exception as error:
+        if isinstance(error, JobCancelled):
+            raise
         message = str(error)
         with DB_LOCK:
             db = load_db()
@@ -732,15 +1008,490 @@ def render_project(project_id: str, preview: bool) -> dict:
         return project
 
 
-def export_project(project_id: str) -> dict:
+def export_project(project_id: str, progress_callback=None) -> dict:
     with DB_LOCK:
         project = find_item(load_db()["projects"], project_id)
         if project.get("status") not in ["Approved", "Ready for Preview", "Completed"]:
             raise ValueError("專案尚未準備好匯出")
-    project = render_project(project_id, preview=False)
+    project = render_project(
+        project_id,
+        preview=False,
+        progress_callback=progress_callback,
+    )
     write_export_package(project)
     append_log("generation.log", "project-exported", {"projectId": project_id, "outputDir": project.get("outputDir")})
     return project
+
+
+class JobCancelled(RuntimeError):
+    pass
+
+
+def get_job(job_id: str) -> dict:
+    return find_item(load_db().get("jobs", []), job_id)
+
+
+def job_provider_summary() -> tuple[str, str]:
+    config = load_config()
+    mode = config.get("providerMode", "local-first")
+    if mode == "production":
+        return "正式本機流程", "自動選擇"
+    ffmpeg = Path(config.get("ffmpegPath") or detect_ffmpeg()).name
+    return "本機優先", ffmpeg or "尚未選定"
+
+
+def update_job(
+    job_id: str,
+    *,
+    status: str | None = None,
+    stage: str | None = None,
+    progress: int | None = None,
+    message: str | None = None,
+    project_id: str | None = None,
+    result: dict | None = None,
+    error: dict | None = None,
+) -> dict:
+    with DB_LOCK:
+        db = load_db()
+        job = find_item(db["jobs"], job_id)
+        if status:
+            job["status"] = status
+        if stage:
+            previous_stage = job.get("currentStage", "")
+            job["lastStage"] = previous_stage
+            job["currentStage"] = stage
+            if previous_stage != stage:
+                job.setdefault("stageHistory", []).append(
+                    {
+                        "stage": stage,
+                        "progress": int(progress if progress is not None else job.get("progress", 0)),
+                        "message": message or "",
+                        "at": now_iso(),
+                    }
+                )
+        if progress is not None:
+            job["progress"] = max(0, min(100, int(progress)))
+        if message is not None:
+            job["message"] = message
+        if project_id is not None:
+            job["projectId"] = project_id
+        if result is not None:
+            job["result"] = result
+        if error is not None:
+            job["error"] = error
+        job["updatedAt"] = now_iso()
+        started = datetime.fromisoformat(job.get("startedAt") or job["createdAt"])
+        elapsed = max(0, int((datetime.now() - started).total_seconds()))
+        job["elapsedSeconds"] = elapsed
+        current_progress = int(job.get("progress", 0))
+        if elapsed >= 2 and 5 <= current_progress < 96:
+            job["etaSeconds"] = max(1, int(elapsed * (100 - current_progress) / current_progress))
+        else:
+            job["etaSeconds"] = None
+        if status in {"completed", "failed", "cancelled"}:
+            job["finishedAt"] = now_iso()
+            job["etaSeconds"] = 0
+        save_db(db)
+        snapshot = dict(job)
+    append_log(
+        "jobs.log",
+        "job-updated",
+        {
+            "jobId": job_id,
+            "status": snapshot.get("status"),
+            "stage": snapshot.get("currentStage"),
+            "progress": snapshot.get("progress"),
+            "projectId": snapshot.get("projectId"),
+            "message": snapshot.get("message"),
+        },
+    )
+    return snapshot
+
+
+def ensure_job_not_cancelled(job_id: str) -> None:
+    job = get_job(job_id)
+    if job.get("cancelRequested") or job.get("status") in {"cancelling", "cancelled"}:
+        raise JobCancelled("使用者已取消工作。")
+
+
+def stage_reporter(job_id: str):
+    def report(stage: str, progress: int, message: str) -> None:
+        ensure_job_not_cancelled(job_id)
+        update_job(
+            job_id,
+            status="running",
+            stage=stage,
+            progress=progress,
+            message=message,
+        )
+
+    return report
+
+
+def job_result(project: dict) -> dict:
+    quality = (
+        project.get("videoQuality", {}).get("overallScore")
+        or project.get("visualQuality", {}).get("score")
+        or project.get("visualQuality", {}).get("overallScore")
+    )
+    health = health_payload()
+    return {
+        "projectId": project["id"],
+        "productId": project.get("productId", ""),
+        "productName": project.get("productName", ""),
+        "mode": project.get("mode", "product"),
+        "status": project.get("status"),
+        "outputDir": project.get("outputDir", ""),
+        "previewVideo": project.get("previewVideo", ""),
+        "finalVideo": project.get("finalVideo", ""),
+        "qualityScore": quality,
+        "emmaVersion": health.get("emmaCore", {}).get("activeIdentityVersion", "未啟用"),
+        "voiceVersion": health.get("productionActivation", {}).get("voiceProfile", {}).get("version", "依正式設定"),
+        "provider": get_job_provider(project.get("id", "")),
+        "durationConflict": project.get("durationConflict"),
+    }
+
+
+def get_job_provider(_project_id: str) -> str:
+    return job_provider_summary()[0]
+
+
+def validate_job_payload(payload: dict) -> dict:
+    action = str(payload.get("action", "create-project"))
+    if action == "create-project":
+        return {"action": action, "validation": validate_project_submission(payload)}
+    if action not in {"render-project", "export-project", "regenerate-scene"}:
+        raise ValueError("不支援此工作類型。")
+    project_id = str(payload.get("projectId", "")).strip()
+    project = find_item(load_db()["projects"], project_id)
+    if action == "export-project" and project.get("status") not in {
+        "Approved",
+        "Ready for Preview",
+        "Completed",
+    }:
+        raise ValueError("專案尚未準備好匯出。")
+    if action == "regenerate-scene":
+        scene = find_item(project.get("scenes", []), str(payload.get("sceneId", "")))
+        if scene.get("approved"):
+            raise ValueError("此場景已核准，請先編輯或取消核准後再重產。")
+    return {"action": action, "project": project}
+
+
+def create_job(payload: dict) -> tuple[dict, bool]:
+    validation = validate_job_payload(payload)
+    idempotency_key = str(payload.get("idempotencyKey", "")).strip() or uuid.uuid4().hex
+    provider, model = job_provider_summary()
+    with DB_LOCK:
+        db = load_db()
+        existing = next(
+            (item for item in db.get("jobs", []) if item.get("idempotencyKey") == idempotency_key),
+            None,
+        )
+        if existing:
+            return dict(existing), True
+        job = {
+            "id": new_id("job"),
+            "idempotencyKey": idempotency_key,
+            "action": validation["action"],
+            "status": "queued",
+            "currentStage": "validation",
+            "lastStage": "",
+            "progress": 1,
+            "message": "工作已建立，正在等待執行。",
+            "provider": provider,
+            "model": model,
+            "projectId": str(payload.get("projectId", "")),
+            "productId": str(payload.get("productId", "")),
+            "productName": (
+                validation.get("project", {}).get("productName", "")
+                or (validation.get("validation", {}).get("product") or {}).get("name", "")
+                or (
+                    str(payload.get("textProjectName", "")).strip() or "純文字影片"
+                    if payload.get("mode") == "text-only"
+                    else ""
+                )
+            ),
+            "payload": payload,
+            "cancelRequested": False,
+            "retryCount": 0,
+            "maxRetries": 2,
+            "elapsedSeconds": 0,
+            "etaSeconds": None,
+            "result": {},
+            "error": {},
+            "stageHistory": [
+                {
+                    "stage": "validation",
+                    "progress": 1,
+                    "message": "工作已建立，正在等待執行。",
+                    "at": now_iso(),
+                }
+            ],
+            "createdAt": now_iso(),
+            "submittedAt": now_iso(),
+            "updatedAt": now_iso(),
+        }
+        db.setdefault("jobs", []).append(job)
+        save_db(db)
+    append_log(
+        "jobs.log",
+        "job-created",
+        {
+            "jobId": job["id"],
+            "action": job["action"],
+            "productId": job["productId"],
+            "idempotencyKey": idempotency_key,
+        },
+    )
+    start_job(job["id"])
+    return job, False
+
+
+def start_job(job_id: str) -> None:
+    with JOB_THREAD_LOCK:
+        thread = ACTIVE_JOB_THREADS.get(job_id)
+        if thread and thread.is_alive():
+            return
+        thread = threading.Thread(
+            target=run_job,
+            args=(job_id,),
+            name=f"tpvg-{job_id}",
+            daemon=True,
+        )
+        ACTIVE_JOB_THREADS[job_id] = thread
+        thread.start()
+
+
+def run_job(job_id: str) -> None:
+    reporter = stage_reporter(job_id)
+    try:
+        job = get_job(job_id)
+        payload = job.get("payload", {})
+        action = job.get("action", "create-project")
+        with DB_LOCK:
+            db = load_db()
+            live_job = find_item(db["jobs"], job_id)
+            live_job["startedAt"] = live_job.get("startedAt") or now_iso()
+            live_job["status"] = "running"
+            live_job["updatedAt"] = now_iso()
+            save_db(db)
+        reporter("validation", 3, "需求驗證完成。")
+        ensure_job_not_cancelled(job_id)
+
+        if action == "create-project":
+            validation = validate_project_submission(payload)
+            product_name = (
+                validation.get("product", {}).get("name")
+                if validation.get("product")
+                else str(payload.get("textProjectName", "")).strip() or "純文字影片"
+            )
+            update_job(job_id, stage="product", progress=8, message=f"已載入：{product_name}")
+            reporter("research", 14, "已整理中文需求、商品知識與品牌規則。")
+            reporter("script", 22, "正在建立腳本與內容結構。")
+            project = create_project_record(payload, validation)
+            update_job(job_id, project_id=project["id"])
+            reporter("storyboard", 32, "腳本與分鏡規劃完成。")
+            project = render_project(
+                project["id"],
+                preview=True,
+                progress_callback=reporter,
+            )
+        elif action == "render-project":
+            project = render_project(
+                str(payload.get("projectId")),
+                preview=True,
+                progress_callback=reporter,
+            )
+        elif action == "export-project":
+            reporter("editing", 89, "正在準備完整交付版本。")
+            project = export_project(
+                str(payload.get("projectId")),
+                progress_callback=reporter,
+            )
+        else:
+            reporter("storyboard", 32, "正在重建指定場景。")
+            project = regenerate_scene(
+                str(payload.get("projectId")),
+                str(payload.get("sceneId")),
+                progress_callback=reporter,
+            )
+
+        ensure_job_not_cancelled(job_id)
+        if project.get("status") == "Partially Failed":
+            message = project.get("errors", [{}])[-1].get("message", "影片生成失敗。")
+            raise RuntimeError(message)
+        update_job(
+            job_id,
+            status="completed",
+            stage="export",
+            progress=100,
+            message="工作已完成，可預覽或開啟輸出資料夾。",
+            project_id=project["id"],
+            result=job_result(project),
+        )
+        append_log(
+            "generation.log",
+            "job-completed",
+            {"jobId": job_id, "projectId": project["id"], "outputDir": project.get("outputDir")},
+        )
+    except JobCancelled:
+        cleanup_job_temporary_files(job_id)
+        update_job(
+            job_id,
+            status="cancelled",
+            message="工作已安全取消，已清理暫存處理檔。",
+        )
+    except Exception as error:
+        message = user_error(error)
+        live_job = get_job(job_id)
+        if is_retryable_failure(message) and int(live_job.get("retryCount", 0)) < int(live_job.get("maxRetries", 2)):
+            with DB_LOCK:
+                db = load_db()
+                retrying = find_item(db["jobs"], job_id)
+                retrying["retryCount"] = int(retrying.get("retryCount", 0)) + 1
+                retrying["status"] = "queued"
+                retrying["progress"] = max(1, int(retrying.get("progress", 1)) - 2)
+                retrying["message"] = f"暫時性失敗，系統將自動重試（第 {retrying['retryCount']} 次）。"
+                retrying["error"] = {
+                    "stage": retrying.get("currentStage", "unknown"),
+                    "reason": message,
+                    "suggestedAction": "系統正在自動重試，無需重新送出。",
+                    "at": now_iso(),
+                    "log": "/api/logs/jobs.log",
+                }
+                retrying["updatedAt"] = now_iso()
+                save_db(db)
+            timer = threading.Timer(1.0, start_job, args=(job_id,))
+            timer.daemon = True
+            timer.start()
+            append_log(
+                "recovery.log",
+                "job-auto-retry-scheduled",
+                {"jobId": job_id, "error": message, "retryCount": live_job.get("retryCount", 0) + 1},
+            )
+            return
+        update_job(
+            job_id,
+            status="failed",
+            message="工作失敗，請依建議處理後重試。",
+            error={
+                "stage": get_job(job_id).get("currentStage", "unknown"),
+                "reason": message,
+                "suggestedAction": suggested_action(message),
+                "at": now_iso(),
+                "log": "/api/logs/jobs.log",
+            },
+        )
+        append_log(
+            "recovery.log",
+            "job-failed",
+            {"jobId": job_id, "error": message, "stage": get_job(job_id).get("currentStage")},
+        )
+    finally:
+        with JOB_THREAD_LOCK:
+            ACTIVE_JOB_THREADS.pop(job_id, None)
+
+
+def suggested_action(message: str) -> str:
+    lowered = message.lower()
+    if "ffmpeg" in lowered:
+        return "請到設定頁確認 FFmpeg 路徑後，再按「重試工作」。"
+    if "comfy" in lowered:
+        return "請啟動 ComfyUI 並確認連線狀態，或改用可用的本機模式。"
+    if "tts" in lowered or "聲音" in message:
+        return "請檢查聲音工具狀態；內容與場景資料會保留，可直接重試。"
+    if "照片" in message or "素材" in message:
+        return "請回到商品資料庫補齊有效素材後重試。"
+    return "請查看工作紀錄；修正顯示的問題後可直接重試，不需重新建立專案。"
+
+
+def is_retryable_failure(message: str) -> bool:
+    lowered = message.lower()
+    return any(
+        token in lowered
+        for token in [
+            "timeout",
+            "timed out",
+            "temporarily",
+            "connection",
+            "連線中斷",
+            "暫時",
+            "busy",
+            "503",
+            "429",
+        ]
+    )
+
+
+def cancel_job(job_id: str) -> dict:
+    with DB_LOCK:
+        db = load_db()
+        job = find_item(db["jobs"], job_id)
+        if job.get("status") in {"completed", "failed", "cancelled"}:
+            return dict(job)
+        job["cancelRequested"] = True
+        job["status"] = "cancelling"
+        job["message"] = "正在安全取消，會在目前處理階段結束後停止。"
+        job["updatedAt"] = now_iso()
+        save_db(db)
+        return dict(job)
+
+
+def retry_job(job_id: str) -> dict:
+    with DB_LOCK:
+        db = load_db()
+        job = find_item(db["jobs"], job_id)
+        if job.get("status") not in {"failed", "cancelled"}:
+            raise ValueError("只有失敗或已取消的工作可以重試。")
+        if int(job.get("retryCount", 0)) >= int(job.get("maxRetries", 2)):
+            raise ValueError("此工作已達自動重試上限，請先依錯誤建議修正。")
+        job["retryCount"] = int(job.get("retryCount", 0)) + 1
+        job["status"] = "queued"
+        job["cancelRequested"] = False
+        job["currentStage"] = "validation"
+        job["progress"] = 1
+        job["message"] = "工作已重新排入佇列。"
+        job["error"] = {}
+        job["result"] = {}
+        job["startedAt"] = now_iso()
+        job["finishedAt"] = ""
+        job["updatedAt"] = now_iso()
+        save_db(db)
+        snapshot = dict(job)
+    start_job(job_id)
+    return snapshot
+
+
+def cleanup_job_temporary_files(job_id: str) -> None:
+    try:
+        job = get_job(job_id)
+        project_id = job.get("projectId")
+        if not project_id:
+            return
+        temp_dir = (PROJECT_ROOT / project_id / "_job_tmp").resolve()
+        if temp_dir.exists() and str(temp_dir).lower().startswith(str(PROJECT_ROOT).lower()):
+            shutil.rmtree(temp_dir)
+    except Exception as error:
+        append_log("recovery.log", "job-temp-cleanup-failed", {"jobId": job_id, "error": str(error)})
+
+
+def resume_pending_jobs() -> None:
+    with DB_LOCK:
+        db = load_db()
+        pending_ids = []
+        for job in db.get("jobs", []):
+            if job.get("status") in {"queued", "running"}:
+                job["status"] = "queued"
+                job["message"] = "伺服器重新啟動，工作已自動恢復。"
+                job["updatedAt"] = now_iso()
+                pending_ids.append(job["id"])
+            elif job.get("status") == "cancelling":
+                job["status"] = "cancelled"
+                job["message"] = "工作已在重新啟動時完成取消。"
+                job["finishedAt"] = now_iso()
+        save_db(db)
+    for job_id in pending_ids:
+        start_job(job_id)
 
 
 def create_backup() -> dict:
@@ -983,19 +1734,38 @@ def create_release_package() -> dict:
     return {"folder": str(version_dir), "archive": archive_path}
 
 
-def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
+def build_video_assets(
+    project: dict,
+    product: dict,
+    preview: bool,
+    progress_callback=None,
+) -> dict:
+    report = progress_callback or (lambda *_args, **_kwargs: None)
     config = load_config()
     if config.get("providerMode") == "production":
-        return build_real_production_assets(project, product, preview)
+        report("images", 44, "正在執行正式影像與素材流程。")
+        output = build_real_production_assets(project, product, preview)
+        report("emma", 54, "Emma 一致性與素材品質檢查完成。")
+        report("video", 66, "正式影片生成完成。")
+        report("audio", 74, "聲音同步檢查完成。")
+        report("subtitles", 82, "字幕檢查完成。")
+        report("editing", 89, "剪輯組合完成。")
+        report("render", 96, "MP4 渲染完成。")
+        return output
     ffmpeg = config.get("ffmpegPath") or detect_ffmpeg()
     if not ffmpeg or not Path(ffmpeg).exists():
         raise RuntimeError("找不到 FFmpeg，暫時無法輸出 MP4。")
     output_dir = Path(project["outputDir"])
     output_dir.mkdir(parents=True, exist_ok=True)
-    material_paths = [Path(m["path"]) for m in product.get("materials", []) if Path(m["path"]).exists()]
-    if not material_paths:
+    material_paths = [
+        Path(m["path"])
+        for m in product.get("materials", [])
+        if m.get("kind", "image") in {"image", "logo"} and Path(m["path"]).exists()
+    ]
+    if not material_paths and project.get("mode") != "text-only":
         raise RuntimeError("請先上傳至少一張商品照片。")
 
+    report("images", 44, "正在建立並評估場景影像。")
     visual_report = run_image_pipeline(
         project,
         product,
@@ -1006,7 +1776,13 @@ def build_video_assets(project: dict, product: dict, preview: bool) -> dict:
         append_log("generation.log", "visual-pipeline-quality-failed", {"projectId": project["id"], "quality": visual_report.get("quality")})
         raise RuntimeError("圖片品質檢查未通過，請調整素材後再試一次。")
 
+    report("emma", 54, "Emma 與商品視覺一致性檢查完成。")
+    report("video", 66, "正在生成並組合影片畫面。")
     video_report = run_video_generation_pipeline(project, product, output_dir, Path(project["projectDir"]), Path(ffmpeg), preview=preview)
+    report("audio", 74, "聲音軌與影片時間軸已同步。")
+    report("subtitles", 82, "字幕檔與燒錄版本已建立。")
+    report("editing", 89, "場景剪輯與轉場已完成。")
+    report("render", 96, "影片渲染與播放檢查完成。")
     target = Path(video_report["outputVideo"])
     srt_path = Path(video_report["subtitles"])
     return {
@@ -1152,7 +1928,8 @@ def write_export_package(project: dict) -> None:
     if project.get("assetIndex") and Path(project["assetIndex"]).exists():
         shutil.copyfile(project["assetIndex"], output_dir / "asset_index.json")
     (output_dir / "thumbnail_suggestion.txt").write_text(project["thumbnailSuggestion"], encoding="utf-8")
-    product = find_item(load_db()["products"], project["productId"])
+    db = load_db()
+    product = resolve_project_product(db, project)
     material_lines = [f"{m['fileName']} | {m['path']}" for m in product.get("materials", [])]
     (output_dir / "materials_used.txt").write_text("\n".join(material_lines), encoding="utf-8")
     final = output_dir / "final_video.mp4"
@@ -1173,10 +1950,33 @@ def file_url(path: Path) -> str:
             return ""
 
 
+def open_local_path(value: str) -> dict:
+    target = Path(str(value or "")).resolve()
+    allowed_roots = {
+        DATA_ROOT,
+        Path(load_config().get("outputDir") or EXPORT_ROOT).resolve(),
+        production_data_root(),
+    }
+    if not any(
+        target == root or str(target).lower().startswith(str(root).lower() + os.sep)
+        for root in allowed_roots
+    ):
+        raise ValueError("只能開啟 Temple AI Studio 的資料或輸出位置。")
+    if not target.exists():
+        raise ValueError("指定位置尚不存在。")
+    if hasattr(os, "startfile"):
+        os.startfile(str(target))  # type: ignore[attr-defined]
+    else:
+        raise RuntimeError("目前系統不支援自動開啟資料夾。")
+    return {"path": str(target), "opened": True}
+
+
 def json_response(handler: SimpleHTTPRequestHandler, payload, status: int = 200) -> None:
     body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     handler.send_response(status)
     handler.send_header("Content-Type", "application/json; charset=utf-8")
+    handler.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+    handler.send_header("Pragma", "no-cache")
     handler.send_header("Content-Length", str(len(body)))
     handler.end_headers()
     handler.wfile.write(body)
@@ -1188,6 +1988,14 @@ def read_json(handler: SimpleHTTPRequestHandler) -> dict:
         return {}
     raw = handler.rfile.read(length)
     return json.loads(raw.decode("utf-8"))
+
+
+def error_response_payload(error: Exception) -> dict:
+    payload = {"ok": False, "message": user_error(error)}
+    field_errors = getattr(error, "field_errors", None)
+    if field_errors:
+        payload["fieldErrors"] = field_errors
+    return payload
 
 
 class AppHandler(SimpleHTTPRequestHandler):
@@ -1207,6 +2015,10 @@ class AppHandler(SimpleHTTPRequestHandler):
                 return json_response(self, health_payload())
             if path == "/api/state":
                 return json_response(self, {"db": load_db(), "config": load_config(), "health": health_payload()})
+            if path.startswith("/api/jobs/"):
+                return json_response(self, {"ok": True, "job": get_job(path.rsplit("/", 1)[-1])})
+            if path.startswith("/api/logs/"):
+                return self.serve_log(path.rsplit("/", 1)[-1])
             if path.startswith("/api/files/"):
                 return self.serve_data_file(path.removeprefix("/api/files/"))
             if path.startswith("/api/output-files/"):
@@ -1224,7 +2036,7 @@ class AppHandler(SimpleHTTPRequestHandler):
                 return json_response(self, {"ok": True, "outputDir": project["outputDir"]})
             return super().do_GET()
         except Exception as error:
-            return json_response(self, {"ok": False, "message": user_error(error)}, 400)
+            return json_response(self, error_response_payload(error), 400)
 
     def do_POST(self):
         try:
@@ -1236,7 +2048,24 @@ class AppHandler(SimpleHTTPRequestHandler):
                 return json_response(self, {"ok": True, "product": create_product(payload)})
             if path.endswith("/materials") and path.startswith("/api/products/"):
                 product_id = path.split("/")[3]
-                return json_response(self, {"ok": True, **add_materials(product_id, payload.get("files", []))})
+                return json_response(
+                    self,
+                    {
+                        "ok": True,
+                        **add_materials(
+                            product_id,
+                            payload.get("files", []),
+                            payload.get("kind", ""),
+                        ),
+                    },
+                )
+            if path == "/api/jobs":
+                job, duplicate = create_job(payload)
+                return json_response(
+                    self,
+                    {"ok": True, "job": job, "duplicate": duplicate},
+                    200 if duplicate else 202,
+                )
             if path == "/api/projects":
                 return json_response(self, {"ok": True, "project": create_project(payload)})
             if path == "/api/demo/run":
@@ -1245,6 +2074,13 @@ class AppHandler(SimpleHTTPRequestHandler):
                 return json_response(self, {"ok": True, "backup": create_backup()})
             if path == "/api/restore":
                 return json_response(self, {"ok": True, **restore_backup(payload.get("file", {}), payload.get("confirm", ""))})
+            if path == "/api/open-path":
+                return json_response(self, {"ok": True, **open_local_path(payload.get("path", ""))})
+            match = re.match(r"^/api/jobs/([^/]+)/(cancel|retry)$", path)
+            if match:
+                job_id, action = match.groups()
+                job = cancel_job(job_id) if action == "cancel" else retry_job(job_id)
+                return json_response(self, {"ok": True, "job": job})
             match = re.match(r"^/api/projects/([^/]+)/(approve|export|render)$", path)
             if match:
                 project_id, action = match.groups()
@@ -1270,7 +2106,7 @@ class AppHandler(SimpleHTTPRequestHandler):
                     return json_response(self, {"ok": True, "project": regenerate_scene(project_id, scene_id)})
             return json_response(self, {"ok": False, "message": "找不到 API 路徑"}, 404)
         except Exception as error:
-            return json_response(self, {"ok": False, "message": user_error(error)}, 400)
+            return json_response(self, error_response_payload(error), 400)
 
     def do_PUT(self):
         try:
@@ -1288,7 +2124,7 @@ class AppHandler(SimpleHTTPRequestHandler):
                     return json_response(self, {"ok": True, **move_material(product_id, material_id, payload.get("direction", "down"))})
             return json_response(self, {"ok": False, "message": "找不到 API 路徑"}, 404)
         except Exception as error:
-            return json_response(self, {"ok": False, "message": user_error(error)}, 400)
+            return json_response(self, error_response_payload(error), 400)
 
     def do_DELETE(self):
         try:
@@ -1304,7 +2140,20 @@ class AppHandler(SimpleHTTPRequestHandler):
                 return json_response(self, {"ok": True, **delete_project(match.group(1))})
             return json_response(self, {"ok": False, "message": "找不到 API 路徑"}, 404)
         except Exception as error:
-            return json_response(self, {"ok": False, "message": user_error(error)}, 400)
+            return json_response(self, error_response_payload(error), 400)
+
+    def serve_log(self, name: str):
+        allowed = {"app.log", "jobs.log", "generation.log", "recovery.log", "ffmpeg-error.log"}
+        if name not in allowed:
+            self.send_error(HTTPStatus.NOT_FOUND, "Log not found")
+            return
+        target = LOG_ROOT / name
+        body = target.read_bytes() if target.exists() else b""
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
     def serve_data_file(self, rel: str):
         target = (DATA_ROOT / unquote(rel)).resolve()
@@ -1406,12 +2255,31 @@ def main() -> int:
     ensure_dirs()
     if "--smoke-test" in sys.argv:
         return smoke_test()
+    resume_pending_jobs()
     host = "127.0.0.1"
     port = int(os.environ.get("TPVG_PORT", "4173"))
     server = ThreadingHTTPServer((host, port), AppHandler)
     print(f"Temple Product Video Generator V1 running at http://{host}:{port}")
     print(f"Data: {DATA_ROOT}")
-    append_log("app.log", "server-started", {"host": host, "port": port, "dataRoot": str(DATA_ROOT), "version": VERSION})
+    db_health = database_health()
+    print(f"Database: {db_health['path']}")
+    print(
+        "Database status: "
+        f"readable={db_health['readable']} writable={db_health['writable']} "
+        f"migration={db_health['migrationStatus']} products={db_health['productCount']}"
+    )
+    append_log(
+        "app.log",
+        "server-started",
+        {
+            "host": host,
+            "port": port,
+            "dataRoot": str(DATA_ROOT),
+            "version": VERSION,
+            "database": db_health,
+            "apiHealth": "正常",
+        },
+    )
     try:
         server.serve_forever()
     except KeyboardInterrupt:

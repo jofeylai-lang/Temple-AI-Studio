@@ -1,6 +1,7 @@
 param(
   [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
   [string]$DataRoot = "D:\AI\Temple AI Studio Production Data",
+  [int]$TempleOsPort = 8766,
   [switch]$NoBrowser
 )
 
@@ -82,16 +83,16 @@ function Start-TempleProcess {
   Write-Host "$Name started with PID $($process.Id)."
 }
 
-$osArguments = "`"$osCli`" --root `"$osData`" serve --host 127.0.0.1 --port 8765"
+$osArguments = "`"$osCli`" --root `"$osData`" serve --host 127.0.0.1 --port $TempleOsPort"
 $appArguments = "`"$appServer`""
-Start-TempleProcess -Name "temple-os" -Arguments $osArguments -WorkingDirectory $ProjectRoot -Port 8765
+Start-TempleProcess -Name "temple-os" -Arguments $osArguments -WorkingDirectory $ProjectRoot -Port $TempleOsPort
 Start-TempleProcess -Name "product-video-generator" -Arguments $appArguments -WorkingDirectory (Split-Path -Parent $appServer) -Port 4173
 
 $appReady = $false
 $osReady = $false
 for ($attempt = 0; $attempt -lt 30; $attempt++) {
   $appReady = Test-LocalPort -Port 4173
-  $osReady = Test-LocalPort -Port 8765
+  $osReady = Test-LocalPort -Port $TempleOsPort
   if ($appReady -and $osReady) {
     break
   }

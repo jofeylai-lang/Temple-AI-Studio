@@ -27,7 +27,7 @@ http://127.0.0.1:4173
 正式安裝版請使用：
 
 ```text
-D:\AI\Temple Product Video Generator\start.bat
+D:\AI\Temple AI Studio\start_temple_ai_studio.bat
 ```
 
 ## 一鍵測試
@@ -62,17 +62,14 @@ C:\Program Files\Softdeluxe\Free Download Manager\ffmpeg.exe
 
 ## 操作流程
 
-1. 開啟「商品資料庫」。
-2. 建立或選擇商品。
-3. 上傳一張或多張商品照片。
-4. 排序、替換或移除照片。
-5. 開啟「建立影片」。
-6. 輸入中文影片需求。
-7. 產生內容包與影片。
-8. 前往「影片預覽」檢查影片與文案。
-9. 前往「場景細節」修改、核准或只重產單一場景。
-10. 核准完整影片。
-11. 前往「輸出」建立完整交付包。
+1. 商品影片：建立或選擇商品，並上傳至少一張照片或 Logo。
+2. 純文字影片：在「建立影片」選擇純文字模式，不需要商品或照片。
+3. 輸入繁體中文需求、平台與影片秒數。
+4. 按「送出並開始製作」後立即取得工作編號。
+5. 在「生成進度」查看後端即時進度、目前階段、時間、Provider 與錯誤處理。
+6. 工作完成後播放預覽、檢查場景、核准影片並建立完整交付包。
+
+工作狀態會保存到正式資料庫；重新整理瀏覽器或重啟程式後，未完成工作會自動恢復。
 
 ## 輸出內容
 
@@ -98,7 +95,7 @@ data\exports\<project-id>\
 正式安裝版輸出位置：
 
 ```text
-D:\AI\Temple Product Video Generator\data\exports\
+D:\AI\Temple AI Studio Production Data\applications\temple-product-video-generator\exports\
 ```
 
 ## 資料位置
@@ -112,10 +109,16 @@ apps\temple-product-video-generator\data\
 正式安裝版資料：
 
 ```text
-D:\AI\Temple Product Video Generator\data\
+D:\AI\Temple AI Studio Production Data\applications\temple-product-video-generator\
 ```
 
-`data`、`runtime`、`release` 與快取檔案不納入 Git。
+商品資料庫：
+
+```text
+D:\AI\Temple AI Studio Production Data\applications\temple-product-video-generator\database.json
+```
+
+`data`、`runtime`、`release`、logs、exports 與快取檔案不納入 Git。
 
 ## 備份與還原
 
